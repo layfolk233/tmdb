@@ -1638,16 +1638,31 @@
         const overview = d.overview || '暂无简介';
         const rating = d.vote_average != null ? d.vote_average.toFixed(1) : '?';
         const voteCount = d.vote_count || 0;
+        const popularity = d.popularity != null ? Math.round(d.popularity) : '—';
         const genres = (d.genres || []).map(g => g.name);
         const countries = (d.production_countries || []).map(c => c.name).join(', ') || '—';
         const tmdbUrl = 'https://www.themoviedb.org/' + AppState.mediaType + '/' + d.id;
         const status = d.status || '';
         const seasons = d.number_of_seasons ? d.number_of_seasons + ' 季' : '';
         const episodes = d.number_of_episodes ? d.number_of_episodes + ' 集' : '';
+        const certification = d.release_dates ? (
+            d.release_dates.results && d.release_dates.results.find(r => r.iso_3166_1 === 'US')
+            && d.release_dates.results.find(r => r.iso_3166_1 === 'US').release_dates
+            && d.release_dates.results.find(r => r.iso_3166_1 === 'US').release_dates[0]
+            ? d.release_dates.results.find(r => r.iso_3166_1 === 'US').release_dates[0].certification
+            : ''
+        ) : '';
+        const contentRatings = d.content_ratings ? (
+            d.content_ratings.results && d.content_ratings.results.find(r => r.iso_3166_1 === 'US')
+            ? d.content_ratings.results.find(r => r.iso_3166_1 === 'US').rating
+            : ''
+        ) : '';
+        const cert = certification || contentRatings || '';
 
-        const crew = d.credits || {};
-        const cast = (crew.cast || []).slice(0, 10);
-        const recs = (d.recommendations && d.recommendations.results || []).slice(0, 8);
+        // Director and writer from crew
+        const crewList = d.credits || {};
+        const director = (crewList.crew || []).filter(p => p.job === 'Director').slice(0, 2);
+        const writers = (crewList.crew || []).filter(p => p.job === 'Writer' || p.job === 'Screenplay').slice(0, 2);
 
         let castHtml = '';
         if (cast.length) {
@@ -1698,12 +1713,17 @@
                             (year ? '<span>📆 ' + year + '</span><span class="sep">|</span>' : '') +
                             (runtime ? '<span>⏱️ ' + runtime + '</span><span class="sep">|</span>' : '') +
                             (seasons ? '<span>📺 ' + seasons + (episodes ? ' · ' + episodes : '') + '</span><span class="sep">|</span>' : '') +
+                            (cert ? '<span>🔞 ' + escapeHtml(cert) + '</span><span class="sep">|</span>' : '') +
                             '<span class="modal-rating-big">⭐ ' + rating + ' <span style="font-weight:400;font-size:0.75rem;">(' + voteCount.toLocaleString() + ' 票)</span></span>' +
                         '</div>' +
                         (genres.length ? '<div class="modal-genres">' + genres.map(g => '<span class="modal-genre-tag">' + escapeHtml(g) + '</span>').join('') + '</div>' : '') +
-                        '<div class="modal-meta-row" style="margin-bottom:12px;">' +
-                            '<span>🌍 国家: ' + escapeHtml(countries) + '</span>' +
-                            (status ? '<span class="sep">|</span><span>📌 ' + escapeHtml(status) + '</span>' : '') +
+                        '<div class="modal-info-table">' +
+                            (countries ? '<div class="info-row"><span class="info-label">🌍 国家</span><span class="info-value">' + escapeHtml(countries) + '</span></div>' : '') +
+                            (status ? '<div class="info-row"><span class="info-label">📌 状态</span><span class="info-value">' + escapeHtml(status) + '</span></div>' : '') +
+                            '<div class="info-row"><span class="info-label">📅 发行日期</span><span class="info-value">' + escapeHtml(dateStr || '—') + '</span></div>' +
+                            '<div class="info-row"><span class="info-label">⭐ 流行度</span><span class="info-value">' + popularity + '</span></div>' +
+                            (director.length ? '<div class="info-row"><span class="info-label">🎬 导演</span><span class="info-value">' + director.map(p => escapeHtml(p.name)).join('、') + '</span></div>' : '') +
+                            (writers.length ? '<div class="info-row"><span class="info-label">✍️ 编剧</span><span class="info-value">' + writers.map(p => escapeHtml(p.name)).join('、') + '</span></div>' : '') +
                         '</div>' +
                     '</div>' +
                 '</div>' +
