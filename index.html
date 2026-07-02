@@ -459,35 +459,37 @@
            ============================================================ */
         .hero-section {
             display:flex; align-items:center; justify-content:center;
-            min-height:60vh; text-align:center;
-            padding:var(--space-2xl);
+            min-height:45vh; text-align:center;
+            padding:0;
         }
         .hero-section.hidden { display:none; }
         .hero-content {
-            max-width:480px;
+            max-width:460px;
+            display:flex; flex-direction:column; align-items:center;
         }
-        .hero-icon { font-size:4rem; margin-bottom:var(--space-md); }
+        .hero-icon { font-size:2.5rem; margin-bottom:8px; }
         .hero-title {
-            font-size:2.4rem; font-weight:800; letter-spacing:-0.03em;
+            font-size:1.8rem; font-weight:800; letter-spacing:-0.03em;
             background:var(--accent-gradient);
             -webkit-background-clip:text; background-clip:text;
-            color:transparent; margin-bottom:var(--space-sm);
+            color:transparent; margin-bottom:8px;
         }
         .hero-slogan {
-            font-size:1.15rem; color:var(--text-secondary);
-            margin-bottom:var(--space-md); font-weight:500;
+            font-size:0.9rem; color:var(--text-secondary);
+            margin-bottom:8px; font-weight:500;
         }
         .hero-desc {
-            font-size:1.5rem; color:var(--text-muted);
-            margin-bottom:var(--space-xl); line-height:1.0;
+            font-size:1.85rem; color:var(--text-muted);
+            margin-bottom:4px; line-height:1.4;
         }
         .hero-start {
-            padding:14px 48px; border-radius:var(--radius-full);
+            padding:8px 24px; border-radius:var(--radius-full);
             border:none; background:var(--accent); color:#fff;
-            font-size:2.05rem; font-weight:700;
+            font-size:1.9rem; font-weight:700;
             transition:var(--transition-fast); cursor:pointer;
+            margin-top:8px;
         }
-        .hero-start:hover { background:var(--accent-hover); box-shadow:0 6px 20px var(--accent-glow); transform:translateY(-2px); }
+        .hero-start:hover { background:var(--accent-hover); box-shadow:0 6px 20px var(--accent-glow); transform:translateY(-1px); }
 
         /* ============================================================
            CONTENT AREA — RESULTS
@@ -944,7 +946,7 @@
                 <div class="genre-chips" id="genreChips">加载中...</div>
                 <div class="filter-section filter-row-inline">
                     <label class="filter-label">📆 年份</label>
-                    <input type="number" class="filter-input" id="yearInput" placeholder="2024" min="1900" max="2030">
+                    <input type="number" class="filter-input" id="yearInput" placeholder="2026" min="1900" max="2030">
                 </div>
                 <div class="filter-section">
                     <label class="filter-label" id="dateLabel">🗓️ 日期范围</label>
@@ -991,9 +993,9 @@
             <!-- Hero section (shown on first visit before data loads) -->
             <div class="hero-section" id="heroSection">
                 <div class="hero-content">
-                    <p class="hero-desc">发现你喜爱的电影与电视剧</p>
-                    <p class="hero-desc">强大的筛选与推荐引擎</p>
-                    <button class="hero-start" id="btnHeroStart">开始探索</button>
+                    <p class="hero-desc" style="white-space:nowrap;">强大的筛选与推荐引擎</p>
+                    <p class="hero-desc" style="white-space:nowrap;">发现你喜爱的影视剧</p>
+                    <button class="hero-start" id="btnHeroStart" style="margin-top:12px;">开始探索</button>
                 </div>
             </div>
             <div class="results-header" id="resultsHeader" style="display:none;">
