@@ -1,0 +1,2337 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>影觅 · 让好作品不再隐秘</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* ============================================================
+           DESIGN TOKENS — DARK THEME (default)
+           ============================================================ */
+        :root {
+            --bg-primary: #181e2a;
+            --bg-secondary: #1e2535;
+            --bg-tertiary: #252d40;
+            --bg-card: #1c2333;
+            --bg-card-hover: #242c42;
+            --bg-modal: #1a2130;
+            --bg-input: #1a2130;
+            --bg-chip: #252d40;
+            --bg-chip-active: #2a3d60;
+            --bg-skeleton: #252d40;
+            --bg-skeleton-shine: #2e3a52;
+            --bg-header: rgba(30,37,53,0.92);
+            --bg-toolbar: #1a2130;
+            --bg-toolbar-btn: #252d40;
+            --bg-toolbar-btn-text: #94a3b8;
+            --bg-toolbar-btn-active: #3b82f6;
+            --bg-toolbar-btn-active-text: #fff;
+
+            --border-subtle: #2a3448;
+            --border-medium: #364462;
+            --border-accent: #40507a;
+
+            --text-primary: #eef2f8;
+            --text-secondary: #a8b5c8;
+            --text-muted: #7a8aa0;
+            --text-slogan: #6a7a94;
+
+            --accent: #3b82f6;
+            --accent-hover: #5590f7;
+            --accent-glow: rgba(59,130,246,0.3);
+            --accent-gradient: linear-gradient(135deg, #6aa0fa, #3b82f6);
+
+            --rating-gold: #f5a623;
+            --rating-bg: rgba(245,166,35,0.2);
+
+            --error: #ef4444;
+            --error-bg: rgba(239,68,68,0.12);
+            --success: #22c55e;
+            --success-bg: rgba(34,197,94,0.12);
+
+            --shadow-card: 0 4px 16px rgba(0,0,0,0.4);
+            --shadow-modal: 0 8px 48px rgba(0,0,0,0.7);
+
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            --space-2xl: 48px;
+
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            --radius-full: 9999px;
+
+            --transition-fast: 0.15s ease;
+            --transition-smooth: 0.25s cubic-bezier(0.4,0,0.2,1);
+
+            --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+
+            --header-h: 52px;
+            --toolbar-h: 48px;
+
+            --filter-width: 350px;/*筛选面板宽度*/
+        }
+
+        /* ============================================================
+           LIGHT THEME
+           ============================================================ */
+        [data-theme="light"] {
+            --bg-primary: #f0f2f6;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #e6e9ef;
+            --bg-card: #ffffff;
+            --bg-card-hover: #e8edf7;
+            --bg-modal: #ffffff;
+            --bg-input: #f2f4f8;
+            --bg-chip: #e4e8ef;
+            --bg-chip-active: #cddbff;
+            --bg-skeleton: #e6e9ef;
+            --bg-skeleton-shine: #d8dce5;
+            --bg-header: rgba(255,255,255,0.94);
+            --bg-toolbar: #e8ebf0;
+            --bg-toolbar-btn: #dce0e7;
+            --bg-toolbar-btn-text: #3a4050;
+            --bg-toolbar-btn-active: #3b82f6;
+            --bg-toolbar-btn-active-text: #fff;
+
+            --border-subtle: #d4d9e0;
+            --border-medium: #bcc3ce;
+            --border-accent: #a0abb8;
+
+            --text-primary: #14181f;
+            --text-secondary: #3d4658;
+            --text-muted: #7a8498;
+            --text-slogan: #7a8498;
+
+            --accent: #2563eb;
+            --accent-hover: #1d4ed8;
+            --accent-glow: rgba(37,99,235,0.18);
+
+            --rating-gold: #c97a0e;
+            --rating-bg: rgba(201,122,14,0.12);
+
+            --error: #dc2626;
+            --error-bg: rgba(220,38,38,0.08);
+            --success: #16a34a;
+            --success-bg: rgba(22,163,74,0.08);
+
+            --shadow-card: 0 2px 8px rgba(0,0,0,0.06);
+            --shadow-modal: 0 8px 40px rgba(0,0,0,0.1);
+        }
+
+        /* ============================================================
+           RESET & BASE
+           ============================================================ */
+        *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+        html { scroll-behavior:smooth; -webkit-font-smoothing:antialiased; }
+        body {
+            background:var(--bg-primary);
+            color:var(--text-primary);
+            font-family:var(--font-sans);
+            line-height:1.5;
+            min-height:100vh;
+            overflow-x:hidden;
+            transition:background var(--transition-smooth), color var(--transition-smooth);
+        }
+        body.modal-open { overflow:hidden; }
+        a { color:var(--accent); text-decoration:none; }
+        a:hover { text-decoration:underline; }
+        button { cursor:pointer; font-family:inherit; }
+        input,select { font-family:inherit; }
+        img { max-width:100%; display:block; }
+        ::-webkit-scrollbar { width:6px; }
+        ::-webkit-scrollbar-track { background:var(--bg-primary); }
+        ::-webkit-scrollbar-thumb { background:var(--border-accent); border-radius:3px; }
+
+        /* ============================================================
+           HEADER BAR
+           ============================================================ */
+        .app-header {
+            position:sticky; top:0; z-index:100;
+            background:var(--bg-header);
+            border-bottom:1px solid var(--border-subtle);
+            height:var(--header-h);
+            display:flex; align-items:center; justify-content:space-between;
+            padding:0 var(--space-lg);
+            backdrop-filter:blur(14px);
+            -webkit-backdrop-filter:blur(14px);
+            transition:background var(--transition-smooth), border var(--transition-smooth);
+        }
+        .header-left {
+            display:flex; align-items:baseline; gap:12px;
+            flex:1 1 auto;
+        }
+        .header-right {
+            display:flex; align-items:center; gap:var(--space-sm);
+            flex:0 0 auto;
+        }
+        .logo {
+            font-size:1.2rem; font-weight:800; letter-spacing:-0.02em;
+            background:var(--accent-gradient);
+            -webkit-background-clip:text; background-clip:text;
+            color:transparent; white-space:nowrap;
+        }
+        .slogan {
+            font-size:0.95rem; color:var(--text-slogan);
+            white-space:nowrap; display:block;
+            transition:color var(--transition-smooth);
+        }
+
+        /* Theme toggle */
+        .theme-toggle, .resp-toggle {
+            width:36px; height:36px; border-radius:50%;
+            border:1px solid var(--border-subtle);
+            background:var(--bg-toolbar); color:var(--text-secondary);
+            font-size:1.05rem;
+            display:flex; align-items:center; justify-content:center;
+            transition:var(--transition-fast);
+            flex-shrink:0;
+        }
+        .theme-toggle:hover, .resp-toggle:hover {
+            border-color:var(--border-medium); color:var(--text-primary);
+        }
+        .resp-toggle.active {
+            background:var(--bg-toolbar-btn-active);
+            border-color:var(--bg-toolbar-btn-active);
+            color:var(--bg-toolbar-btn-active-text);
+        }
+
+        /* ============================================================
+           TOOLBAR
+           ============================================================ */
+        .toolbar {
+            background:var(--bg-toolbar);
+            border-bottom:1px solid var(--border-subtle);
+            height:var(--toolbar-h);
+            display:flex; align-items:center; justify-content:space-between;
+            padding:0 var(--space-lg);
+            gap:var(--space-sm);
+            transition:background var(--transition-smooth), border var(--transition-smooth);
+            position:sticky; top:var(--header-h); z-index:90;
+        }
+        .toolbar-left { display:flex; align-items:center; gap:var(--space-sm); flex:0 0 auto; }
+        .toolbar-center { display:flex; align-items:center; justify-content:center; flex:1 1 auto; }
+        .toolbar-right { display:flex; align-items:center; gap:var(--space-sm); flex:0 0 auto; }
+
+        /* Pill button style */
+        .pill-btn {
+            display:inline-flex; align-items:center; gap:4px;
+            padding:5px 14px; border-radius:var(--radius-full);
+            border:1px solid var(--border-subtle);
+            background:var(--bg-toolbar-btn); color:var(--text-secondary);
+            font-size:0.78rem; font-weight:500;
+            transition:var(--transition-fast);
+            white-space:nowrap; height:30px;
+        }
+        .pill-btn:hover { border-color:var(--border-medium); color:var(--text-primary); }
+        .pill-btn .icon { font-size:0.9rem; line-height:1; }
+        .pill-btn.active { background:var(--bg-toolbar-btn-active); color:var(--bg-toolbar-btn-active-text); border-color:var(--bg-toolbar-btn-active); }
+
+        /* Pill toggle group */
+        .pill-toggle {
+            display:flex; border-radius:var(--radius-full);
+            border:1px solid var(--border-subtle);
+            overflow:hidden; height:30px;
+        }
+        .pill-toggle .pill-btn {
+            border:none; border-radius:0;
+            background:transparent;
+        }
+        .pill-toggle .pill-btn:first-child {
+            border-radius:var(--radius-full) 0 0 var(--radius-full);
+        }
+        .pill-toggle .pill-btn:last-child {
+            border-radius:0 var(--radius-full) var(--radius-full) 0;
+        }
+        /* Only 2 sub-pills: both get full half-pill rounding */
+        .pill-toggle .pill-btn.sub-pill:first-child {
+            border-radius:var(--radius-full) 0 0 var(--radius-full);
+        }
+        .pill-toggle .pill-btn.sub-pill:last-child {
+            border-radius:0 var(--radius-full) var(--radius-full) 0;
+        }
+        .pill-toggle .pill-btn.active {
+            background:var(--bg-toolbar-btn-active);
+            color:var(--bg-toolbar-btn-active-text);
+            border-color:var(--bg-toolbar-btn-active);
+        }
+        /* Smaller pills inside toggle */
+        .pill-toggle .pill-btn.sub-pill {
+            padding:5px 10px;
+            font-size:0.75rem;
+        }
+
+        /* ============================================================
+           MAIN LAYOUT
+           ============================================================ */
+        .app-layout {
+            display:flex;
+            min-height:calc(100vh - var(--header-h) - var(--toolbar-h));
+        }
+        body.phone-mode .app-layout {
+            max-width:480px; margin:0 auto;
+        }
+        .content-area {
+            flex:1; padding:var(--space-lg);
+            display:flex; flex-direction:column;
+            gap:var(--space-md);
+            min-width:0;
+        }
+
+        /* ============================================================
+           FILTER SIDEBAR — desktop fixed sidebar
+           ============================================================ */
+        .filter-sidebar {
+            width:var(--filter-width); min-width:320px;
+            background:var(--bg-secondary);
+            border-right:1px solid var(--border-subtle);
+            padding:var(--space-lg);
+            overflow-y:auto;
+            max-height:calc(100vh - var(--header-h) - var(--toolbar-h));
+            position:sticky; top:calc(var(--header-h) + var(--toolbar-h));
+            display:flex; flex-direction:column; gap:var(--space-md);
+            transition:background var(--transition-smooth), border var(--transition-smooth);
+        }
+        .filter-sidebar-header { display:none !important; }
+        .filter-overlay { display:none; }
+
+        /* Narrow/phone: sidebar slides in as drawer */
+        @media (max-width:1023px) {
+            .filter-sidebar {
+                position:fixed; top:0; left:0; bottom:0; z-index:85;
+                width:var(--filter-width); max-width:85vw;
+                transform:translateX(-100%);
+                margin-top:0 !important;
+                max-height:100vh;
+                padding-top:calc(var(--header-h) + var(--toolbar-h) + var(--space-lg));
+                transition:transform 0.3s ease, background var(--transition-smooth), border var(--transition-smooth);
+            }
+            .filter-sidebar.open { transform:translateX(0); }
+            .filter-overlay {
+                display:none; position:fixed; inset:0; top:0; z-index:80;
+                background:rgba(0,0,0,0.4);
+            }
+            .filter-overlay.open { display:block; }
+        }
+
+        /* Phone-mode simulation (📱 toggle on wide screens): same as narrow */
+        body.phone-mode .filter-sidebar {
+            position:fixed; top:0; left:0; bottom:0; z-index:85;
+            width:var(--filter-width); max-width:85vw;
+            transform:translateX(-100%);
+            margin-top:0 !important;
+            max-height:100vh;
+            padding-top:calc(var(--header-h) + var(--toolbar-h) + var(--space-lg));
+            transition:transform 0.3s ease, background var(--transition-smooth), border var(--transition-smooth);
+        }
+        body.phone-mode .filter-sidebar.open { transform:translateX(0); }
+        body.phone-mode .filter-sidebar-header { display:none !important; }
+        body.phone-mode .filter-overlay {
+            display:none; position:fixed; inset:0; top:0; z-index:80;
+            background:rgba(0,0,0,0.4);
+        }
+        body.phone-mode .filter-overlay.open { display:block; }
+
+        .filter-section { display:flex; flex-direction:column; gap:var(--space-xs); }
+        .filter-label {
+            font-size:0.75rem; font-weight:600; text-transform:uppercase;
+            letter-spacing:0.05em; color:var(--text-muted);
+            transition:color var(--transition-smooth);
+        }
+        .filter-select, .filter-input {
+            width:100%; padding:8px 12px; border-radius:var(--radius-sm);
+            border:1px solid var(--border-subtle);
+            background:var(--bg-input); color:var(--text-primary);
+            font-size:0.85rem; transition:var(--transition-fast);
+        }
+        .filter-input::placeholder {/* 输入框提示字符 */
+            color: #909090;      /* 文字颜色 */
+            font-size: 0.75rem;             /* 字号 */
+            font-weight: 400;              /* 粗细 */
+            opacity: 0.7;                  /* 透明度 */
+            font-style: normal;            /* 去掉浏览器默认斜体 */
+            letter-spacing: 0.5px;         /* 字间距（可选） */
+        }
+        .filter-select:focus, .filter-input:focus {
+            outline:none; border-color:var(--accent);
+            box-shadow:0 0 0 3px var(--accent-glow);
+        }
+        .filter-select { cursor:pointer; }
+
+        .filter-row { display:flex; gap:var(--space-sm); align-items: center; width: 100%; }
+        .filter-row .filter-input { flex:1; }
+        .filter-row-inline { display:flex; flex-direction:row; align-items:center; gap:var(--space-sm); }
+        .filter-row-inline .filter-label { white-space:nowrap; flex-shrink:0; }
+        .filter-row-inline .filter-input { flex:1; min-width:0; }
+
+        .genre-chips { display:flex; flex-wrap:wrap; gap:6px; padding:2px 0; }
+        .genre-chip {
+            padding:5px 12px; border-radius:var(--radius-full);
+            border:1px solid var(--border-subtle);
+            background:var(--bg-chip); color:var(--text-secondary);
+            font-size:0.75rem; font-weight:500; cursor:pointer;
+            transition:var(--transition-fast);
+            white-space:nowrap;
+        }
+        .genre-chip:hover { border-color:var(--border-medium); color:var(--text-primary); }
+        .genre-chip.active {
+            background:var(--bg-chip-active); border-color:var(--accent);
+            color:var(--accent);
+        }
+
+        .provider-chips { display:flex; flex-wrap:wrap; gap:6px; }
+        .provider-chip {
+            padding:5px 10px; border-radius:var(--radius-full);
+            border:1px solid var(--border-subtle);
+            background:var(--bg-chip); color:var(--text-secondary);
+            font-size:0.7rem; font-weight:500; cursor:pointer;
+            transition:var(--transition-fast);
+        }
+        .provider-chip:hover { border-color:var(--border-medium); }
+        .provider-chip.active {
+            background:var(--bg-chip-active); border-color:var(--accent);
+            color:var(--accent);
+        }
+
+        .btn-primary {
+            width:100%; padding:10px; border-radius:var(--radius-md); border:none;
+            background:var(--accent); color:#fff;
+            font-size:0.85rem; font-weight:600;
+            transition:var(--transition-fast);
+        }
+        .btn-primary:hover { background:var(--accent-hover); box-shadow:0 4px 12px var(--accent-glow); }
+        .btn-secondary {
+            width:100%; padding:10px; border-radius:var(--radius-md);
+            border:1px solid var(--border-subtle);
+            background:transparent; color:var(--text-secondary);
+            font-size:0.85rem; font-weight:500;
+            transition:var(--transition-fast);
+        }
+        .btn-secondary:hover { border-color:var(--border-medium); color:var(--text-primary); }
+
+        /* Filter top bar — frozen at top */
+        .filter-top-bar {
+            display:flex; gap:8px;
+            position:sticky; top:0; z-index:2;
+            background:var(--bg-secondary);
+            padding:0 0 8px 0;
+            flex-shrink:0;
+        }
+        .filter-top-bar .btn-primary {
+            flex:1; padding:9px; border-radius:var(--radius-md); border:none;
+            background:var(--accent); color:#fff;
+            font-size:0.85rem; font-weight:600;
+            transition:var(--transition-fast);
+        }
+        .filter-top-bar .btn-primary:hover { background:var(--accent-hover); }
+        .filter-top-bar .btn-secondary {
+            flex:0 0 90px; width:90px; padding:9px; border-radius:var(--radius-md);
+            border:1px solid var(--border-subtle);
+            background:transparent; color:var(--text-secondary);
+            font-size:0.85rem; font-weight:500;
+            transition:var(--transition-fast);
+        }
+        .filter-top-bar .btn-secondary:hover { border-color:var(--border-medium); color:var(--text-primary); }
+
+        /* Section divider — colored background block */
+        .filter-section-divider {
+            border:none; height:1px;
+            background:var(--border-subtle);
+            margin:4px 0; flex-shrink:0;
+        }
+        .filter-group {
+            background:var(--bg-tertiary);
+            border-radius:var(--radius-md);
+            padding:var(--space-md);
+            display:flex; flex-direction:column; gap:var(--space-sm);
+            margin:2px 0;
+        }
+
+        /* ============================================================
+           HERO SECTION
+           ============================================================ */
+        .hero-section {
+            display:flex; align-items:center; justify-content:center;
+            min-height:60vh; text-align:center;
+            padding:var(--space-2xl);
+        }
+        .hero-section.hidden { display:none; }
+        .hero-content {
+            max-width:480px;
+        }
+        .hero-icon { font-size:4rem; margin-bottom:var(--space-md); }
+        .hero-title {
+            font-size:2.4rem; font-weight:800; letter-spacing:-0.03em;
+            background:var(--accent-gradient);
+            -webkit-background-clip:text; background-clip:text;
+            color:transparent; margin-bottom:var(--space-sm);
+        }
+        .hero-slogan {
+            font-size:1.15rem; color:var(--text-secondary);
+            margin-bottom:var(--space-md); font-weight:500;
+        }
+        .hero-desc {
+            font-size:1.5rem; color:var(--text-muted);
+            margin-bottom:var(--space-xl); line-height:1.0;
+        }
+        .hero-start {
+            padding:14px 48px; border-radius:var(--radius-full);
+            border:none; background:var(--accent); color:#fff;
+            font-size:2.05rem; font-weight:700;
+            transition:var(--transition-fast); cursor:pointer;
+        }
+        .hero-start:hover { background:var(--accent-hover); box-shadow:0 6px 20px var(--accent-glow); transform:translateY(-2px); }
+
+        /* ============================================================
+           CONTENT AREA — RESULTS
+           ============================================================ */
+        .results-header {
+            display:flex; align-items:center; justify-content:space-between;
+            flex-wrap:wrap; gap:var(--space-sm);
+        }
+        .results-count { font-size:0.9rem; color:var(--text-secondary); transition:color var(--transition-smooth); }
+        .results-count strong { color:var(--text-primary); }
+        .active-filters {
+            display:flex; flex-wrap:wrap; gap:6px; align-items:center;
+        }
+        .filter-tag {
+            display:inline-flex; align-items:center; gap:4px;
+            padding:3px 10px; border-radius:var(--radius-full);
+            background:var(--bg-chip-active); color:var(--accent);
+            font-size:0.7rem; font-weight:500;
+            transition:background var(--transition-smooth), color var(--transition-smooth);
+        }
+        .filter-tag-remove {
+            cursor:pointer; opacity:0.7; font-size:0.85rem; line-height:1;
+        }
+        .filter-tag-remove:hover { opacity:1; }
+
+        /* ============================================================
+           LIST VIEW
+           ============================================================ */
+        .card-list { display:grid; grid-template-columns:1fr; gap:var(--space-sm); }
+        @media (min-width:1024px) {
+            .card-list { grid-template-columns:1fr 1fr; }
+        }
+        .card-list-item {
+            display:flex; gap:var(--space-md);
+            background:var(--bg-card); border:1px solid var(--border-subtle);
+            border-radius:var(--radius-lg); padding:var(--space-md);
+            cursor:pointer; transition:var(--transition-smooth);
+            contain:content;
+            box-shadow:var(--shadow-card);
+        }
+        .card-list-item:hover {
+            background:var(--bg-card-hover);
+            border-color:var(--border-medium);
+            transform:translateX(4px);
+        }
+        .card-list-idx {
+            font-size:0.8rem; font-weight:600;
+            color:var(--text-muted); margin-right:4px;
+        }
+        .card-list-poster {
+            width:80px; height:120px; border-radius:var(--radius-sm);
+            object-fit:cover; flex-shrink:0; background:var(--bg-tertiary);
+        }
+        .card-list-poster-placeholder {
+            width:80px; height:120px; border-radius:var(--radius-sm);
+            flex-shrink:0; background:var(--bg-tertiary);
+            display:flex; align-items:center; justify-content:center;
+            font-size:1.2rem; color:var(--text-muted);
+        }
+        .card-list-info { flex:1; min-width:0; display:flex; flex-direction:column; gap:4px; justify-content:center; }
+        .card-list-title { font-weight:700; font-size:1rem; color:var(--text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .card-list-meta { display:flex; flex-wrap:wrap; gap:8px; align-items:center; font-size:0.8rem; color:var(--text-secondary); }
+        .card-list-meta span { white-space:nowrap; }
+        .card-list-rating {
+            display:inline-flex; align-items:center; gap:3px;
+            background:var(--rating-bg); color:var(--rating-gold);
+            padding:2px 8px; border-radius:var(--radius-full);
+            font-weight:700; font-size:0.78rem;
+        }
+        .card-list-genres { display:flex; flex-wrap:wrap; gap:4px; }
+        .card-list-genre-tag {
+            font-size:0.68rem; padding:1px 8px; border-radius:var(--radius-full);
+            border:1px solid var(--border-subtle); color:var(--text-muted);
+            white-space:nowrap;
+        }
+        .card-list-overview {
+            font-size:0.8rem; color:var(--text-muted);
+            display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical;
+            overflow:hidden; line-height:1.4;
+        }
+        /* Detail meta row — fixed-width label/value pairs */
+        .detail-meta-row {
+            display:flex; flex-wrap:wrap; gap:4px 8px;
+            font-size:0.72rem; color:var(--text-secondary);
+            margin:3px 0 2px;
+        }
+        .detail-meta-item {
+            display:inline-flex; align-items:center; gap:2px;
+            white-space:nowrap; margin-right:4px;
+        }
+        .detail-meta-label {
+            color:var(--text-muted); min-width:16px; text-align:center;
+        }
+        .detail-meta-value {
+            color:var(--text-secondary);
+            min-width:30px;
+        }
+        @media (max-width:768px) {
+            .card-list-overview { -webkit-line-clamp:3; }
+        }
+
+        /* ============================================================
+           GRID VIEW
+           ============================================================ */
+        .card-grid {
+            display:grid;
+            grid-template-columns:repeat(auto-fill, minmax(165px, 1fr));
+            gap:var(--space-md);
+        }
+        .card-grid-item {
+            background:var(--bg-card); border:1px solid var(--border-subtle);
+            border-radius:var(--radius-lg); overflow:hidden;
+            cursor:pointer; transition:var(--transition-smooth);
+            contain:content; box-shadow:var(--shadow-card);
+        }
+        .card-grid-item:hover {
+            transform:translateY(-4px);
+            border-color:var(--border-medium);
+            box-shadow:0 8px 24px rgba(0,0,0,0.25);
+        }
+        .card-grid-poster-wrap { position:relative; aspect-ratio:2/3; overflow:hidden; background:var(--bg-tertiary); }
+        .card-grid-poster { width:100%; height:100%; object-fit:cover; transition:transform 0.3s ease; }
+        .card-grid-item:hover .card-grid-poster { transform:scale(1.05); }
+        .card-grid-rating {
+            position:absolute; top:8px; right:8px;
+            background:rgba(0,0,0,0.75); color:var(--rating-gold);
+            padding:3px 8px; border-radius:var(--radius-full);
+            font-size:0.72rem; font-weight:700;
+            backdrop-filter:blur(4px);
+        }
+        .card-grid-index {
+            position:absolute; top:8px; left:8px; z-index:1;
+            background:rgba(0,0,0,0.7); color:#fff;
+            width:22px; height:22px; border-radius:50%;
+            font-size:0.68rem; font-weight:700;
+            display:flex; align-items:center; justify-content:center;
+        }
+        .card-grid-info { padding:10px 12px 12px; }
+        .card-grid-title {
+            font-weight:600; font-size:0.85rem; color:var(--text-primary);
+            white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+        }
+        .card-grid-year { font-size:0.72rem; color:var(--text-secondary); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+        /* ============================================================
+           PAGINATION
+           ============================================================ */
+        .pagination {
+            display:flex; align-items:center; justify-content:center; gap:var(--space-xs);
+            padding:var(--space-md) 0;
+        }
+        .page-btn {
+            min-width:36px; height:36px; border-radius:var(--radius-sm);
+            border:1px solid var(--border-subtle);
+            background:var(--bg-card); color:var(--text-secondary);
+            font-size:0.85rem; font-weight:500;
+            display:flex; align-items:center; justify-content:center;
+            transition:var(--transition-fast); padding:0 10px;
+        }
+        .page-btn:hover:not(:disabled):not(.active) {
+            border-color:var(--border-medium); color:var(--text-primary);
+        }
+        .page-btn.active {
+            background:var(--accent); border-color:var(--accent); color:#fff;
+            box-shadow:0 2px 8px var(--accent-glow);
+        }
+        .page-btn:disabled { opacity:0.35; cursor:default; }
+        .page-ellipsis { color:var(--text-muted); padding:0 4px; }
+
+        /* ============================================================
+           DETAIL MODAL
+           ============================================================ */
+        .modal-overlay {
+            position:fixed; inset:0; z-index:200;
+            background:rgba(0,0,0,0.8); backdrop-filter:blur(8px);
+            display:none; align-items:center; justify-content:center;
+            padding:var(--space-lg);
+        }
+        .modal-overlay.open { display:flex; }
+        .modal-content {
+            background:var(--bg-modal); border:1px solid var(--border-medium);
+            border-radius:var(--radius-xl); max-width:800px; width:100%;
+            max-height:90vh; overflow-y:auto; position:relative;
+            animation:modalIn 0.3s ease; box-shadow:var(--shadow-modal);
+        }
+        @keyframes modalIn {
+            from { opacity:0; transform:scale(0.95) translateY(20px); }
+            to { opacity:1; transform:scale(1) translateY(0); }
+        }
+        .modal-close {
+            position:sticky; top:12px; float:right; z-index:10;
+            width:36px; height:36px; border-radius:50%;
+            border:none; background:rgba(0,0,0,0.6);
+            color:#fff; font-size:1.2rem;
+            display:flex; align-items:center; justify-content:center;
+            margin-right:12px;
+        }
+        .modal-close:hover { background:rgba(255,255,255,0.15); }
+        .modal-backdrop-wrap {
+            position:relative; width:100%; height:250px; overflow:hidden;
+            border-radius:var(--radius-xl) var(--radius-xl) 0 0;
+        }
+        .modal-backdrop {
+            width:100%; height:100%; object-fit:cover;
+        }
+        .modal-backdrop-gradient {
+            position:absolute; inset:0;
+            background:linear-gradient(to top, var(--bg-modal) 0%, transparent 60%);
+        }
+        .modal-body { padding:var(--space-lg); margin-top:-60px; position:relative; }
+        .modal-poster-row { display:flex; gap:var(--space-lg); align-items:flex-start; }
+        .modal-poster {
+            width:180px; border-radius:var(--radius-md);
+            box-shadow:0 8px 32px rgba(0,0,0,0.5); flex-shrink:0;
+        }
+        .modal-info { flex:1; min-width:0; }
+        .modal-title { font-size:1.6rem; font-weight:800; line-height:1.2; }
+        .modal-tagline { font-size:0.9rem; color:var(--text-muted); font-style:italic; margin:4px 0 12px; }
+        .modal-meta-row {
+            display:flex; flex-wrap:wrap; gap:var(--space-sm); align-items:center;
+            font-size:0.85rem; color:var(--text-secondary); margin-bottom:12px;
+        }
+        .modal-meta-row .sep { color:var(--text-muted); }
+        .modal-rating-big {
+            display:inline-flex; align-items:center; gap:6px;
+            background:var(--rating-bg); color:var(--rating-gold);
+            padding:6px 14px; border-radius:var(--radius-full);
+            font-weight:700; font-size:1.1rem;
+        }
+        .modal-genres { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:16px; }
+        .modal-genre-tag {
+            padding:4px 12px; border-radius:var(--radius-full);
+            border:1px solid var(--border-medium); color:var(--text-secondary);
+            font-size:0.78rem;
+        }
+        .modal-overview-title { font-weight:700; margin-bottom:6px; font-size:0.95rem; }
+        .modal-overview { font-size:0.9rem; color:var(--text-secondary); line-height:1.7; margin-bottom:20px; }
+        .modal-section { margin-bottom:20px; }
+        .modal-section-title { font-weight:700; font-size:0.95rem; margin-bottom:10px; display:flex; align-items:center; gap:6px; }
+        .cast-grid { display:flex; gap:12px; overflow-x:auto; padding-bottom:8px; }
+        .cast-card {
+            flex-shrink:0; width:100px; text-align:center;
+        }
+        .cast-photo {
+            width:72px; height:72px; border-radius:50%; object-fit:cover;
+            margin:0 auto 6px; background:var(--bg-tertiary);
+        }
+        .cast-photo-placeholder {
+            width:72px; height:72px; border-radius:50%; margin:0 auto 6px;
+            background:var(--bg-tertiary);
+            display:flex; align-items:center; justify-content:center;
+            font-size:1.5rem; color:var(--text-muted);
+        }
+        .cast-name { font-size:0.75rem; font-weight:600; color:var(--text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .cast-character { font-size:0.68rem; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .recs-grid { display:flex; gap:10px; overflow-x:auto; padding-bottom:8px; }
+        .rec-card {
+            flex-shrink:0; width:130px; cursor:pointer;
+            transition:var(--transition-fast);
+        }
+        .rec-card:hover { transform:translateY(-3px); }
+        .rec-poster {
+            width:100%; aspect-ratio:2/3; object-fit:cover;
+            border-radius:var(--radius-sm); background:var(--bg-tertiary);
+        }
+        .rec-title { font-size:0.72rem; font-weight:600; margin-top:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .rec-rating { font-size:0.68rem; color:var(--rating-gold); }
+        .modal-tmdb-link {
+            display:inline-flex; align-items:center; gap:6px;
+            padding:8px 16px; border-radius:var(--radius-md);
+            background:var(--accent); color:#fff; font-size:0.85rem; font-weight:600;
+            transition:var(--transition-fast); margin-top:8px;
+        }
+        .modal-tmdb-link:hover { background:var(--accent-hover); text-decoration:none; }
+
+        /* Modal info table */
+        .modal-info-table {
+            margin:12px 0 0;
+            display:flex; flex-direction:column; gap:4px;
+        }
+        .info-row {
+            display:flex; align-items:center;
+            font-size:0.82rem; line-height:1.6;
+        }
+        .info-label {
+            color:var(--text-muted); min-width:68px; flex-shrink:0;
+        }
+        .info-value {
+            color:var(--text-secondary);
+        }
+
+        /* ============================================================
+           LOADING SKELETONS
+           ============================================================ */
+        @keyframes shimmer {
+            0% { background-position:-400px 0; }
+            100% { background-position:400px 0; }
+        }
+        .skeleton {
+            background:linear-gradient(90deg, var(--bg-skeleton) 25%, var(--bg-skeleton-shine) 50%, var(--bg-skeleton) 75%);
+            background-size:800px 100%;
+            animation:shimmer 1.5s infinite;
+            border-radius:var(--radius-sm);
+        }
+        .skeleton-list-item {
+            display:flex; gap:var(--space-md); padding:var(--space-md);
+            background:var(--bg-card); border-radius:var(--radius-lg);
+            border:1px solid var(--border-subtle);
+        }
+        .skel-poster { width:64px; height:96px; flex-shrink:0; border-radius:var(--radius-sm); }
+        .skel-info { flex:1; display:flex; flex-direction:column; gap:8px; justify-content:center; }
+        .skel-title { height:18px; width:60%; }
+        .skel-meta { height:14px; width:40%; }
+        .skel-text { height:14px; width:80%; }
+
+        /* ============================================================
+           STATES
+           ============================================================ */
+        .state-message {
+            display:flex; flex-direction:column; align-items:center;
+            justify-content:center; padding:var(--space-2xl); text-align:center;
+            gap:var(--space-md); min-height:300px;
+        }
+        .state-icon { font-size:3rem; }
+        .state-title { font-size:1.1rem; font-weight:700; }
+        .state-desc { color:var(--text-muted); font-size:0.9rem; max-width:400px; }
+        .state-retry {
+            padding:10px 24px; border-radius:var(--radius-full);
+            border:none; background:var(--accent); color:#fff;
+            font-weight:600; font-size:0.9rem; transition:var(--transition-fast);
+        }
+        .state-retry:hover { background:var(--accent-hover); }
+
+        /* ============================================================
+           RESPONSIVE
+           ============================================================ */
+        @media (max-width:1024px) {
+            .card-grid { grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); }
+            .resp-toggle { display:none; }
+        }
+        @media (max-width:480px) {
+            .app-layout { flex-direction:column; }
+            .content-area { padding:var(--space-md); }
+            .card-list-item { flex-direction:row; gap:12px; padding:12px; }
+            .card-list-poster, .card-list-poster-placeholder { width:60px; height:90px; }
+            .card-grid { grid-template-columns:repeat(auto-fill, minmax(130px, 1fr)); gap:12px; }
+            .modal-poster-row { flex-direction:column; align-items:center; }
+            .modal-poster { width:150px; }
+            .modal-title { font-size:1.3rem; text-align:center; }
+            .modal-backdrop-wrap { height:180px; }
+            .app-header { padding:0 var(--space-md); }
+            .toolbar { padding:0 var(--space-md); }
+            .logo { font-size:1.05rem; }
+            .slogan { display:none; }
+            .pill-btn .label { display:none; }
+            .pill-btn .icon { font-size:1rem; }
+            .filter-sidebar { width:85vw; }
+        }
+        @media (max-width:480px) {
+            .card-grid { grid-template-columns:repeat(3, 1fr); gap:10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============================================================
+    HEADER — 影觅 brand + viewport toggle + theme toggle
+    ============================================================ -->
+    <header class="app-header">
+        <div class="header-left">
+            <span class="logo">🎬 影觅</span>
+            <span class="slogan">让好作品不再隐秘</span>
+        </div>
+        <div class="header-right">
+            <button class="resp-toggle" id="btnRespToggle" title="切换手机/电脑视图" aria-label="切换响应式视图">📱</button>
+            <button class="theme-toggle" id="btnThemeToggle" title="切换日间/夜间模式" aria-label="切换主题">🌙</button>
+            <button class="theme-toggle" id="btnAbout" style="font-size:1rem;font-weight:700;" title="关于" aria-label="关于">?</button>
+        </div>
+    </header>
+
+    <!-- ============================================================
+    TOOLBAR — filters, media toggle, view toggle
+    ============================================================ -->
+    <div class="toolbar">
+        <div class="toolbar-left">
+            <button class="pill-btn" id="btnFilterOpen">
+                <span class="icon">🔍</span>
+                <span class="label">筛选</span>
+            </button>
+        </div>
+        <div class="toolbar-center">
+            <div class="pill-toggle" id="mediaToggle">
+                <button class="pill-btn sub-pill active" data-type="movie">电影</button>
+                <button class="pill-btn sub-pill" data-type="tv">电视剧</button>
+            </div>
+        </div>
+        <div class="toolbar-right">
+            <div class="pill-toggle" id="viewToggle">
+                <button class="pill-btn sub-pill active" data-view="list">概览</button>
+                <button class="pill-btn sub-pill" data-view="grid">海报</button>
+                <button class="pill-btn sub-pill" data-view="detail">完整</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+    MAIN LAYOUT
+    ============================================================ -->
+    <div class="app-layout">
+        <!-- Filter Overlay -->
+        <div class="filter-overlay" id="filterOverlay"></div>
+
+        <!-- Filter Sidebar — sticky on desktop, slide-in drawer on mobile -->
+        <aside class="filter-sidebar" id="filterSidebar">
+            <!-- Frozen top bar: 应用筛选 + 重置 -->
+            <div class="filter-top-bar">
+                <button class="btn-primary" id="btnApply" style="flex:1;">应用筛选</button>
+                <button class="btn-secondary" id="btnReset" style="flex:0 0 90px;width:90px;">重置</button>
+            </div>
+
+            <!-- 搜索 + 排序（第一组） -->
+            <div class="filter-group">
+                <div class="filter-section filter-row-inline">
+                    <label class="filter-label">🔍 搜索　　</label>
+                    <input type="text" class="filter-input" id="searchInput" placeholder="关键词...">
+                </div>
+                <div class="filter-section filter-row-inline">
+                    <label class="filter-label">📊 排序　　</label>
+                    <select class="filter-select" id="sortSelect"></select>
+                </div>
+            </div>
+
+            <!-- 筛选条件（第二组）：评分 → 票数 → 类型 → 年份 → 日期 -->
+            <div class="filter-group">
+                <div class="filter-section filter-row-inline">
+                    <label class="filter-label">⭐ 评分　　</label>
+                    <div class="filter-row" style="flex:1;">
+                        <input type="number" class="filter-input" id="ratingMin" placeholder="最低" min="0" max="10" step="0.5">
+                        <span style="color:var(--text-muted);align-self:center;">—</span>
+                        <input type="number" class="filter-input" id="ratingMax" placeholder="最高" min="0" max="10" step="0.5">
+                    </div>
+                </div>
+                <div class="filter-section filter-row-inline">
+                    <label class="filter-label">🗳️ 票数　　</label>
+                    <div class="filter-row" style="flex:1;">
+                        <input type="number" class="filter-input" id="voteCountMin" placeholder="最少" min="0" value="10">
+                        <span style="color:var(--text-muted);align-self:center;">—</span>
+                        <input type="number" class="filter-input" id="voteCountMax" placeholder="最多" min="0">
+                    </div>
+                </div>
+                <div class="filter-section filter-row-inline">
+                    <label class="filter-label">🏷️ 类型　　</label>
+                </div>
+                <div class="genre-chips" id="genreChips">加载中...</div>
+                <div class="filter-section filter-row-inline">
+                    <label class="filter-label">📆 年份　　</label>
+                    <input type="number" class="filter-input" id="yearInput" placeholder="2024" min="1900" max="2030">
+                </div>
+                <div class="filter-section">
+                    <label class="filter-label" id="dateLabel">🗓️ 日期范围　　</label>
+                    <div class="filter-section filter-row-inline">
+                        <input type="date" class="filter-input" id="dateFrom">
+                        <input type="date" class="filter-input" id="dateTo">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 其他（第三组） -->
+            <div class="filter-group">
+                <div class="filter-section filter-row-inline">
+                    <label class="filter-label">🌐 原始语言　　</label>
+                    <select class="filter-select" id="languageSelect"></select>
+                </div>
+                <div class="filter-section filter-row-inline">
+                    <label class="filter-label">🌍 上映地区　　</label>
+                    <select class="filter-select" id="regionSelect"></select>
+                </div>
+                <div class="filter-section">
+                    <div class="filter-section filter-row-inline">
+                        <label class="filter-label">📡 流媒体　　</label>
+                        <select class="filter-select" id="watchRegionSelect"></select>
+                    </div>
+                    <div class="provider-chips" id="providerChips" style="margin-top:4px;"></div>
+                </div>
+                <!-- 新增筛选行：返回语言 + 显示语言下拉 -->
+                <div class="filter-section filter-row-inline" style="border-top:1px solid var(--border-subtle);padding-top:8px;margin-top:4px;">
+                    <label class="filter-label">📄 显示语言　　</label>
+                    <select class="filter-select" id="displayLangSelect">
+                        <option value="zh-CN">中文</option>
+                        <option value="en-US">English</option>
+                        <option value="ja-JP">日本語</option>
+                        <option value="ko-KR">한국어</option>
+                        <option value="fr-FR">Français</option>
+                        <option value="es-ES">Español</option>
+                    </select>
+                </div>
+            </div>
+        </aside>
+
+        <main class="content-area" id="contentArea">
+            <!-- Hero section (shown on first visit before data loads) -->
+            <div class="hero-section" id="heroSection">
+                <div class="hero-content">
+                    <p class="hero-desc">发现你喜爱的电影与电视剧</p>
+                    <p class="hero-desc">强大的筛选与推荐引擎</p>
+                    <button class="hero-start" id="btnHeroStart">开始探索</button>
+                </div>
+            </div>
+            <div class="results-header" id="resultsHeader" style="display:none;">
+                <div class="results-count" id="resultsCount"></div>
+                <div class="active-filters" id="activeFilters"></div>
+            </div>
+            <div id="cardContainer"></div>
+            <nav class="pagination" id="pagination" aria-label="分页导航"></nav>
+        </main>
+    </div>
+
+    <!-- ============================================================
+    DETAIL MODAL
+    ============================================================ -->
+    <div class="modal-overlay" id="detailModal" aria-hidden="true">
+        <div class="modal-content" id="modalContent" role="dialog" aria-modal="true">
+            <button class="modal-close" id="modalClose" aria-label="关闭">&times;</button>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+    ABOUT MODAL
+    ============================================================ -->
+    <div class="modal-overlay" id="aboutModal" aria-hidden="true">
+        <div class="modal-content" style="max-width:600px;">
+            <button class="modal-close" id="aboutClose" aria-label="关闭">&times;</button>
+            <div style="padding:var(--space-xl);">
+                <h3 style="font-size:1.2rem;font-weight:700;margin-bottom:var(--space-md);">📋 关于影觅</h3>
+                <p style="font-size:0.9rem;color:var(--text-secondary);line-height:1.7;margin-bottom:var(--space-lg);">
+                    本网站数据来源于 <a href="https://www.themoviedb.org/" target="_blank" rel="noopener">TMDB</a>（The Movie Database）API。
+                </p>
+                <div id="aboutRequestLog">
+                    <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:var(--space-sm);">最近请求记录：</p>
+                    <div id="aboutRequestList" style="font-size:0.72rem;color:var(--text-secondary);line-height:1.6;word-break:break-all;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    /* ============================================================
+       GLOBAL — request log
+       ============================================================ */
+    const requestLog = [];
+
+    /* ============================================================
+       SECTION 1: CONFIGURATION & CONSTANTS
+       ============================================================ */
+    const TMDB_TOKEN = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyZGNlYjM3NTkwNThiNzdjZGEyNTQzMTQ1MTQ2ZjdmMSIsIm5iZiI6MTc3OTg2MjczMC4xNDMwMDAxLCJzdWIiOiI2YTE2OGNjYTU4M2NmODgzYzViNDY3ODciLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.VsTg3MMVoCRoOSFgoW4S06G1yBdVIb6hrWwTTk0Lj8I';
+
+    const IMAGE_BASE = 'https://image.tmdb.org/t/p/';
+    const POSTER_SIZES = { thumb:'w92', small:'w185', medium:'w342', large:'w500', xlarge:'w780' };
+    const BACKDROP_SIZE = 'w780';
+    const PROFILE_SIZE = 'w185';
+
+    const SORT_OPTIONS = {
+        movie: [
+            { value:'popularity.desc', label:'🔥 流行度 ↓' },
+            { value:'popularity.asc', label:'🔥 流行度 ↑' },
+            { value:'revenue.desc', label:'💰 票房 ↓' },
+            { value:'revenue.asc', label:'💰 票房 ↑' },
+            { value:'primary_release_date.desc', label:'📅 上映日期 ↓' },
+            { value:'primary_release_date.asc', label:'📅 上映日期 ↑' },
+            { value:'vote_average.desc', label:'⭐ 评分 ↓' },
+            { value:'vote_average.asc', label:'⭐ 评分 ↑' },
+            { value:'vote_count.desc', label:'🗳️ 投票数 ↓' },
+            { value:'vote_count.asc', label:'🗳️ 投票数 ↑' },
+            { value:'original_title.asc', label:'🔤 标题 A-Z' },
+            { value:'original_title.desc', label:'🔤 标题 Z-A' },
+        ],
+        tv: [
+            { value:'popularity.desc', label:'🔥 流行度 ↓' },
+            { value:'popularity.asc', label:'🔥 流行度 ↑' },
+            { value:'first_air_date.desc', label:'📅 首播日期 ↓' },
+            { value:'first_air_date.asc', label:'📅 首播日期 ↑' },
+            { value:'vote_average.desc', label:'⭐ 评分 ↓' },
+            { value:'vote_average.asc', label:'⭐ 评分 ↑' },
+            { value:'vote_count.desc', label:'🗳️ 投票数 ↓' },
+            { value:'vote_count.asc', label:'🗳️ 投票数 ↑' },
+        ]
+    };
+
+    const LANGUAGES = [
+        { code:'', label:'全部语言' },
+        { code:'en', label:'English' },
+        { code:'zh', label:'中文' },
+        { code:'ja', label:'日本語' },
+        { code:'ko', label:'한국어' },
+        { code:'fr', label:'Français' },
+        { code:'de', label:'Deutsch' },
+        { code:'es', label:'Español' },
+        { code:'it', label:'Italiano' },
+        { code:'pt', label:'Português' },
+        { code:'ru', label:'Русский' },
+        { code:'hi', label:'हिन्दी' },
+        { code:'th', label:'ไทย' },
+        { code:'sv', label:'Svenska' },
+        { code:'da', label:'Dansk' },
+        { code:'nl', label:'Nederlands' },
+        { code:'no', label:'Norsk' },
+        { code:'fi', label:'Suomi' },
+        { code:'pl', label:'Polski' },
+        { code:'tr', label:'Türkçe' },
+        { code:'ar', label:'العربية' },
+        { code:'id', label:'Bahasa Indonesia' },
+        { code:'vi', label:'Tiếng Việt' },
+    ];
+
+    const REGIONS = [
+        { code:'', label:'全部地区' },
+        { code:'US', label:'🇺🇸 美国' },
+        { code:'CN', label:'🇨🇳 中国' },
+        { code:'JP', label:'🇯🇵 日本' },
+        { code:'KR', label:'🇰🇷 韩国' },
+        { code:'GB', label:'🇬🇧 英国' },
+        { code:'FR', label:'🇫🇷 法国' },
+        { code:'DE', label:'🇩🇪 德国' },
+        { code:'IN', label:'🇮🇳 印度' },
+        { code:'HK', label:'🇭🇰 香港' },
+        { code:'TW', label:'🇹🇼 台湾' },
+        { code:'CA', label:'🇨🇦 加拿大' },
+        { code:'AU', label:'🇦🇺 澳大利亚' },
+        { code:'BR', label:'🇧🇷 巴西' },
+        { code:'MX', label:'🇲🇽 墨西哥' },
+        { code:'ES', label:'🇪🇸 西班牙' },
+        { code:'IT', label:'🇮🇹 意大利' },
+        { code:'RU', label:'🇷🇺 俄罗斯' },
+        { code:'SE', label:'🇸🇪 瑞典' },
+        { code:'NL', label:'🇳🇱 荷兰' },
+    ];
+
+    const WATCH_PROVIDERS = [
+        { id:8, name:'Netflix' },
+        { id:9, name:'Amazon Prime Video' },
+        { id:337, name:'Disney+' },
+        { id:350, name:'Apple TV+' },
+        { id:384, name:'Max (HBO)' },
+        { id:15, name:'Hulu' },
+        { id:531, name:'Paramount+' },
+        { id:2, name:'Apple iTunes' },
+        { id:3, name:'Google Play Movies' },
+        { id:611, name:'iQIYI' },
+        { id:283, name:'Crunchyroll' },
+        { id:119, name:'Amazon Prime Video (US)' },
+    ];
+
+    /* ============================================================
+       SECTION 2: STATE MANAGEMENT
+       ============================================================ */
+    const AppState = {
+        mediaType: 'movie',
+        sortBy: 'popularity.desc',
+        withGenres: [],
+        voteAverageGte: 0,
+        voteAverageLte: 10,
+        voteCountGte: 10,
+        voteCountLte: 0,
+        dateGte: '',
+        dateLte: '',
+        year: '',
+        withOriginalLanguage: '',
+        region: '',
+        watchProviders: [],
+        watchRegion: '',
+        searchQuery: '',
+        currentPage: 1,
+        totalPages: 1,
+        totalResults: 0,
+        results: [],
+        genres: { movie:[], tv:[] },
+        genreMap: { movie:new Map(), tv:new Map() },
+        viewMode: 'list',
+        isLoading: false,
+        error: null,
+        detailData: null,
+        filtersOpen: false,
+        hasStarted: false,           // first visit — show hero
+        displayLang: 'zh-CN',        // TMDB API language param
+        theme: 'dark',
+        respMode: 'desktop',       // 'desktop' | 'phone'
+        abortController: null,
+        searchDebounce: null,
+        filterDebounce: null,
+    };
+
+    /* ============================================================
+       SECTION 3: UTILITIES
+       ============================================================ */
+    function escapeHtml(str) {
+        if (!str && str !== 0) return '';
+        const map = { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#x27;' };
+        return String(str).replace(/[&<>"']/g, m => map[m]);
+    }
+
+    function langToRegion(langCode) {
+        const map = {
+            en:'US', zh:'CN', ja:'JP', ko:'KR', fr:'FR', de:'DE', es:'ES',
+            it:'IT', pt:'PT/BR', ru:'RU', hi:'IN', th:'TH', sv:'SE',
+            da:'DK', nl:'NL', no:'NO', fi:'FI', pl:'PL', tr:'TR',
+            ar:'AR', id:'ID', vi:'VN', ms:'MY', tl:'PH', he:'IL',
+        };
+        return map[langCode] || langCode.toUpperCase();
+    }
+
+    const $ = id => document.getElementById(id);
+
+    /* ============================================================
+       SECTION 4: THEME & RESPONSIVE TOGGLE
+       ============================================================ */
+    function initTheme() {
+        const saved = localStorage.getItem('yingmi-theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const theme = saved || (prefersDark ? 'dark' : 'light');
+        applyTheme(theme);
+    }
+
+    function applyTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        AppState.theme = theme;
+        $('btnThemeToggle').textContent = theme === 'dark' ? '🌙' : '☀️';
+        try { localStorage.setItem('yingmi-theme', theme); } catch (_) {}
+    }
+
+    function toggleTheme() {
+        applyTheme(AppState.theme === 'dark' ? 'light' : 'dark');
+    }
+
+    function toggleRespMode() {
+        AppState.respMode = AppState.respMode === 'desktop' ? 'phone' : 'desktop';
+        const isPhone = AppState.respMode === 'phone';
+        // swap icons correctly: currently showing 📱 means we're in desktop, click to see phone
+        // so showing 📱 → click → phone mode, icon becomes 💻
+        // showing 💻 → click → desktop mode, icon becomes 📱
+        $('btnRespToggle').textContent = isPhone ? '💻' : '📱';
+        $('btnRespToggle').classList.remove('active');
+
+        if (isPhone) {
+            document.body.classList.add('phone-mode');
+        } else {
+            document.body.classList.remove('phone-mode');
+        }
+
+        updateLayoutVisibility();
+    }
+
+    function updateLayoutVisibility() {
+        const isNarrow = AppState.respMode === 'phone' || window.innerWidth < 1024;
+
+        // Clear inline style overrides that might interfere with CSS classes
+        $('filterSidebar').style.position = '';
+        $('filterSidebar').style.top = '';
+        $('filterSidebar').style.left = '';
+        $('filterSidebar').style.bottom = '';
+        $('filterSidebar').style.zIndex = '';
+        $('filterSidebar').style.width = '';
+        $('filterSidebar').style.maxWidth = '';
+        $('filterSidebar').style.transform = '';
+        $('filterSidebar').style.marginTop = '';
+        $('filterSidebar').style.maxHeight = '';
+
+        // Close drawer when switching modes
+        $('filterSidebar').classList.remove('open');
+        $('filterOverlay').classList.remove('open');
+        AppState.filtersOpen = false;
+
+        // Filter button visibility
+        $('btnFilterOpen').style.display = isNarrow ? 'flex' : 'none';
+    }
+
+    /* ============================================================
+       SECTION 5: API LAYER
+       ============================================================ */
+    async function apiFetch(endpoint, params = {}) {
+        //const url = new URL('/tmdb/3' + endpoint, window.location.origin);
+        const url = new URL('https://api.themoviedb.org/3' + endpoint, window.location.origin);
+
+        Object.entries(params).forEach(([k, v]) => {
+            if (v === '' || v === null || v === undefined) return;
+            if (Array.isArray(v) && v.length === 0) return;
+            url.searchParams.set(k, Array.isArray(v) ? v.join(',') : v);
+        });
+        url.searchParams.set('language', AppState.displayLang || 'zh-CN');
+
+        // Log request URL (before fetch, so even failed requests are logged)
+        const fullUrl = url.toString();
+        requestLog.unshift({ url: fullUrl, time: new Date().toLocaleTimeString() });
+        if (requestLog.length > 3) requestLog.length = 3;
+
+        const res = await fetch(fullUrl, {
+            headers: {
+                'Authorization': 'Bearer ' + TMDB_TOKEN,
+                'Content-Type': 'application/json',
+            },
+            signal: AppState.abortController ? AppState.abortController.signal : undefined,
+        });
+
+        return await handleApiResponse(res, fullUrl);
+    }
+
+    async function handleApiResponse(res, url = '') {
+        if (!res.ok) {
+            const errText = await res.text().catch(() => 'Unknown error');
+            const err = new Error('HTTP ' + res.status + ': ' + errText.substring(0, 200));
+            err.status = res.status;
+            throw err;
+        }
+        return res.json();
+    }
+
+    async function fetchGenres(type) {
+        const cacheKey = 'tmdb_genres_' + type;
+        try {
+            const cached = sessionStorage.getItem(cacheKey);
+            if (cached) {
+                const parsed = JSON.parse(cached);
+                if (parsed.length > 0) return parsed;
+            }
+        } catch (_) {}
+
+        const data = await apiFetch('/genre/' + type + '/list');
+        const genres = data.genres || [];
+        try { sessionStorage.setItem(cacheKey, JSON.stringify(genres)); } catch (_) {}
+        return genres;
+    }
+
+    async function fetchDiscover() {
+        const params = { sort_by:AppState.sortBy, page:AppState.currentPage };
+
+        if (AppState.withGenres.length > 0) params.with_genres = AppState.withGenres;
+        if (AppState.voteAverageGte > 0) params['vote_average.gte'] = AppState.voteAverageGte;
+        if (AppState.voteAverageLte < 10) params['vote_average.lte'] = AppState.voteAverageLte;
+        if (AppState.voteCountGte > 0) params['vote_count.gte'] = AppState.voteCountGte;
+        if (AppState.voteCountLte > 0) params['vote_count.lte'] = AppState.voteCountLte;
+        if (AppState.year) {
+            params[AppState.mediaType === 'movie' ? 'primary_release_year' : 'first_air_date_year'] = AppState.year;
+        }
+        if (AppState.dateGte) {
+            params[AppState.mediaType === 'movie' ? 'primary_release_date.gte' : 'first_air_date.gte'] = AppState.dateGte;
+        }
+        if (AppState.dateLte) {
+            params[AppState.mediaType === 'movie' ? 'primary_release_date.lte' : 'first_air_date.lte'] = AppState.dateLte;
+        }
+        if (AppState.withOriginalLanguage) params.with_original_language = AppState.withOriginalLanguage;
+        if (AppState.region) params.region = AppState.region;
+        if (AppState.watchProviders.length > 0 && AppState.watchRegion) {
+            params.with_watch_providers = AppState.watchProviders;
+            params.watch_region = AppState.watchRegion;
+        }
+
+        return apiFetch('/discover/' + AppState.mediaType, params);
+    }
+
+    async function fetchSearch() {
+        const params = { query:AppState.searchQuery, page:AppState.currentPage };
+        if (AppState.year) params.year = AppState.year;
+        if (AppState.region) params.region = AppState.region;
+        return apiFetch('/search/' + AppState.mediaType, params);
+    }
+
+    async function fetchDetail(id) {
+        const append = 'credits,recommendations';
+        return apiFetch('/' + AppState.mediaType + '/' + id, { append_to_response:append });
+    }
+
+    /* ============================================================
+       SECTION 6: UI RENDERERS
+       ============================================================ */
+
+    // --- Filter Panel ---
+    function renderSortOptions() {
+        const sel = $('sortSelect');
+        const options = SORT_OPTIONS[AppState.mediaType];
+        sel.innerHTML = options.map(o =>
+            '<option value="' + o.value + '"' + (AppState.sortBy === o.value ? ' selected' : '') + '>' + escapeHtml(o.label) + '</option>'
+        ).join('');
+    }
+
+    function renderGenreChips() {
+        const container = $('genreChips');
+        const genres = AppState.genres[AppState.mediaType];
+        if (!genres.length) {
+            container.innerHTML = '<span style="font-size:0.75rem;color:var(--text-muted);">加载中...</span>';
+            return;
+        }
+        container.innerHTML = genres.map(g => {
+            const active = AppState.withGenres.includes(g.id);
+            return '<button class="genre-chip' + (active ? ' active' : '') + '" data-genre-id="' + g.id + '">' + escapeHtml(g.name) + '</button>';
+        }).join('');
+
+        container.querySelectorAll('.genre-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                const id = parseInt(chip.dataset.genreId);
+                const idx = AppState.withGenres.indexOf(id);
+                if (idx >= 0) AppState.withGenres.splice(idx, 1);
+                else AppState.withGenres.push(id);
+                renderGenreChips();
+                renderActiveFilters();
+            });
+        });
+    }
+
+    function renderLanguageOptions() {
+        $('languageSelect').innerHTML = LANGUAGES.map(l =>
+            '<option value="' + l.code + '"' + (AppState.withOriginalLanguage === l.code ? ' selected' : '') + '>' + escapeHtml(l.label) + '</option>'
+        ).join('');
+    }
+
+    function renderRegionOptions() {
+        $('regionSelect').innerHTML = REGIONS.map(r =>
+            '<option value="' + r.code + '"' + (AppState.region === r.code ? ' selected' : '') + '>' + escapeHtml(r.label) + '</option>'
+        ).join('');
+    }
+
+    function renderWatchRegionOptions() {
+        $('watchRegionSelect').innerHTML = '<option value="">选择地区...</option>' + REGIONS.filter(r => r.code).map(r =>
+            '<option value="' + r.code + '"' + (AppState.watchRegion === r.code ? ' selected' : '') + '>' + escapeHtml(r.label) + '</option>'
+        ).join('');
+    }
+
+    function renderProviderChips() {
+        const container = $('providerChips');
+        if (!AppState.watchRegion) {
+            //container.innerHTML = '<span style="font-size:0.7rem;color:var(--text-muted);">选择地区后可筛选平台</span>';
+            return;
+        }
+        container.innerHTML = WATCH_PROVIDERS.map(p => {
+            const active = AppState.watchProviders.includes(p.id);
+            return '<button class="provider-chip' + (active ? ' active' : '') + '" data-provider-id="' + p.id + '">' + escapeHtml(p.name) + '</button>';
+        }).join('');
+
+        container.querySelectorAll('.provider-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                const id = parseInt(chip.dataset.providerId);
+                const idx = AppState.watchProviders.indexOf(id);
+                if (idx >= 0) AppState.watchProviders.splice(idx, 1);
+                else AppState.watchProviders.push(id);
+                renderProviderChips();
+                renderActiveFilters();
+            });
+        });
+    }
+
+    function renderActiveFilters() {
+        const container = $('activeFilters');
+        const tags = [];
+
+        if (AppState.searchQuery) {
+            tags.push({ label:'搜索: ' + AppState.searchQuery, clear:() => { $('searchInput').value = ''; AppState.searchQuery = ''; applyFilters(); } });
+        }
+        if (AppState.withGenres.length > 0) {
+            const genreMap = AppState.genreMap[AppState.mediaType];
+            AppState.withGenres.forEach(gid => {
+                const name = genreMap.get(gid) || 'ID:' + gid;
+                tags.push({ label:'类型: ' + name, clear:() => {
+                    AppState.withGenres = AppState.withGenres.filter(x => x !== gid);
+                    renderGenreChips(); renderActiveFilters();
+                }});
+            });
+        }
+        if (AppState.voteAverageGte > 0 || AppState.voteAverageLte < 10) {
+            tags.push({ label:'评分: ' + AppState.voteAverageGte + '-' + AppState.voteAverageLte, clear:() => {
+                AppState.voteAverageGte = 0; AppState.voteAverageLte = 10;
+                $('ratingMin').value = ''; $('ratingMax').value = '';
+                renderActiveFilters();
+            }});
+        }
+        if (AppState.voteCountGte > 0 || AppState.voteCountLte > 0) {
+            var vcLabel = '';
+            if (AppState.voteCountGte > 0) vcLabel += '≥' + AppState.voteCountGte;
+            if (AppState.voteCountGte > 0 && AppState.voteCountLte > 0) vcLabel += ' ';
+            if (AppState.voteCountLte > 0) vcLabel += '≤' + AppState.voteCountLte;
+            tags.push({ label:'投票: ' + vcLabel, clear:() => {
+                AppState.voteCountGte = 0; AppState.voteCountLte = 0;
+                $('voteCountMin').value = ''; $('voteCountMax').value = '';
+                renderActiveFilters();
+            }});
+        }
+        if (AppState.year) {
+            tags.push({ label:'年份: ' + AppState.year, clear:() => {
+                AppState.year = ''; $('yearInput').value = '';
+                renderActiveFilters();
+            }});
+        }
+        if (AppState.withOriginalLanguage) {
+            tags.push({ label:'语言: ' + AppState.withOriginalLanguage, clear:() => {
+                AppState.withOriginalLanguage = ''; $('languageSelect').value = '';
+                renderActiveFilters();
+            }});
+        }
+        if (AppState.region) {
+            tags.push({ label:'地区: ' + AppState.region, clear:() => {
+                AppState.region = ''; $('regionSelect').value = '';
+                renderActiveFilters();
+            }});
+        }
+        if (AppState.watchProviders.length > 0) {
+            AppState.watchProviders.forEach(pid => {
+                const prov = WATCH_PROVIDERS.find(p => p.id === pid);
+                tags.push({ label:(prov ? prov.name : 'ID:' + pid), clear:() => {
+                    AppState.watchProviders = AppState.watchProviders.filter(x => x !== pid);
+                    renderProviderChips(); renderActiveFilters();
+                }});
+            });
+        }
+
+        container.innerHTML = tags.map(t =>
+            '<span class="filter-tag">' + escapeHtml(t.label) + '<span class="filter-tag-remove" data-clear="1">✕</span></span>'
+        ).join('');
+
+        container.querySelectorAll('.filter-tag-remove').forEach((el, i) => {
+            el.addEventListener('click', tags[i].clear);
+        });
+    }
+
+    // --- List View ("概览" view) — 1-row title; 1-row meta; 2-3-row overview ---
+    function renderListView() {
+        const container = $('cardContainer');
+        if (!AppState.results.length) {
+            renderEmpty();
+            return;
+        }
+        const genreMap = AppState.genreMap[AppState.mediaType];
+        const page = AppState.currentPage;
+        const langNames = { en:'英语', zh:'中文', ja:'日语', ko:'韩语', fr:'法语', de:'德语',
+            es:'西班牙语', it:'意大利语', pt:'葡萄牙语', ru:'俄语', hi:'印地语', th:'泰语',
+            sv:'瑞典语', da:'丹麦语', nl:'荷兰语', no:'挪威语', fi:'芬兰语', pl:'波兰语',
+            tr:'土耳其语', ar:'阿拉伯语', id:'印尼语', vi:'越南语', ms:'马来语', tl:'菲律宾语',
+            he:'希伯来语', ro:'罗马尼亚语', hu:'匈牙利语', cs:'捷克语', el:'希腊语',
+            uk:'乌克兰语', bg:'保加利亚语', sr:'塞尔维亚语', hr:'克罗地亚语',
+            sk:'斯洛伐克语', sl:'斯洛文尼亚语', lt:'立陶宛语', lv:'拉脱维亚语',
+            et:'爱沙尼亚语', is:'冰岛语', mt:'马耳他语', ga:'爱尔兰语',
+            fa:'波斯语', ur:'乌尔都语', ta:'泰米尔语', te:'泰卢固语',
+            ml:'马拉雅拉姆语', kn:'卡纳达语', mr:'马拉地语', gu:'古吉拉特语',
+            bn:'孟加拉语', pa:'旁遮普语', ne:'尼泊尔语', si:'僧伽罗语',
+            my:'缅甸语', km:'高棉语', lo:'老挝语', mn:'蒙古语',
+            ka:'格鲁吉亚语', hy:'亚美尼亚语', az:'阿塞拜疆语',
+            kk:'哈萨克语', uz:'乌兹别克语', af:'南非语', sw:'斯瓦希里语',
+            zu:'祖鲁语', ha:'豪萨语', yo:'约鲁巴语', ig:'伊博语',
+            am:'阿姆哈拉语' };
+        container.innerHTML = '<div class="card-list">' + AppState.results.map((item, i) => {
+            const index = (page - 1) * 20 + i + 1;
+            const title = item.title || item.name || 'Untitled';
+            const dateStr = item.release_date || item.first_air_date || '';
+            const year = dateStr ? dateStr.slice(0, 4) : '—';
+            const lang = item.original_language || '';
+            const langCN = langNames[lang] || lang.toUpperCase();
+            const rating = item.vote_average != null ? item.vote_average.toFixed(1) : '?';
+            const overview = item.overview || '';
+            const posterPath = item.poster_path;
+            const genreIds = (item.genre_ids || []).slice(0, 1);
+            const genreName = genreIds.map(gid => genreMap.get(gid) || '').filter(Boolean)[0] || '';
+
+            let posterHtml;
+            if (posterPath) {
+                posterHtml = '<img class="card-list-poster" src="' + IMAGE_BASE + POSTER_SIZES.thumb + posterPath + '" alt="' + escapeHtml(title) + '" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';">' +
+                    '<div class="card-list-poster-placeholder" style="display:none;">🎬</div>';
+            } else {
+                posterHtml = '<div class="card-list-poster-placeholder">🎬</div>';
+            }
+
+            return '<div class="card-list-item" data-id="' + item.id + '">' +
+                posterHtml +
+                '<div class="card-list-info">' +
+                    '<div class="card-list-title"><span class="card-list-idx">' + index + '.</span>' + escapeHtml(title) + '</div>' +
+                    '<div class="card-list-meta">' +
+                        '<span>📆 ' + year + '</span>' +
+                        ' · <span>🌐 ' + escapeHtml(langCN) + '</span>' +
+                        (genreName ? ' · <span class="card-list-genre-tag" style="font-size:0.75rem;">' + escapeHtml(genreName) + '</span>' : '') +
+                        ' · <span class="card-list-rating">★ ' + rating + '</span>' +
+                    '</div>' +
+                    (overview ? '<div class="card-list-overview">' + escapeHtml(overview) + '</div>' : '') +
+                '</div>' +
+            '</div>';
+        }).join('') + '</div>';
+
+        container.querySelectorAll('.card-list-item').forEach(card => {
+            card.addEventListener('click', () => openDetail(parseInt(card.dataset.id)));
+        });
+    }
+
+    function renderGridView() {
+        const container = $('cardContainer');
+        if (!AppState.results.length) {
+            renderEmpty();
+            return;
+        }
+        const genreMap = AppState.genreMap[AppState.mediaType];
+        const page = AppState.currentPage;
+        container.innerHTML = '<div class="card-grid">' + AppState.results.map((item, i) => {
+            const index = (page - 1) * 20 + i + 1;
+            const title = item.title || item.name || 'Untitled';
+            const dateStr = item.release_date || item.first_air_date || '';
+            const year = dateStr ? dateStr.slice(0, 4) : '—';
+            const rating = item.vote_average != null ? item.vote_average.toFixed(1) : '?';
+            const lang = item.original_language || '';
+            const langCN = ({ en:'英语', zh:'中文', ja:'日语', ko:'韩语', fr:'法语', de:'德语',
+                es:'西班牙语', it:'意大利语', pt:'葡萄牙语', ru:'俄语', hi:'印地语', th:'泰语',
+                sv:'瑞典语', da:'丹麦语', nl:'荷兰语', no:'挪威语', fi:'芬兰语', pl:'波兰语',
+                tr:'土耳其语', ar:'阿拉伯语', id:'印尼语', vi:'越南语', ms:'马来语', tl:'菲律宾语',
+                he:'希伯来语', ro:'罗马尼亚语', hu:'匈牙利语', cs:'捷克语', el:'希腊语',
+                uk:'乌克兰语', bg:'保加利亚语', sr:'塞尔维亚语', hr:'克罗地亚语',
+                sk:'斯洛伐克语', sl:'斯洛文尼亚语', lt:'立陶宛语', lv:'拉脱维亚语',
+                et:'爱沙尼亚语', is:'冰岛语', mt:'马耳他语', ga:'爱尔兰语',
+                fa:'波斯语', ur:'乌尔都语', ta:'泰米尔语', te:'泰卢固语',
+                ml:'马拉雅拉姆语', kn:'卡纳达语', mr:'马拉地语', gu:'古吉拉特语',
+                bn:'孟加拉语', pa:'旁遮普语', ne:'尼泊尔语', si:'僧伽罗语',
+                my:'缅甸语', km:'高棉语', lo:'老挝语', mn:'蒙古语',
+                ka:'格鲁吉亚语', hy:'亚美尼亚语', az:'阿塞拜疆语',
+                kk:'哈萨克语', uz:'乌兹别克语', af:'南非语', sw:'斯瓦希里语',
+                zu:'祖鲁语', ha:'豪萨语', yo:'约鲁巴语', ig:'伊博语',
+                am:'阿姆哈拉语' })[lang] || lang.toUpperCase();
+            const posterPath = item.poster_path;
+            const genreIds = (item.genre_ids || []).slice(0, 1);
+            const genreName = genreIds.map(gid => genreMap.get(gid) || '').filter(Boolean)[0] || '';
+
+            let posterHtml;
+            if (posterPath) {
+                posterHtml = '<div class="card-grid-poster-wrap">' +
+                    '<img class="card-grid-poster" src="' + IMAGE_BASE + POSTER_SIZES.medium + posterPath + '" alt="' + escapeHtml(title) + '" loading="lazy" onerror="this.style.display=\'none\';">' +
+                    '<div class="card-grid-rating">★ ' + rating + '</div>' +
+                '</div>';
+            } else {
+                posterHtml = '<div class="card-grid-poster-wrap" style="display:flex;align-items:center;justify-content:center;font-size:3rem;">🎬</div>';
+            }
+
+            return '<div class="card-grid-item" data-id="' + item.id + '">' +
+                '<div class="card-grid-index">' + index + '</div>' +
+                posterHtml +
+                '<div class="card-grid-info">' +
+                    '<div class="card-grid-title" title="' + escapeHtml(title) + '">' + escapeHtml(title) + '</div>' +
+                    '<div class="card-grid-year">' + year + ' · ' + escapeHtml(langCN) + (genreName ? ' · ' + escapeHtml(genreName) : '') + '</div>' +
+                '</div>' +
+            '</div>';
+        }).join('') + '</div>';
+
+        container.querySelectorAll('.card-grid-item').forEach(card => {
+            card.addEventListener('click', () => openDetail(parseInt(card.dataset.id)));
+        });
+    }
+
+    function renderResultsHeader() {
+        $('resultsCount').innerHTML = AppState.totalResults > 0
+            ? '共找到 <strong>' + AppState.totalResults.toLocaleString() + '</strong> 部作品'
+            : '';
+    }
+
+    // --- Detail View ("完整" view) — single column, 3-line cards, all discover fields ---
+    function renderDetailView() {
+        const container = $('cardContainer');
+        if (!AppState.results.length) {
+            renderEmpty();
+            return;
+        }
+        const genreMap = AppState.genreMap[AppState.mediaType];
+        const page = AppState.currentPage;
+        container.innerHTML = AppState.results.map((item, i) => {
+            const index = (page - 1) * 20 + i + 1;
+            const title = item.title || item.name || 'Untitled';
+            const dateStr = item.release_date || item.first_air_date || '';
+            const fullDate = dateStr || '—';
+            const lang = item.original_language || '';
+            const langCN = ({ en:'英语', zh:'中文', ja:'日语', ko:'韩语', fr:'法语', de:'德语',
+                es:'西班牙语', it:'意大利语', pt:'葡萄牙语', ru:'俄语', hi:'印地语', th:'泰语',
+                sv:'瑞典语', da:'丹麦语', nl:'荷兰语', no:'挪威语', fi:'芬兰语', pl:'波兰语',
+                tr:'土耳其语', ar:'阿拉伯语', id:'印尼语', vi:'越南语', ms:'马来语', tl:'菲律宾语',
+                he:'希伯来语', ro:'罗马尼亚语', hu:'匈牙利语', cs:'捷克语', el:'希腊语',
+                uk:'乌克兰语', bg:'保加利亚语', sr:'塞尔维亚语', hr:'克罗地亚语',
+                sk:'斯洛伐克语', sl:'斯洛文尼亚语', lt:'立陶宛语', lv:'拉脱维亚语',
+                et:'爱沙尼亚语', is:'冰岛语', mt:'马耳他语', ga:'爱尔兰语',
+                fa:'波斯语', ur:'乌尔都语', ta:'泰米尔语', te:'泰卢固语',
+                ml:'马拉雅拉姆语', kn:'卡纳达语', mr:'马拉地语', gu:'古吉拉特语',
+                bn:'孟加拉语', pa:'旁遮普语', ne:'尼泊尔语', si:'僧伽罗语',
+                my:'缅甸语', km:'高棉语', lo:'老挝语', mn:'蒙古语',
+                ka:'格鲁吉亚语', hy:'亚美尼亚语', az:'阿塞拜疆语',
+                kk:'哈萨克语', uz:'乌兹别克语', af:'南非语', sw:'斯瓦希里语',
+                zu:'祖鲁语', ha:'豪萨语', yo:'约鲁巴语', ig:'伊博语',
+                am:'阿姆哈拉语' })[lang] || lang.toUpperCase();
+            const rating = item.vote_average != null ? item.vote_average.toFixed(1) : '—';
+            const voteCount = item.vote_count || 0;
+            const popularity = item.popularity != null ? Math.round(item.popularity) : '—';
+            const overview = item.overview || '';
+            const posterPath = item.poster_path;
+            const genreIds = (item.genre_ids || []);
+            const genreNames = genreIds.map(gid => genreMap.get(gid) || '').filter(Boolean);
+            const adult = item.adult ? '是' : '否';
+            const video = item.video ? '是' : '否';
+
+            let posterHtml;
+            if (posterPath) {
+                posterHtml = '<img class="card-list-poster" src="' + IMAGE_BASE + POSTER_SIZES.thumb + posterPath + '" alt="' + escapeHtml(title) + '" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';">' +
+                    '<div class="card-list-poster-placeholder" style="display:none;">🎬</div>';
+            } else {
+                posterHtml = '<div class="card-list-poster-placeholder">🎬</div>';
+            }
+
+            // Vote count color
+            function voteColor(n) {
+                if (n < 100) return 'red';
+                if (n < 10000) return '#f5a623';
+                return '#22c55e';
+            }
+            const vc = voteColor(voteCount);
+            const voteStr = rating + ' (<span style="color:' + vc + ';">' + voteCount.toLocaleString() + '</span> 票)';
+
+            // Fixed-width label-value pairs for alignment
+            const metaItems = [
+                { label:'📅', value:escapeHtml(fullDate) },
+                { label:'⭐', value:voteStr },
+                { label:'🔥', value:String(popularity) },
+                { label:'🌐', value:escapeHtml(langCN) },
+            ];
+            if (genreNames.length) {
+                metaItems.push({ label:'🏷️', value:genreNames.map(g => '<span class="card-list-genre-tag">' + escapeHtml(g) + '</span>').join(' ') });
+            }
+            metaItems.push({ label:'🔞', value:adult });
+            metaItems.push({ label:'📼', value:video });
+
+            const metaHtml = metaItems.map(m =>
+                '<span class="detail-meta-item"><span class="detail-meta-label">' + m.label + '</span><span class="detail-meta-value">' + m.value + '</span></span>'
+            ).join('');
+
+            return '<div class="card-list-item" data-id="' + item.id + '" style="max-width:100%;">' +
+                posterHtml +
+                '<div class="card-list-info">' +
+                    '<div class="card-list-title" style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:4px;"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:1;min-width:0;"><span class="card-list-idx">' + index + '.</span>' + escapeHtml(title) + '</span><span style="flex-shrink:0;white-space:nowrap;font-size:0.78rem;"><span style="font-weight:600;">⭐ ' + rating + '</span> <span style="font-weight:400;color:' + vc + ';">(' + voteCount.toLocaleString() + ' 票)</span> <span style="color:var(--text-muted);">🔥 ' + popularity + '</span></span></div>' +
+                    '<div style="font-size:0.72rem;color:var(--text-secondary);margin-bottom:2px;">' +
+                        escapeHtml(fullDate) +
+                        ' · ' + escapeHtml(langCN) +
+                        (genreNames.length ? ' · ' + genreNames.map(g => '<span class="card-list-genre-tag">' + escapeHtml(g) + '</span>').join(' ') : '') +
+                        ' · 成人 ' + adult +
+                        ' · 视频 ' + video +
+                    '</div>' +
+                    (overview ? '<div class="card-list-overview" style="-webkit-line-clamp:unset;display:block;overflow:visible;">' + escapeHtml(overview) + '</div>' : '') +
+                '</div>' +
+            '</div>';
+        }).join('');
+
+        container.querySelectorAll('.card-list-item').forEach(card => {
+            card.addEventListener('click', () => openDetail(parseInt(card.dataset.id)));
+        });
+    }
+
+    function renderPagination() {
+        const container = $('pagination');
+        if (AppState.totalPages <= 1) {
+            container.innerHTML = '';
+            return;
+        }
+        const current = AppState.currentPage;
+        const total = AppState.totalPages;
+        let pages = [];
+
+        pages.push(1);
+        for (let i = Math.max(2, current - 2); i <= Math.min(total - 1, current + 2); i++) {
+            if (i === pages[pages.length - 1] + 1) pages.push(i);
+            else if (i > pages[pages.length - 1] + 1) { pages.push('...'); pages.push(i); }
+        }
+        if (total > 1 && pages[pages.length - 1] !== total) {
+            if (pages[pages.length - 1] !== total - 1) pages.push('...');
+            pages.push(total);
+        }
+
+        container.innerHTML =
+            '<button class="page-btn" ' + (current === 1 ? 'disabled' : '') + ' data-page="' + (current - 1) + '">◀</button>' +
+            pages.map(p => {
+                if (p === '...') return '<span class="page-ellipsis">...</span>';
+                return '<button class="page-btn' + (p === current ? ' active' : '') + '" data-page="' + p + '">' + p + '</button>';
+            }).join('') +
+            '<button class="page-btn" ' + (current === total ? 'disabled' : '') + ' data-page="' + (current + 1) + '">▶</button>';
+
+        container.querySelectorAll('.page-btn:not([disabled])').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const page = parseInt(btn.dataset.page);
+                if (page && page !== AppState.currentPage && page >= 1 && page <= AppState.totalPages) {
+                    AppState.currentPage = page;
+                    loadData();
+                    document.querySelector('.content-area').scrollIntoView({ behavior:'smooth' });
+                }
+            });
+        });
+    }
+
+    function renderSkeletons() {
+        const container = $('cardContainer');
+        if (AppState.viewMode === 'list') {
+            container.innerHTML = Array.from({ length:8 }, () =>
+                '<div class="skeleton-list-item">' +
+                    '<div class="skeleton skel-poster"></div>' +
+                    '<div class="skel-info">' +
+                        '<div class="skeleton skel-title"></div>' +
+                        '<div class="skeleton skel-meta"></div>' +
+                        '<div class="skeleton skel-text"></div>' +
+                    '</div>' +
+                '</div>'
+            ).join('');
+        } else if (AppState.viewMode === 'grid') {
+            container.innerHTML = '<div class="card-grid">' + Array.from({ length:8 }, () =>
+                '<div class="card-grid-item">' +
+                    '<div class="card-grid-poster-wrap"><div class="skeleton" style="width:100%;height:100%;"></div></div>' +
+                    '<div class="card-grid-info">' +
+                        '<div class="skeleton" style="height:16px;width:80%;margin-bottom:6px;"></div>' +
+                        '<div class="skeleton" style="height:12px;width:40%;"></div>' +
+                    '</div>' +
+                '</div>'
+            ).join('') + '</div>';
+        } else {
+            // detail view skeleton
+            container.innerHTML = '<div class="skeleton" style="height:200px;border-radius:var(--radius-lg);margin-bottom:16px;"></div>' +
+                '<div class="skeleton" style="height:24px;width:60%;margin-bottom:12px;"></div>' +
+                '<div class="skeleton" style="height:16px;width:90%;margin-bottom:6px;"></div>' +
+                '<div class="skeleton" style="height:16px;width:70%;margin-bottom:6px;"></div>';
+        }
+    }
+
+    function renderError(err) {
+        const container = $('cardContainer');
+        const status = err.status || 0;
+        let title = '请求失败';
+        let desc = err.message || '未知错误';
+        if (status === 401) {
+            title = 'API 认证失败';
+            desc = 'TMDB Access Token 无效或已过期，请检查 Token 配置。';
+        } else if (status === 429) {
+            title = '请求过于频繁';
+            desc = '已达到 API 速率限制，请稍后重试。';
+        }
+
+        container.innerHTML =
+            '<div class="state-message">' +
+                '<div class="state-icon">⚠️</div>' +
+                '<div class="state-title">' + escapeHtml(title) + '</div>' +
+                '<div class="state-desc">' + escapeHtml(desc) + '</div>' +
+                '<button class="state-retry" onclick="loadData()">🔄 重试</button>' +
+            '</div>';
+    }
+
+    function renderEmpty() {
+        const container = $('cardContainer');
+        container.innerHTML =
+            '<div class="state-message">' +
+                '<div class="state-icon">🔍</div>' +
+                '<div class="state-title">没有找到作品</div>' +
+                '<div class="state-desc">尝试调整筛选条件或搜索关键词，可能会有新发现哦。</div>' +
+                '<button class="state-retry" onclick="resetFilters();loadData();">🔄 重置筛选</button>' +
+            '</div>';
+    }
+
+    // --- Detail Modal ---
+    async function openDetail(id) {
+        AppState.isLoading = true;
+        $('detailModal').classList.add('open');
+        $('detailModal').setAttribute('aria-hidden', 'false');
+        $('modalBody').innerHTML =
+            '<div class="state-message" style="min-height:200px;">' +
+                '<div class="skeleton" style="width:100%;height:180px;border-radius:var(--radius-lg);"></div>' +
+                '<div class="skeleton" style="width:60%;height:24px;margin-top:16px;"></div>' +
+            '</div>';
+        document.body.classList.add('modal-open');
+
+        try {
+            AppState.detailData = await fetchDetail(id);
+            renderDetailModal();
+        } catch (err) {
+            $('modalBody').innerHTML =
+                '<div class="state-message" style="min-height:200px;">' +
+                    '<div class="state-icon">⚠️</div>' +
+                    '<div class="state-title">加载详情失败</div>' +
+                    '<div class="state-desc">' + escapeHtml(err.message) + '</div>' +
+                '</div>';
+        }
+        AppState.isLoading = false;
+    }
+
+    function renderDetailModal() {
+        const d = AppState.detailData;
+        const title = d.title || d.name || 'Untitled';
+        const dateStr = d.release_date || d.first_air_date || '';
+        const year = dateStr ? dateStr.slice(0, 4) : '';
+        const runtime = d.runtime ? d.runtime + ' 分钟' : (d.episode_run_time && d.episode_run_time.length ? d.episode_run_time[0] + ' 分钟/集' : '');
+        const tagline = d.tagline || '';
+        const overview = d.overview || '暂无简介';
+        const rating = d.vote_average != null ? d.vote_average.toFixed(1) : '?';
+        const voteCount = d.vote_count || 0;
+        const popularity = d.popularity != null ? Math.round(d.popularity) : '—';
+        const genres = (d.genres || []).map(g => g.name);
+        const countries = (d.production_countries || []).map(c => c.name).join(', ') || '—';
+        const tmdbUrl = 'https://www.themoviedb.org/' + AppState.mediaType + '/' + d.id;
+        const status = d.status || '';
+        const seasons = d.number_of_seasons ? d.number_of_seasons + ' 季' : '';
+        const episodes = d.number_of_episodes ? d.number_of_episodes + ' 集' : '';
+
+        // Director and writer from crew
+        const crewList = d.credits || {};
+        const director = (crewList.crew || []).filter(p => p.job === 'Director').slice(0, 2);
+        const writers = (crewList.crew || []).filter(p => p.job === 'Writer' || p.job === 'Screenplay').slice(0, 2);
+        const cast = (crewList.cast || []).slice(0, 10);
+        const recs = (d.recommendations && d.recommendations.results || []).slice(0, 8);
+
+        let castHtml = '';
+        if (cast.length) {
+            castHtml = '<div class="cast-grid">' + cast.map(c => {
+                const photo = c.profile_path
+                    ? '<img class="cast-photo" src="' + IMAGE_BASE + PROFILE_SIZE + c.profile_path + '" alt="' + escapeHtml(c.name) + '" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';">' +
+                      '<div class="cast-photo-placeholder" style="display:none;">👤</div>'
+                    : '<div class="cast-photo-placeholder">👤</div>';
+                return '<div class="cast-card">' + photo +
+                    '<div class="cast-name" title="' + escapeHtml(c.name) + '">' + escapeHtml(c.name) + '</div>' +
+                    '<div class="cast-character" title="' + escapeHtml(c.character || '') + '">' + escapeHtml(c.character || '—') + '</div>' +
+                '</div>';
+            }).join('') + '</div>';
+        }
+
+        let recsHtml = '';
+        if (recs.length) {
+            recsHtml = '<div class="recs-grid">' + recs.map(r => {
+                const rtitle = r.title || r.name || 'Untitled';
+                const ryear = (r.release_date || r.first_air_date || '').slice(0, 4);
+                const rposter = r.poster_path
+                    ? '<img class="rec-poster" src="' + IMAGE_BASE + POSTER_SIZES.small + r.poster_path + '" alt="' + escapeHtml(rtitle) + '" loading="lazy">'
+                    : '<div class="rec-poster" style="display:flex;align-items:center;justify-content:center;font-size:2rem;">🎬</div>';
+                return '<div class="rec-card" data-id="' + r.id + '" title="' + escapeHtml(rtitle) + '">' + rposter +
+                    '<div class="rec-title">' + escapeHtml(rtitle) + '</div>' +
+                    '<div class="rec-rating">★ ' + (r.vote_average != null ? r.vote_average.toFixed(1) : '?') + (ryear ? ' · ' + ryear : '') + '</div>' +
+                '</div>';
+            }).join('') + '</div>';
+        }
+
+        const backdropHtml = d.backdrop_path
+            ? '<img class="modal-backdrop" src="' + IMAGE_BASE + BACKDROP_SIZE + d.backdrop_path + '" alt="" onerror="this.parentElement.style.display=\'none\';">'
+            : '';
+
+        const posterHtml = d.poster_path
+            ? '<img class="modal-poster" src="' + IMAGE_BASE + POSTER_SIZES.large + d.poster_path + '" alt="' + escapeHtml(title) + '">'
+            : '';
+
+        $('modalBody').innerHTML =
+            (backdropHtml ? '<div class="modal-backdrop-wrap">' + backdropHtml + '<div class="modal-backdrop-gradient"></div></div>' : '') +
+            '<div class="modal-body">' +
+                '<div class="modal-poster-row">' +
+                    posterHtml +
+                    '<div class="modal-info">' +
+                        '<h2 class="modal-title">' + escapeHtml(title) + (year ? ' (' + year + ')' : '') + '</h2>' +
+                        (tagline ? '<p class="modal-tagline">"' + escapeHtml(tagline) + '"</p>' : '') +
+                        '<div class="modal-meta-row">' +
+                            (year ? '<span>📆 ' + year + '</span><span class="sep">|</span>' : '') +
+                            (runtime ? '<span>⏱️ ' + runtime + '</span><span class="sep">|</span>' : '') +
+                            (seasons ? '<span>📺 ' + seasons + (episodes ? ' · ' + episodes : '') + '</span><span class="sep">|</span>' : '') +
+                            '<span class="modal-rating-big">⭐ ' + rating + ' <span style="font-weight:400;font-size:0.75rem;">(' + voteCount.toLocaleString() + ' 票)</span></span>' +
+                        '</div>' +
+                        (genres.length ? '<div class="modal-genres">' + genres.map(g => '<span class="modal-genre-tag">' + escapeHtml(g) + '</span>').join('') + '</div>' : '') +
+                        '<div class="modal-info-table">' +
+                            (countries ? '<div class="info-row"><span class="info-label">🌍 国家</span><span class="info-value">' + escapeHtml(countries) + '</span></div>' : '') +
+                            (status ? '<div class="info-row"><span class="info-label">📌 状态</span><span class="info-value">' + escapeHtml(status) + '</span></div>' : '') +
+                            '<div class="info-row"><span class="info-label">📅 发行日期</span><span class="info-value">' + escapeHtml(dateStr || '—') + '</span></div>' +
+                            '<div class="info-row"><span class="info-label">⭐ 流行度</span><span class="info-value">' + popularity + '</span></div>' +
+                            (director.length ? '<div class="info-row"><span class="info-label">🎬 导演</span><span class="info-value">' + director.map(p => escapeHtml(p.name)).join('、') + '</span></div>' : '') +
+                            (writers.length ? '<div class="info-row"><span class="info-label">✍️ 编剧</span><span class="info-value">' + writers.map(p => escapeHtml(p.name)).join('、') + '</span></div>' : '') +
+                        '</div>' +
+                    '</div>' +
+                '</div>' +
+                '<div style="margin-top:16px;">' +
+                    '<div class="modal-overview-title">📖 剧情简介</div>' +
+                    '<p class="modal-overview">' + escapeHtml(overview) + '</p>' +
+                '</div>' +
+                (castHtml ? '<div class="modal-section"><div class="modal-section-title">🎭 演员阵容</div>' + castHtml + '</div>' : '') +
+                (recsHtml ? '<div class="modal-section"><div class="modal-section-title">💡 相关推荐</div>' + recsHtml + '</div>' : '') +
+                '<a class="modal-tmdb-link" href="' + escapeHtml(tmdbUrl) + '" target="_blank" rel="noopener">🔗 在 TMDB 查看完整页面 →</a>' +
+            '</div>';
+
+        // Wire up recommendation clicks
+        $('modalBody').querySelectorAll('.rec-card').forEach(card => {
+            card.addEventListener('click', (e) => {
+                e.stopPropagation();
+                openDetail(parseInt(card.dataset.id));
+            });
+        });
+    }
+
+    function closeDetail() {
+        $('detailModal').classList.remove('open');
+        $('detailModal').setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('modal-open');
+        AppState.detailData = null;
+    }
+
+    /* ============================================================
+       SECTION 7: DATA LOADING
+       ============================================================ */
+    function scheduleFilterFetch() {
+        clearTimeout(AppState.filterDebounce);
+        AppState.filterDebounce = setTimeout(() => {
+            AppState.currentPage = 1;
+            loadData();
+        }, 300);
+    }
+
+    function applyFilters() {
+        clearTimeout(AppState.filterDebounce);
+        AppState.currentPage = 1;
+        loadData();
+        // Close drawer on mobile/phone mode
+        if (window.innerWidth < 1024 || AppState.respMode === 'phone') {
+            $('filterSidebar').classList.remove('open');
+            $('filterOverlay').classList.remove('open');
+            AppState.filtersOpen = false;
+        }
+    }
+
+    async function loadData() {
+        // Auto-close hero section on any data fetch
+        if (!AppState.hasStarted) {
+            AppState.hasStarted = true;
+            const hero = $('heroSection');
+            if (hero) hero.classList.add('hidden');
+        }
+        if (AppState.abortController) {
+            AppState.abortController.abort();
+        }
+        AppState.abortController = new AbortController();
+        AppState.isLoading = true;
+        AppState.error = null;
+
+        renderSkeletons();
+        renderResultsHeader();
+        renderPagination();
+        renderActiveFilters();
+
+        try {
+            const data = AppState.searchQuery.trim()
+                ? await fetchSearch()
+                : await fetchDiscover();
+
+            AppState.results = data.results || [];
+            AppState.totalResults = data.total_results || 0;
+            AppState.totalPages = Math.min(data.total_pages || 1, 500);
+
+            if (AppState.viewMode === 'grid') renderGridView();
+            else if (AppState.viewMode === 'detail') renderDetailView();
+            else renderListView();
+
+            renderResultsHeader();
+            renderPagination();
+            renderActiveFilters();
+        } catch (err) {
+            if (err.name === 'AbortError') return;
+            AppState.error = err;
+            renderError(err);
+            renderPagination();
+        }
+        AppState.isLoading = false;
+        AppState.abortController = null;
+    }
+
+    function resetFilters() {
+        AppState.sortBy = 'popularity.desc';
+        AppState.withGenres = [];
+        AppState.voteAverageGte = 0;
+        AppState.voteAverageLte = 10;
+        AppState.voteCountGte = 0;
+        AppState.voteCountLte = 0;
+        AppState.dateGte = '';
+        AppState.dateLte = '';
+        AppState.year = '';
+        AppState.withOriginalLanguage = '';
+        AppState.region = '';
+        AppState.watchProviders = [];
+        AppState.watchRegion = '';
+        AppState.displayLang = 'zh-CN';
+        AppState.searchQuery = '';
+        AppState.currentPage = 1;
+
+        $('sortSelect').value = 'popularity.desc';
+        $('ratingMin').value = '';
+        $('ratingMax').value = '';
+        $('voteCountMin').value = '10';
+        $('voteCountMax').value = '';
+        $('dateFrom').value = '';
+        $('dateTo').value = '';
+        $('yearInput').value = '';
+        $('languageSelect').value = '';
+        $('regionSelect').value = '';
+        $('displayLangSelect').value = 'zh-CN';
+        $('watchRegionSelect').value = '';
+        $('searchInput').value = '';
+
+        renderGenreChips();
+        renderProviderChips();
+        renderActiveFilters();
+    }
+
+    /* ============================================================
+       SECTION 8: EVENT HANDLERS
+       ============================================================ */
+    function setupEvents() {
+        // Theme toggle
+        $('btnThemeToggle').addEventListener('click', toggleTheme);
+
+        // Responsive mode toggle (phone/desktop simulation)
+        $('btnRespToggle').addEventListener('click', toggleRespMode);
+
+        // Window resize — re-check layout visibility
+        window.addEventListener('resize', () => {
+            if (AppState.respMode !== 'phone') updateLayoutVisibility();
+        });
+
+        // Filter drawer open/close
+        $('btnFilterOpen').addEventListener('click', () => {
+            const open = !$('filterSidebar').classList.contains('open');
+            AppState.filtersOpen = open;
+            $('filterSidebar').classList.toggle('open', open);
+            $('filterOverlay').classList.toggle('open', open);
+            $('btnFilterOpen').classList.toggle('active', open);
+        });
+        function closeFilterDrawer() {
+            AppState.filtersOpen = false;
+            $('filterSidebar').classList.remove('open');
+            $('filterOverlay').classList.remove('open');
+            $('btnFilterOpen').classList.remove('active');
+        }
+        $('filterOverlay').addEventListener('click', closeFilterDrawer);
+
+        // Media type toggle (pill-toggle delegation) — immediate fetch
+        $('mediaToggle').addEventListener('click', e => {
+            const btn = e.target.closest('.pill-btn');
+            if (!btn || !btn.dataset.type) return;
+            const type = btn.dataset.type;
+            if (type === AppState.mediaType) return;
+            AppState.mediaType = type;
+            AppState.currentPage = 1;
+            AppState.withGenres = [];
+            AppState.sortBy = 'popularity.desc';
+            $('mediaToggle').querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            updateDateLabel();
+            renderSortOptions();
+            renderGenreChips();
+            renderActiveFilters();
+            loadData();
+        });
+
+        // View mode toggle — no fetch, just switch rendered view
+        $('viewToggle').addEventListener('click', e => {
+            const btn = e.target.closest('.pill-btn');
+            if (!btn || !btn.dataset.view) return;
+            const view = btn.dataset.view;
+            if (view === AppState.viewMode) return;
+            AppState.viewMode = view;
+            $('viewToggle').querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            if (AppState.results.length) {
+                if (view === 'list') renderListView();
+                else if (view === 'grid') renderGridView();
+                else if (view === 'detail') renderDetailView();
+            } else if (AppState.isLoading) {
+                renderSkeletons();
+            }
+        });
+
+        // Apply button — triggers fetch with current filter settings
+        $('btnApply').addEventListener('click', applyFilters);
+
+        // Sort change — save but don't fetch
+        $('sortSelect').addEventListener('change', () => {
+            AppState.sortBy = $('sortSelect').value;
+        });
+
+        // Search input — save but don't fetch (user must click apply)
+        $('searchInput').addEventListener('input', () => {
+            clearTimeout(AppState.searchDebounce);
+            AppState.searchDebounce = setTimeout(() => {
+                AppState.searchQuery = $('searchInput').value.trim();
+            }, 400);
+        });
+
+        // Filter inputs — save to state but don't auto-fetch
+        $('ratingMin').addEventListener('change', () => {
+            const v = parseFloat($('ratingMin').value);
+            AppState.voteAverageGte = isNaN(v) ? 0 : Math.max(0, Math.min(10, v));
+        });
+        $('ratingMax').addEventListener('change', () => {
+            const v = parseFloat($('ratingMax').value);
+            AppState.voteAverageLte = isNaN(v) ? 10 : Math.max(0, Math.min(10, v));
+        });
+        $('voteCountMin').addEventListener('change', () => {
+            const v = parseInt($('voteCountMin').value);
+            AppState.voteCountGte = isNaN(v) ? 0 : Math.max(0, v);
+        });
+        $('voteCountMax').addEventListener('change', () => {
+            const v = parseInt($('voteCountMax').value);
+            AppState.voteCountLte = isNaN(v) ? 0 : Math.max(0, v);
+        });
+        $('dateFrom').addEventListener('change', () => {
+            AppState.dateGte = $('dateFrom').value;
+            // If date range set, clear year
+            if (AppState.dateGte || AppState.dateLte) {
+                AppState.year = '';
+                $('yearInput').value = '';
+            }
+        });
+        $('dateTo').addEventListener('change', () => {
+            AppState.dateLte = $('dateTo').value;
+            if (AppState.dateGte || AppState.dateLte) {
+                AppState.year = '';
+                $('yearInput').value = '';
+            }
+        });
+        $('yearInput').addEventListener('change', () => {
+            const y = $('yearInput').value.trim();
+            AppState.year = y;
+            // If year set, auto-fill date range
+            if (y) {
+                AppState.dateGte = y + '-01-01';
+                AppState.dateLte = y + '-12-31';
+                $('dateFrom').value = AppState.dateGte;
+                $('dateTo').value = AppState.dateLte;
+            }
+        });
+        $('languageSelect').addEventListener('change', () => {
+            AppState.withOriginalLanguage = $('languageSelect').value;
+        });
+        $('regionSelect').addEventListener('change', () => {
+            AppState.region = $('regionSelect').value;
+        });
+        $('displayLangSelect').addEventListener('change', () => {
+            AppState.displayLang = $('displayLangSelect').value;
+        });
+        $('watchRegionSelect').addEventListener('change', () => {
+            AppState.watchRegion = $('watchRegionSelect').value;
+            AppState.watchProviders = [];
+            renderProviderChips();
+        });
+
+        // Reset button — only clears inputs, apply triggers fetch
+        $('btnReset').addEventListener('click', () => {
+            resetFilters();
+        });
+
+        // Modal close
+        $('modalClose').addEventListener('click', closeDetail);
+        $('detailModal').addEventListener('click', e => {
+            if (e.target === $('detailModal')) closeDetail();
+        });
+
+        // Hero start button
+        $('btnHeroStart').addEventListener('click', () => {
+            AppState.hasStarted = true;
+            $('heroSection').classList.add('hidden');
+            loadData();
+        });
+
+        // About modal
+        $('btnAbout').addEventListener('click', () => {
+            $('aboutModal').classList.add('open');
+            $('aboutModal').setAttribute('aria-hidden', 'false');
+            document.body.classList.add('modal-open');
+            // Render request log
+            const list = $('aboutRequestList');
+            list.innerHTML = requestLog.length
+                ? requestLog.map(r => '<div style="margin-bottom:6px;">🕐 ' + escapeHtml(r.time) + '<br>🔗 ' + escapeHtml(r.url) + '</div>').join('')
+                : '<span style="color:var(--text-muted);">暂无请求记录</span>';
+        });
+        $('aboutClose').addEventListener('click', () => {
+            $('aboutModal').classList.remove('open');
+            $('aboutModal').setAttribute('aria-hidden', 'true');
+            document.body.classList.remove('modal-open');
+        });
+        $('aboutModal').addEventListener('click', e => {
+            if (e.target === $('aboutModal')) {
+                $('aboutModal').classList.remove('open');
+                $('aboutModal').setAttribute('aria-hidden', 'true');
+                document.body.classList.remove('modal-open');
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') {
+                if ($('detailModal').classList.contains('open')) closeDetail();
+                else if ($('aboutModal').classList.contains('open')) {
+                    $('aboutModal').classList.remove('open');
+                    $('aboutModal').setAttribute('aria-hidden', 'true');
+                    document.body.classList.remove('modal-open');
+                }
+                else if ($('filterSidebar').classList.contains('open')) closeFilterDrawer();
+            }
+        });
+    }
+
+    function updateDateLabel() {
+        $('dateLabel').textContent = AppState.mediaType === 'movie' ? '📅 上映日期范围' : '📅 首播日期范围';
+    }
+
+    /* ============================================================
+       SECTION 9: INITIALIZATION
+       ============================================================ */
+    async function init() {
+        initTheme();
+        setupEvents();
+
+        // Render static filter options
+        renderLanguageOptions();
+        renderRegionOptions();
+        renderWatchRegionOptions();
+        renderSortOptions();
+        updateDateLabel();
+
+        // Fetch genres (cached)
+        try {
+            const genres = await fetchGenres('movie');
+            AppState.genres.movie = genres;
+            const map = new Map();
+            genres.forEach(g => map.set(g.id, g.name));
+            AppState.genreMap.movie = map;
+        } catch (_) {
+            AppState.genres.movie = [];
+        }
+        try {
+            const tvGenres = await fetchGenres('tv');
+            AppState.genres.tv = tvGenres;
+            const map = new Map();
+            tvGenres.forEach(g => map.set(g.id, g.name));
+            AppState.genreMap.tv = map;
+        } catch (_) {
+            AppState.genres.tv = [];
+        }
+
+        renderGenreChips();
+        renderProviderChips();
+
+        // Set vote count default value in input
+        $('voteCountMin').value = '10';
+
+        // Load initial data — don't auto fetch, show hero instead
+        // loadData();
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
