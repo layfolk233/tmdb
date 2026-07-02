@@ -516,7 +516,10 @@
         /* ============================================================
            LIST VIEW
            ============================================================ */
-        .card-list { display:flex; flex-direction:column; gap:var(--space-sm); }
+        .card-list { display:grid; grid-template-columns:1fr; gap:var(--space-sm); }
+        @media (min-width:1024px) {
+            .card-list { grid-template-columns:1fr 1fr; }
+        }
         .card-list-item {
             display:flex; gap:var(--space-md);
             background:var(--bg-card); border:1px solid var(--border-subtle);
@@ -530,15 +533,19 @@
             border-color:var(--border-medium);
             transform:translateX(4px);
         }
+        .card-list-idx {
+            font-size:0.8rem; font-weight:600;
+            color:var(--text-muted); margin-right:4px;
+        }
         .card-list-poster {
-            width:64px; height:96px; border-radius:var(--radius-sm);
+            width:80px; height:120px; border-radius:var(--radius-sm);
             object-fit:cover; flex-shrink:0; background:var(--bg-tertiary);
         }
         .card-list-poster-placeholder {
-            width:64px; height:96px; border-radius:var(--radius-sm);
+            width:80px; height:120px; border-radius:var(--radius-sm);
             flex-shrink:0; background:var(--bg-tertiary);
             display:flex; align-items:center; justify-content:center;
-            font-size:1.5rem; color:var(--text-muted);
+            font-size:1.2rem; color:var(--text-muted);
         }
         .card-list-info { flex:1; min-width:0; display:flex; flex-direction:column; gap:4px; justify-content:center; }
         .card-list-title { font-weight:700; font-size:1rem; color:var(--text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -558,8 +565,25 @@
         }
         .card-list-overview {
             font-size:0.8rem; color:var(--text-muted);
-            display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;
+            display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical;
             overflow:hidden; line-height:1.4;
+        }
+        /* Detail meta row — fixed-width label/value pairs */
+        .detail-meta-row {
+            display:flex; flex-wrap:wrap; gap:4px 8px;
+            font-size:0.72rem; color:var(--text-secondary);
+            margin:3px 0 2px;
+        }
+        .detail-meta-item {
+            display:inline-flex; align-items:center; gap:2px;
+            white-space:nowrap; margin-right:4px;
+        }
+        .detail-meta-label {
+            color:var(--text-muted); min-width:16px; text-align:center;
+        }
+        .detail-meta-value {
+            color:var(--text-secondary);
+            min-width:30px;
         }
         @media (max-width:768px) {
             .card-list-overview { -webkit-line-clamp:3; }
@@ -570,7 +594,7 @@
            ============================================================ */
         .card-grid {
             display:grid;
-            grid-template-columns:repeat(auto-fill, minmax(160px, 1fr));
+            grid-template-columns:repeat(auto-fill, minmax(165px, 1fr));
             gap:var(--space-md);
         }
         .card-grid-item {
@@ -594,12 +618,19 @@
             font-size:0.72rem; font-weight:700;
             backdrop-filter:blur(4px);
         }
+        .card-grid-index {
+            position:absolute; top:8px; left:8px; z-index:1;
+            background:rgba(0,0,0,0.7); color:#fff;
+            width:22px; height:22px; border-radius:50%;
+            font-size:0.68rem; font-weight:700;
+            display:flex; align-items:center; justify-content:center;
+        }
         .card-grid-info { padding:10px 12px 12px; }
         .card-grid-title {
             font-weight:600; font-size:0.85rem; color:var(--text-primary);
             white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
         }
-        .card-grid-year { font-size:0.72rem; color:var(--text-muted); margin-top:2px; }
+        .card-grid-year { font-size:0.72rem; color:var(--text-secondary); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
         /* ============================================================
            PAGINATION
@@ -732,6 +763,22 @@
         }
         .modal-tmdb-link:hover { background:var(--accent-hover); text-decoration:none; }
 
+        /* Modal info table */
+        .modal-info-table {
+            margin:12px 0 0;
+            display:flex; flex-direction:column; gap:4px;
+        }
+        .info-row {
+            display:flex; align-items:center;
+            font-size:0.82rem; line-height:1.6;
+        }
+        .info-label {
+            color:var(--text-muted); min-width:68px; flex-shrink:0;
+        }
+        .info-value {
+            color:var(--text-secondary);
+        }
+
         /* ============================================================
            LOADING SKELETONS
            ============================================================ */
@@ -785,7 +832,7 @@
             .app-layout { flex-direction:column; }
             .content-area { padding:var(--space-md); }
             .card-list-item { flex-direction:row; gap:12px; padding:12px; }
-            .card-list-poster, .card-list-poster-placeholder { width:56px; height:84px; }
+            .card-list-poster, .card-list-poster-placeholder { width:60px; height:90px; }
             .card-grid { grid-template-columns:repeat(auto-fill, minmax(130px, 1fr)); gap:12px; }
             .modal-poster-row { flex-direction:column; align-items:center; }
             .modal-poster { width:150px; }
@@ -817,6 +864,7 @@
         <div class="header-right">
             <button class="resp-toggle" id="btnRespToggle" title="切换手机/电脑视图" aria-label="切换响应式视图">📱</button>
             <button class="theme-toggle" id="btnThemeToggle" title="切换日间/夜间模式" aria-label="切换主题">🌙</button>
+            <button class="theme-toggle" id="btnAbout" style="font-size:1rem;font-weight:700;" title="关于" aria-label="关于">?</button>
         </div>
     </header>
 
@@ -838,8 +886,9 @@
         </div>
         <div class="toolbar-right">
             <div class="pill-toggle" id="viewToggle">
-                <button class="pill-btn sub-pill active" data-view="list">列表</button>
-                <button class="pill-btn sub-pill" data-view="grid">网格</button>
+                <button class="pill-btn sub-pill active" data-view="list">概览</button>
+                <button class="pill-btn sub-pill" data-view="grid">海报</button>
+                <button class="pill-btn sub-pill" data-view="detail">完整</button>
             </div>
         </div>
     </div>
@@ -862,11 +911,11 @@
             <!-- 搜索 + 排序（第一组） -->
             <div class="filter-group">
                 <div class="filter-section filter-row-inline">
-                    <label class="filter-label">🔍 搜索</label>
+                    <label class="filter-label">🔍 搜索　　</label>
                     <input type="text" class="filter-input" id="searchInput" placeholder="关键词...">
                 </div>
                 <div class="filter-section filter-row-inline">
-                    <label class="filter-label">📊 排序</label>
+                    <label class="filter-label">📊 排序　　</label>
                     <select class="filter-select" id="sortSelect"></select>
                 </div>
             </div>
@@ -874,7 +923,7 @@
             <!-- 筛选条件（第二组）：评分 → 票数 → 类型 → 年份 → 日期 -->
             <div class="filter-group">
                 <div class="filter-section filter-row-inline">
-                    <label class="filter-label">⭐ 评分</label>
+                    <label class="filter-label">⭐ 评分　　</label>
                     <div class="filter-row" style="flex:1;">
                         <input type="number" class="filter-input" id="ratingMin" placeholder="最低" min="0" max="10" step="0.5">
                         <span style="color:var(--text-muted);align-self:center;">—</span>
@@ -882,19 +931,23 @@
                     </div>
                 </div>
                 <div class="filter-section filter-row-inline">
-                    <label class="filter-label">🗳️ 票数</label>
-                    <input type="number" class="filter-input" id="voteCountMin" placeholder="100" min="0">
+                    <label class="filter-label">🗳️ 票数　　</label>
+                    <div class="filter-row" style="flex:1;">
+                        <input type="number" class="filter-input" id="voteCountMin" placeholder="最少" min="0" value="10">
+                        <span style="color:var(--text-muted);align-self:center;">—</span>
+                        <input type="number" class="filter-input" id="voteCountMax" placeholder="最多" min="0">
+                    </div>
                 </div>
                 <div class="filter-section filter-row-inline">
-                    <label class="filter-label">🏷️ 类型</label>
+                    <label class="filter-label">🏷️ 类型　　</label>
                 </div>
                 <div class="genre-chips" id="genreChips">加载中...</div>
                 <div class="filter-section filter-row-inline">
-                    <label class="filter-label">📆 年份</label>
+                    <label class="filter-label">📆 年份　　</label>
                     <input type="number" class="filter-input" id="yearInput" placeholder="2024" min="1900" max="2030">
                 </div>
                 <div class="filter-section">
-                    <label class="filter-label" id="dateLabel">🗓️ 日期范围</label>
+                    <label class="filter-label" id="dateLabel">🗓️ 日期范围　　</label>
                     <div class="filter-section filter-row-inline">
                         <input type="date" class="filter-input" id="dateFrom">
                         <input type="date" class="filter-input" id="dateTo">
@@ -905,19 +958,31 @@
             <!-- 其他（第三组） -->
             <div class="filter-group">
                 <div class="filter-section filter-row-inline">
-                    <label class="filter-label">🌐 语言</label>
+                    <label class="filter-label">🌐 原始语言　　</label>
                     <select class="filter-select" id="languageSelect"></select>
                 </div>
                 <div class="filter-section filter-row-inline">
-                    <label class="filter-label">🌍 地区</label>
+                    <label class="filter-label">🌍 上映地区　　</label>
                     <select class="filter-select" id="regionSelect"></select>
                 </div>
                 <div class="filter-section">
                     <div class="filter-section filter-row-inline">
-                        <label class="filter-label">📡 流媒体</label>
+                        <label class="filter-label">📡 流媒体　　</label>
                         <select class="filter-select" id="watchRegionSelect"></select>
                     </div>
                     <div class="provider-chips" id="providerChips" style="margin-top:4px;"></div>
+                </div>
+                <!-- 新增筛选行：返回语言 + 显示语言下拉 -->
+                <div class="filter-section filter-row-inline" style="border-top:1px solid var(--border-subtle);padding-top:8px;margin-top:4px;">
+                    <label class="filter-label">📄 显示语言　　</label>
+                    <select class="filter-select" id="displayLangSelect">
+                        <option value="zh-CN">中文</option>
+                        <option value="en-US">English</option>
+                        <option value="ja-JP">日本語</option>
+                        <option value="ko-KR">한국어</option>
+                        <option value="fr-FR">Français</option>
+                        <option value="es-ES">Español</option>
+                    </select>
                 </div>
             </div>
         </aside>
@@ -950,7 +1015,31 @@
         </div>
     </div>
 
+    <!-- ============================================================
+    ABOUT MODAL
+    ============================================================ -->
+    <div class="modal-overlay" id="aboutModal" aria-hidden="true">
+        <div class="modal-content" style="max-width:600px;">
+            <button class="modal-close" id="aboutClose" aria-label="关闭">&times;</button>
+            <div style="padding:var(--space-xl);">
+                <h3 style="font-size:1.2rem;font-weight:700;margin-bottom:var(--space-md);">📋 关于影觅</h3>
+                <p style="font-size:0.9rem;color:var(--text-secondary);line-height:1.7;margin-bottom:var(--space-lg);">
+                    本网站数据来源于 <a href="https://www.themoviedb.org/" target="_blank" rel="noopener">TMDB</a>（The Movie Database）API。
+                </p>
+                <div id="aboutRequestLog">
+                    <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:var(--space-sm);">最近请求记录：</p>
+                    <div id="aboutRequestList" style="font-size:0.72rem;color:var(--text-secondary);line-height:1.6;word-break:break-all;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
+    /* ============================================================
+       GLOBAL — request log
+       ============================================================ */
+    const requestLog = [];
+
     /* ============================================================
        SECTION 1: CONFIGURATION & CONSTANTS
        ============================================================ */
@@ -1062,6 +1151,7 @@
         voteAverageGte: 0,
         voteAverageLte: 10,
         voteCountGte: 10,
+        voteCountLte: 0,
         dateGte: '',
         dateLte: '',
         year: '',
@@ -1082,6 +1172,7 @@
         detailData: null,
         filtersOpen: false,
         hasStarted: false,           // first visit — show hero
+        displayLang: 'zh-CN',        // TMDB API language param
         theme: 'dark',
         respMode: 'desktop',       // 'desktop' | 'phone'
         abortController: null,
@@ -1179,15 +1270,20 @@
     async function apiFetch(endpoint, params = {}) {
         //const url = new URL('/tmdb/3' + endpoint, window.location.origin);
         const url = new URL('https://api.themoviedb.org/3' + endpoint, window.location.origin);
-        
+
         Object.entries(params).forEach(([k, v]) => {
             if (v === '' || v === null || v === undefined) return;
             if (Array.isArray(v) && v.length === 0) return;
             url.searchParams.set(k, Array.isArray(v) ? v.join(',') : v);
         });
-        url.searchParams.set('language', 'zh-CN');
+        url.searchParams.set('language', AppState.displayLang || 'zh-CN');
 
-        const res = await fetch(url.toString(), {
+        // Log request URL (before fetch, so even failed requests are logged)
+        const fullUrl = url.toString();
+        requestLog.unshift({ url: fullUrl, time: new Date().toLocaleTimeString() });
+        if (requestLog.length > 3) requestLog.length = 3;
+
+        const res = await fetch(fullUrl, {
             headers: {
                 'Authorization': 'Bearer ' + TMDB_TOKEN,
                 'Content-Type': 'application/json',
@@ -1195,6 +1291,10 @@
             signal: AppState.abortController ? AppState.abortController.signal : undefined,
         });
 
+        return await handleApiResponse(res, fullUrl);
+    }
+
+    async function handleApiResponse(res, url = '') {
         if (!res.ok) {
             const errText = await res.text().catch(() => 'Unknown error');
             const err = new Error('HTTP ' + res.status + ': ' + errText.substring(0, 200));
@@ -1227,6 +1327,7 @@
         if (AppState.voteAverageGte > 0) params['vote_average.gte'] = AppState.voteAverageGte;
         if (AppState.voteAverageLte < 10) params['vote_average.lte'] = AppState.voteAverageLte;
         if (AppState.voteCountGte > 0) params['vote_count.gte'] = AppState.voteCountGte;
+        if (AppState.voteCountLte > 0) params['vote_count.lte'] = AppState.voteCountLte;
         if (AppState.year) {
             params[AppState.mediaType === 'movie' ? 'primary_release_year' : 'first_air_date_year'] = AppState.year;
         }
@@ -1254,7 +1355,7 @@
     }
 
     async function fetchDetail(id) {
-        const append = 'credits,recommendations,watch/providers';
+        const append = 'credits,recommendations';
         return apiFetch('/' + AppState.mediaType + '/' + id, { append_to_response:append });
     }
 
@@ -1360,9 +1461,14 @@
                 renderActiveFilters();
             }});
         }
-        if (AppState.voteCountGte > 0) {
-            tags.push({ label:'投票 ≥' + AppState.voteCountGte, clear:() => {
-                AppState.voteCountGte = 0; $('voteCountMin').value = '';
+        if (AppState.voteCountGte > 0 || AppState.voteCountLte > 0) {
+            var vcLabel = '';
+            if (AppState.voteCountGte > 0) vcLabel += '≥' + AppState.voteCountGte;
+            if (AppState.voteCountGte > 0 && AppState.voteCountLte > 0) vcLabel += ' ';
+            if (AppState.voteCountLte > 0) vcLabel += '≤' + AppState.voteCountLte;
+            tags.push({ label:'投票: ' + vcLabel, clear:() => {
+                AppState.voteCountGte = 0; AppState.voteCountLte = 0;
+                $('voteCountMin').value = ''; $('voteCountMax').value = '';
                 renderActiveFilters();
             }});
         }
@@ -1403,7 +1509,7 @@
         });
     }
 
-    // --- Content Cards ---
+    // --- List View ("概览" view) — 1-row title; 1-row meta; 2-3-row overview ---
     function renderListView() {
         const container = $('cardContainer');
         if (!AppState.results.length) {
@@ -1411,26 +1517,35 @@
             return;
         }
         const genreMap = AppState.genreMap[AppState.mediaType];
-        container.innerHTML = '<div class="card-list">' + AppState.results.map(item => {
+        const page = AppState.currentPage;
+        const langNames = { en:'英语', zh:'中文', ja:'日语', ko:'韩语', fr:'法语', de:'德语',
+            es:'西班牙语', it:'意大利语', pt:'葡萄牙语', ru:'俄语', hi:'印地语', th:'泰语',
+            sv:'瑞典语', da:'丹麦语', nl:'荷兰语', no:'挪威语', fi:'芬兰语', pl:'波兰语',
+            tr:'土耳其语', ar:'阿拉伯语', id:'印尼语', vi:'越南语', ms:'马来语', tl:'菲律宾语',
+            he:'希伯来语', ro:'罗马尼亚语', hu:'匈牙利语', cs:'捷克语', el:'希腊语',
+            uk:'乌克兰语', bg:'保加利亚语', sr:'塞尔维亚语', hr:'克罗地亚语',
+            sk:'斯洛伐克语', sl:'斯洛文尼亚语', lt:'立陶宛语', lv:'拉脱维亚语',
+            et:'爱沙尼亚语', is:'冰岛语', mt:'马耳他语', ga:'爱尔兰语',
+            fa:'波斯语', ur:'乌尔都语', ta:'泰米尔语', te:'泰卢固语',
+            ml:'马拉雅拉姆语', kn:'卡纳达语', mr:'马拉地语', gu:'古吉拉特语',
+            bn:'孟加拉语', pa:'旁遮普语', ne:'尼泊尔语', si:'僧伽罗语',
+            my:'缅甸语', km:'高棉语', lo:'老挝语', mn:'蒙古语',
+            ka:'格鲁吉亚语', hy:'亚美尼亚语', az:'阿塞拜疆语',
+            kk:'哈萨克语', uz:'乌兹别克语', af:'南非语', sw:'斯瓦希里语',
+            zu:'祖鲁语', ha:'豪萨语', yo:'约鲁巴语', ig:'伊博语',
+            am:'阿姆哈拉语' };
+        container.innerHTML = '<div class="card-list">' + AppState.results.map((item, i) => {
+            const index = (page - 1) * 20 + i + 1;
             const title = item.title || item.name || 'Untitled';
             const dateStr = item.release_date || item.first_air_date || '';
             const year = dateStr ? dateStr.slice(0, 4) : '—';
             const lang = item.original_language || '';
-            const region = lang ? langToRegion(lang) : '—';
+            const langCN = langNames[lang] || lang.toUpperCase();
             const rating = item.vote_average != null ? item.vote_average.toFixed(1) : '?';
-            const overview = item.overview || '暂无简介';
+            const overview = item.overview || '';
             const posterPath = item.poster_path;
-            const genreIds = (item.genre_ids || []).slice(0, 2);
-            const genreNames = genreIds.map(gid => genreMap.get(gid) || '').filter(Boolean);
-
-            // Country name helper
-            function countryName(code) {
-                const m = { US:'美国', CN:'中国', JP:'日本', KR:'韩国', GB:'英国', FR:'法国',
-                    DE:'德国', IN:'印度', HK:'香港', TW:'台湾', CA:'加拿大', AU:'澳大利亚',
-                    BR:'巴西', MX:'墨西哥', ES:'西班牙', IT:'意大利', RU:'俄罗斯', SE:'瑞典', NL:'荷兰' };
-                return m[code] || code;
-            }
-            const regionCN = lang ? countryName(langToRegion(lang)) : '—';
+            const genreIds = (item.genre_ids || []).slice(0, 1);
+            const genreName = genreIds.map(gid => genreMap.get(gid) || '').filter(Boolean)[0] || '';
 
             let posterHtml;
             if (posterPath) {
@@ -1443,14 +1558,14 @@
             return '<div class="card-list-item" data-id="' + item.id + '">' +
                 posterHtml +
                 '<div class="card-list-info">' +
-                    '<div class="card-list-title">' + escapeHtml(title) + '</div>' +
+                    '<div class="card-list-title"><span class="card-list-idx">' + index + '.</span>' + escapeHtml(title) + '</div>' +
                     '<div class="card-list-meta">' +
                         '<span>📆 ' + year + '</span>' +
-                        '<span>🌐 ' + escapeHtml(regionCN) + '</span>' +
-                        (genreNames.length ? genreNames.map(g => '<span class="card-list-genre-tag" style="font-size:0.75rem;">' + escapeHtml(g) + '</span>').join('') : '') +
-                        '<span class="card-list-rating">★ ' + rating + '</span>' +
+                        ' · <span>🌐 ' + escapeHtml(langCN) + '</span>' +
+                        (genreName ? ' · <span class="card-list-genre-tag" style="font-size:0.75rem;">' + escapeHtml(genreName) + '</span>' : '') +
+                        ' · <span class="card-list-rating">★ ' + rating + '</span>' +
                     '</div>' +
-                    '<div class="card-list-overview">' + escapeHtml(overview) + '</div>' +
+                    (overview ? '<div class="card-list-overview">' + escapeHtml(overview) + '</div>' : '') +
                 '</div>' +
             '</div>';
         }).join('') + '</div>';
@@ -1466,12 +1581,34 @@
             renderEmpty();
             return;
         }
-        container.innerHTML = '<div class="card-grid">' + AppState.results.map(item => {
+        const genreMap = AppState.genreMap[AppState.mediaType];
+        const page = AppState.currentPage;
+        container.innerHTML = '<div class="card-grid">' + AppState.results.map((item, i) => {
+            const index = (page - 1) * 20 + i + 1;
             const title = item.title || item.name || 'Untitled';
             const dateStr = item.release_date || item.first_air_date || '';
             const year = dateStr ? dateStr.slice(0, 4) : '—';
             const rating = item.vote_average != null ? item.vote_average.toFixed(1) : '?';
+            const lang = item.original_language || '';
+            const langCN = ({ en:'英语', zh:'中文', ja:'日语', ko:'韩语', fr:'法语', de:'德语',
+                es:'西班牙语', it:'意大利语', pt:'葡萄牙语', ru:'俄语', hi:'印地语', th:'泰语',
+                sv:'瑞典语', da:'丹麦语', nl:'荷兰语', no:'挪威语', fi:'芬兰语', pl:'波兰语',
+                tr:'土耳其语', ar:'阿拉伯语', id:'印尼语', vi:'越南语', ms:'马来语', tl:'菲律宾语',
+                he:'希伯来语', ro:'罗马尼亚语', hu:'匈牙利语', cs:'捷克语', el:'希腊语',
+                uk:'乌克兰语', bg:'保加利亚语', sr:'塞尔维亚语', hr:'克罗地亚语',
+                sk:'斯洛伐克语', sl:'斯洛文尼亚语', lt:'立陶宛语', lv:'拉脱维亚语',
+                et:'爱沙尼亚语', is:'冰岛语', mt:'马耳他语', ga:'爱尔兰语',
+                fa:'波斯语', ur:'乌尔都语', ta:'泰米尔语', te:'泰卢固语',
+                ml:'马拉雅拉姆语', kn:'卡纳达语', mr:'马拉地语', gu:'古吉拉特语',
+                bn:'孟加拉语', pa:'旁遮普语', ne:'尼泊尔语', si:'僧伽罗语',
+                my:'缅甸语', km:'高棉语', lo:'老挝语', mn:'蒙古语',
+                ka:'格鲁吉亚语', hy:'亚美尼亚语', az:'阿塞拜疆语',
+                kk:'哈萨克语', uz:'乌兹别克语', af:'南非语', sw:'斯瓦希里语',
+                zu:'祖鲁语', ha:'豪萨语', yo:'约鲁巴语', ig:'伊博语',
+                am:'阿姆哈拉语' })[lang] || lang.toUpperCase();
             const posterPath = item.poster_path;
+            const genreIds = (item.genre_ids || []).slice(0, 1);
+            const genreName = genreIds.map(gid => genreMap.get(gid) || '').filter(Boolean)[0] || '';
 
             let posterHtml;
             if (posterPath) {
@@ -1484,10 +1621,11 @@
             }
 
             return '<div class="card-grid-item" data-id="' + item.id + '">' +
+                '<div class="card-grid-index">' + index + '</div>' +
                 posterHtml +
                 '<div class="card-grid-info">' +
                     '<div class="card-grid-title" title="' + escapeHtml(title) + '">' + escapeHtml(title) + '</div>' +
-                    '<div class="card-grid-year">📆 ' + year + '</div>' +
+                    '<div class="card-grid-year">' + year + ' · ' + escapeHtml(langCN) + (genreName ? ' · ' + escapeHtml(genreName) : '') + '</div>' +
                 '</div>' +
             '</div>';
         }).join('') + '</div>';
@@ -1501,6 +1639,102 @@
         $('resultsCount').innerHTML = AppState.totalResults > 0
             ? '共找到 <strong>' + AppState.totalResults.toLocaleString() + '</strong> 部作品'
             : '';
+    }
+
+    // --- Detail View ("完整" view) — single column, 3-line cards, all discover fields ---
+    function renderDetailView() {
+        const container = $('cardContainer');
+        if (!AppState.results.length) {
+            renderEmpty();
+            return;
+        }
+        const genreMap = AppState.genreMap[AppState.mediaType];
+        const page = AppState.currentPage;
+        container.innerHTML = AppState.results.map((item, i) => {
+            const index = (page - 1) * 20 + i + 1;
+            const title = item.title || item.name || 'Untitled';
+            const dateStr = item.release_date || item.first_air_date || '';
+            const fullDate = dateStr || '—';
+            const lang = item.original_language || '';
+            const langCN = ({ en:'英语', zh:'中文', ja:'日语', ko:'韩语', fr:'法语', de:'德语',
+                es:'西班牙语', it:'意大利语', pt:'葡萄牙语', ru:'俄语', hi:'印地语', th:'泰语',
+                sv:'瑞典语', da:'丹麦语', nl:'荷兰语', no:'挪威语', fi:'芬兰语', pl:'波兰语',
+                tr:'土耳其语', ar:'阿拉伯语', id:'印尼语', vi:'越南语', ms:'马来语', tl:'菲律宾语',
+                he:'希伯来语', ro:'罗马尼亚语', hu:'匈牙利语', cs:'捷克语', el:'希腊语',
+                uk:'乌克兰语', bg:'保加利亚语', sr:'塞尔维亚语', hr:'克罗地亚语',
+                sk:'斯洛伐克语', sl:'斯洛文尼亚语', lt:'立陶宛语', lv:'拉脱维亚语',
+                et:'爱沙尼亚语', is:'冰岛语', mt:'马耳他语', ga:'爱尔兰语',
+                fa:'波斯语', ur:'乌尔都语', ta:'泰米尔语', te:'泰卢固语',
+                ml:'马拉雅拉姆语', kn:'卡纳达语', mr:'马拉地语', gu:'古吉拉特语',
+                bn:'孟加拉语', pa:'旁遮普语', ne:'尼泊尔语', si:'僧伽罗语',
+                my:'缅甸语', km:'高棉语', lo:'老挝语', mn:'蒙古语',
+                ka:'格鲁吉亚语', hy:'亚美尼亚语', az:'阿塞拜疆语',
+                kk:'哈萨克语', uz:'乌兹别克语', af:'南非语', sw:'斯瓦希里语',
+                zu:'祖鲁语', ha:'豪萨语', yo:'约鲁巴语', ig:'伊博语',
+                am:'阿姆哈拉语' })[lang] || lang.toUpperCase();
+            const rating = item.vote_average != null ? item.vote_average.toFixed(1) : '—';
+            const voteCount = item.vote_count || 0;
+            const popularity = item.popularity != null ? Math.round(item.popularity) : '—';
+            const overview = item.overview || '';
+            const posterPath = item.poster_path;
+            const genreIds = (item.genre_ids || []);
+            const genreNames = genreIds.map(gid => genreMap.get(gid) || '').filter(Boolean);
+            const adult = item.adult ? '是' : '否';
+            const video = item.video ? '是' : '否';
+
+            let posterHtml;
+            if (posterPath) {
+                posterHtml = '<img class="card-list-poster" src="' + IMAGE_BASE + POSTER_SIZES.thumb + posterPath + '" alt="' + escapeHtml(title) + '" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';">' +
+                    '<div class="card-list-poster-placeholder" style="display:none;">🎬</div>';
+            } else {
+                posterHtml = '<div class="card-list-poster-placeholder">🎬</div>';
+            }
+
+            // Vote count color
+            function voteColor(n) {
+                if (n < 100) return 'red';
+                if (n < 10000) return '#f5a623';
+                return '#22c55e';
+            }
+            const vc = voteColor(voteCount);
+            const voteStr = rating + ' (<span style="color:' + vc + ';">' + voteCount.toLocaleString() + '</span> 票)';
+
+            // Fixed-width label-value pairs for alignment
+            const metaItems = [
+                { label:'📅', value:escapeHtml(fullDate) },
+                { label:'⭐', value:voteStr },
+                { label:'🔥', value:String(popularity) },
+                { label:'🌐', value:escapeHtml(langCN) },
+            ];
+            if (genreNames.length) {
+                metaItems.push({ label:'🏷️', value:genreNames.map(g => '<span class="card-list-genre-tag">' + escapeHtml(g) + '</span>').join(' ') });
+            }
+            metaItems.push({ label:'🔞', value:adult });
+            metaItems.push({ label:'📼', value:video });
+
+            const metaHtml = metaItems.map(m =>
+                '<span class="detail-meta-item"><span class="detail-meta-label">' + m.label + '</span><span class="detail-meta-value">' + m.value + '</span></span>'
+            ).join('');
+
+            return '<div class="card-list-item" data-id="' + item.id + '" style="max-width:100%;">' +
+                posterHtml +
+                '<div class="card-list-info">' +
+                    '<div class="card-list-title" style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:4px;"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:1;min-width:0;"><span class="card-list-idx">' + index + '.</span>' + escapeHtml(title) + '</span><span style="flex-shrink:0;white-space:nowrap;font-size:0.78rem;"><span style="font-weight:600;">⭐ ' + rating + '</span> <span style="font-weight:400;color:' + vc + ';">(' + voteCount.toLocaleString() + ' 票)</span> <span style="color:var(--text-muted);">🔥 ' + popularity + '</span></span></div>' +
+                    '<div style="font-size:0.72rem;color:var(--text-secondary);margin-bottom:2px;">' +
+                        escapeHtml(fullDate) +
+                        ' · ' + escapeHtml(langCN) +
+                        (genreNames.length ? ' · ' + genreNames.map(g => '<span class="card-list-genre-tag">' + escapeHtml(g) + '</span>').join(' ') : '') +
+                        ' · 成人 ' + adult +
+                        ' · 视频 ' + video +
+                    '</div>' +
+                    (overview ? '<div class="card-list-overview" style="-webkit-line-clamp:unset;display:block;overflow:visible;">' + escapeHtml(overview) + '</div>' : '') +
+                '</div>' +
+            '</div>';
+        }).join('');
+
+        container.querySelectorAll('.card-list-item').forEach(card => {
+            card.addEventListener('click', () => openDetail(parseInt(card.dataset.id)));
+        });
     }
 
     function renderPagination() {
@@ -1556,7 +1790,7 @@
                     '</div>' +
                 '</div>'
             ).join('');
-        } else {
+        } else if (AppState.viewMode === 'grid') {
             container.innerHTML = '<div class="card-grid">' + Array.from({ length:8 }, () =>
                 '<div class="card-grid-item">' +
                     '<div class="card-grid-poster-wrap"><div class="skeleton" style="width:100%;height:100%;"></div></div>' +
@@ -1566,6 +1800,12 @@
                     '</div>' +
                 '</div>'
             ).join('') + '</div>';
+        } else {
+            // detail view skeleton
+            container.innerHTML = '<div class="skeleton" style="height:200px;border-radius:var(--radius-lg);margin-bottom:16px;"></div>' +
+                '<div class="skeleton" style="height:24px;width:60%;margin-bottom:12px;"></div>' +
+                '<div class="skeleton" style="height:16px;width:90%;margin-bottom:6px;"></div>' +
+                '<div class="skeleton" style="height:16px;width:70%;margin-bottom:6px;"></div>';
         }
     }
 
@@ -1645,24 +1885,13 @@
         const status = d.status || '';
         const seasons = d.number_of_seasons ? d.number_of_seasons + ' 季' : '';
         const episodes = d.number_of_episodes ? d.number_of_episodes + ' 集' : '';
-        const certification = d.release_dates ? (
-            d.release_dates.results && d.release_dates.results.find(r => r.iso_3166_1 === 'US')
-            && d.release_dates.results.find(r => r.iso_3166_1 === 'US').release_dates
-            && d.release_dates.results.find(r => r.iso_3166_1 === 'US').release_dates[0]
-            ? d.release_dates.results.find(r => r.iso_3166_1 === 'US').release_dates[0].certification
-            : ''
-        ) : '';
-        const contentRatings = d.content_ratings ? (
-            d.content_ratings.results && d.content_ratings.results.find(r => r.iso_3166_1 === 'US')
-            ? d.content_ratings.results.find(r => r.iso_3166_1 === 'US').rating
-            : ''
-        ) : '';
-        const cert = certification || contentRatings || '';
 
         // Director and writer from crew
         const crewList = d.credits || {};
         const director = (crewList.crew || []).filter(p => p.job === 'Director').slice(0, 2);
         const writers = (crewList.crew || []).filter(p => p.job === 'Writer' || p.job === 'Screenplay').slice(0, 2);
+        const cast = (crewList.cast || []).slice(0, 10);
+        const recs = (d.recommendations && d.recommendations.results || []).slice(0, 8);
 
         let castHtml = '';
         if (cast.length) {
@@ -1713,7 +1942,6 @@
                             (year ? '<span>📆 ' + year + '</span><span class="sep">|</span>' : '') +
                             (runtime ? '<span>⏱️ ' + runtime + '</span><span class="sep">|</span>' : '') +
                             (seasons ? '<span>📺 ' + seasons + (episodes ? ' · ' + episodes : '') + '</span><span class="sep">|</span>' : '') +
-                            (cert ? '<span>🔞 ' + escapeHtml(cert) + '</span><span class="sep">|</span>' : '') +
                             '<span class="modal-rating-big">⭐ ' + rating + ' <span style="font-weight:400;font-size:0.75rem;">(' + voteCount.toLocaleString() + ' 票)</span></span>' +
                         '</div>' +
                         (genres.length ? '<div class="modal-genres">' + genres.map(g => '<span class="modal-genre-tag">' + escapeHtml(g) + '</span>').join('') + '</div>' : '') +
@@ -1804,6 +2032,7 @@
             AppState.totalPages = Math.min(data.total_pages || 1, 500);
 
             if (AppState.viewMode === 'grid') renderGridView();
+            else if (AppState.viewMode === 'detail') renderDetailView();
             else renderListView();
 
             renderResultsHeader();
@@ -1825,6 +2054,7 @@
         AppState.voteAverageGte = 0;
         AppState.voteAverageLte = 10;
         AppState.voteCountGte = 0;
+        AppState.voteCountLte = 0;
         AppState.dateGte = '';
         AppState.dateLte = '';
         AppState.year = '';
@@ -1832,18 +2062,21 @@
         AppState.region = '';
         AppState.watchProviders = [];
         AppState.watchRegion = '';
+        AppState.displayLang = 'zh-CN';
         AppState.searchQuery = '';
         AppState.currentPage = 1;
 
         $('sortSelect').value = 'popularity.desc';
         $('ratingMin').value = '';
         $('ratingMax').value = '';
-        $('voteCountMin').value = '';
+        $('voteCountMin').value = '10';
+        $('voteCountMax').value = '';
         $('dateFrom').value = '';
         $('dateTo').value = '';
         $('yearInput').value = '';
         $('languageSelect').value = '';
         $('regionSelect').value = '';
+        $('displayLangSelect').value = 'zh-CN';
         $('watchRegionSelect').value = '';
         $('searchInput').value = '';
 
@@ -1912,8 +2145,9 @@
             $('viewToggle').querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             if (AppState.results.length) {
-                if (view === 'grid') renderGridView();
-                else renderListView();
+                if (view === 'list') renderListView();
+                else if (view === 'grid') renderGridView();
+                else if (view === 'detail') renderDetailView();
             } else if (AppState.isLoading) {
                 renderSkeletons();
             }
@@ -1946,8 +2180,11 @@
         });
         $('voteCountMin').addEventListener('change', () => {
             const v = parseInt($('voteCountMin').value);
-            AppState.voteCountGte = isNaN(v) ? 10 : Math.max(0, v);
-            $('voteCountMin').value = AppState.voteCountGte || '';
+            AppState.voteCountGte = isNaN(v) ? 0 : Math.max(0, v);
+        });
+        $('voteCountMax').addEventListener('change', () => {
+            const v = parseInt($('voteCountMax').value);
+            AppState.voteCountLte = isNaN(v) ? 0 : Math.max(0, v);
         });
         $('dateFrom').addEventListener('change', () => {
             AppState.dateGte = $('dateFrom').value;
@@ -1981,6 +2218,9 @@
         $('regionSelect').addEventListener('change', () => {
             AppState.region = $('regionSelect').value;
         });
+        $('displayLangSelect').addEventListener('change', () => {
+            AppState.displayLang = $('displayLangSelect').value;
+        });
         $('watchRegionSelect').addEventListener('change', () => {
             AppState.watchRegion = $('watchRegionSelect').value;
             AppState.watchProviders = [];
@@ -2005,10 +2245,39 @@
             loadData();
         });
 
+        // About modal
+        $('btnAbout').addEventListener('click', () => {
+            $('aboutModal').classList.add('open');
+            $('aboutModal').setAttribute('aria-hidden', 'false');
+            document.body.classList.add('modal-open');
+            // Render request log
+            const list = $('aboutRequestList');
+            list.innerHTML = requestLog.length
+                ? requestLog.map(r => '<div style="margin-bottom:6px;">🕐 ' + escapeHtml(r.time) + '<br>🔗 ' + escapeHtml(r.url) + '</div>').join('')
+                : '<span style="color:var(--text-muted);">暂无请求记录</span>';
+        });
+        $('aboutClose').addEventListener('click', () => {
+            $('aboutModal').classList.remove('open');
+            $('aboutModal').setAttribute('aria-hidden', 'true');
+            document.body.classList.remove('modal-open');
+        });
+        $('aboutModal').addEventListener('click', e => {
+            if (e.target === $('aboutModal')) {
+                $('aboutModal').classList.remove('open');
+                $('aboutModal').setAttribute('aria-hidden', 'true');
+                document.body.classList.remove('modal-open');
+            }
+        });
+
         // Keyboard shortcuts
         document.addEventListener('keydown', e => {
             if (e.key === 'Escape') {
                 if ($('detailModal').classList.contains('open')) closeDetail();
+                else if ($('aboutModal').classList.contains('open')) {
+                    $('aboutModal').classList.remove('open');
+                    $('aboutModal').setAttribute('aria-hidden', 'true');
+                    document.body.classList.remove('modal-open');
+                }
                 else if ($('filterSidebar').classList.contains('open')) closeFilterDrawer();
             }
         });
@@ -2054,6 +2323,9 @@
 
         renderGenreChips();
         renderProviderChips();
+
+        // Set vote count default value in input
+        $('voteCountMin').value = '10';
 
         // Load initial data — don't auto fetch, show hero instead
         // loadData();
