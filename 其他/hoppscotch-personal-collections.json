@@ -1,0 +1,769 @@
+[
+  {
+    "v": 12,
+    "name": "测试API",
+    "folders": [],
+    "requests": [
+      {
+        "v": "17",
+        "name": "Untitled",
+        "method": "GET",
+        "endpoint": "https://echo.hoppscotch.io",
+        "params": [],
+        "headers": [],
+        "preRequestScript": "",
+        "testScript": "",
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "body": {
+          "contentType": null,
+          "body": null
+        },
+        "requestVariables": [],
+        "responses": {},
+        "description": null
+      },
+      {
+        "v": "17",
+        "name": "joke",
+        "method": "GET",
+        "endpoint": "https://v2.jokeapi.dev/joke/Any",
+        "params": [],
+        "headers": [],
+        "preRequestScript": "",
+        "testScript": "// 1. 直接用 pw.response.body 获取响应对象\r\nconst detail = pw.response.body;\r\n\r\n// 2. 提取你需要的数据\r\nconst myMovieData = {\r\n  种类: detail.category,\r\n  类型: detail.type,\r\n  笑话: detail.joke,\r\n  铺垫: detail.setup,\r\n  笑点: detail.delivery,\r\n  编号: detail.id,\r\n  安全: detail.safe,\r\n  语言: detail.lang\r\n};\r\n\r\n// 3. 在 Console 面板查看结果\r\nconsole.log(\"提取的电影数据：\", myMovieData);",
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "body": {
+          "contentType": null,
+          "body": null
+        },
+        "requestVariables": [],
+        "responses": {},
+        "description": null
+      },
+      {
+        "v": "17",
+        "name": "cat",
+        "method": "GET",
+        "endpoint": "https://api.thecatapi.com/v1/images/search",
+        "params": [],
+        "headers": [],
+        "preRequestScript": "",
+        "testScript": "",
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "body": {
+          "contentType": null,
+          "body": null
+        },
+        "requestVariables": [],
+        "responses": {},
+        "description": null
+      },
+      {
+        "v": "17",
+        "name": "TMDB-/movie/popular",
+        "method": "GET",
+        "endpoint": "https://api.themoviedb.org/3/movie/popular",
+        "params": [
+          {
+            "key": "language",
+            "value": "zh-CN",
+            "active": true,
+            "description": ""
+          },
+          {
+            "key": "sort_by",
+            "value": "vote_average.desc",
+            "active": true,
+            "description": "按评分从高到低排序"
+          }
+        ],
+        "headers": [
+          {
+            "key": "Authorization",
+            "value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyZGNlYjM3NTkwNThiNzdjZGEyNTQzMTQ1MTQ2ZjdmMSIsIm5iZiI6MTc3OTg2MjczMC4xNDMwMDAxLCJzdWIiOiI2YTE2OGNjYTU4M2NmODgzYzViNDY3ODciLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.VsTg3MMVoCRoOSFgoW4S06G1yBdVIb6hrWwTTk0Lj8I",
+            "active": true,
+            "description": ""
+          }
+        ],
+        "preRequestScript": "",
+        "testScript": "export {};\nconst d1 = Date.now();\r\nconst d2 = 20;//请求数量，popular最大值20\r\n\r\n\r\npw.test(\"获取电影详情\", async () => {\r\n  const TOKEN = \"Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyZGNlYjM3NTkwNThiNzdjZGEyNTQzMTQ1MTQ2ZjdmMSIsIm5iZiI6MTc3OTg2MjczMC4xNDMwMDAxLCJzdWIiOiI2YTE2OGNjYTU4M2NmODgzYzViNDY3ODciLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.VsTg3MMVoCRoOSFgoW4S06G1yBdVIb6hrWwTTk0Lj8I\"; // ⚠️ 替换成你的真实 Token\r\n  \r\n  // 1. 获取列表数据\r\n  const popularResponse = pw.response.body;\r\n\r\n  //WEB-拦截器-网络代理Proxy\r\n  //每个耗时500-700ms，代理全局/绕过大陆\r\n  //每个耗时1500-2500ms\r\n  const top10Movies = popularResponse.results.slice(0, d2);\r\n  \r\n  if (!top10Movies) {\r\n    console.error(\"没有获取到电影数据\");\r\n    return;\r\n  }\r\n\r\n  console.log(`📋 TMDB-API：获取 ${top10Movies.length} 部热门电影的详情...`);\r\n  const detailedMovies = [];\r\n  const logLines1 = [];\r\n  \r\n\r\n  for (const movie of top10Movies) {\r\n    const movieId = movie.id;\r\n    //console.log(`尝试获取: ${movie.title} (ID: ${movie.id})`);\r\n\r\n    // 2. 发起 fetch 请求\r\n    try {\r\n    \r\n      // 3. 整理成你需要的格式\r\n      const myMovieData = {\r\n        名称: movie.title,\r\n        \r\n        评分: movie.vote_average\r\n      };\r\n      \r\n      detailedMovies.push(myMovieData);\r\n      //console.log(`✅ 成功: ${myMovieData.名称}`);\r\n      //console.log(`✅ 成功获取: ${movie.title} (ID: ${movie.id})`);\r\n      logLines1.push(`✅ 成功获取: ${movie.title} (ID: ${movie.id})\\n`);\r\n\r\n      // 礼貌性延迟，避免请求过快\r\n      //await new Promise(resolve => setTimeout(resolve, 30));\r\n\r\n    } catch (error) {\r\n      console.error(\"fetch 请求失败:\", error.message);\r\n    }\r\n  }\r\n\r\n  // 4. 输出最终结果\r\n  console.log(logLines1.join(\"\"));//\r\n  console.log(`\\n🎉 ===== 最终获得 ${top10Movies.length} 部热门电影的详情 =====`);\r\n  //console.log(`📋 准备获取 ${top10Movies.length} 部电影的详情...`);\r\n  //console.log(JSON.stringify(detailedMovies, null, 2));\r\n  //console.log(JSON.stringify(detailedMovies));\r\n// 将数据转换为制表符分隔的格式输出\r\n//console.log(\"标题\\t日期\\t地区\\t类型\\t主演\\t评分\"); // 可选：加个表头\r\n\r\n//detailedMovies.forEach(movie => {\r\n  //console.log(`${movie.名称}\\t${movie.日期}\\t${movie.类型}\\t${movie.评分}`);\r\n//});\r\n// 创建日志数组，暂存所有行\r\nconst logLines = [];\r\nlogLines.push(\"序号\\t标题\\t评分\\n\");\r\n  // 收集数据行（不加表头）\r\n  let i_num=1;\r\ndetailedMovies.forEach(movie => {\r\n  logLines.push(`${i_num++}\\t${movie.名称}\\t${movie.评分}\\n`);\r\n  \r\n  //logLines.push(`${movie.名称}\\t${movie.日期}\\n`);\r\n});\r\n\r\n// 一次性输出所有行（只有一行日志 = 只有一个时间戳）\r\n  console.log(logLines.join(\"\"));\r\n  //console.log(logLines);\r\n\r\n\r\n  console.log(`脚本耗时: ${(Date.now()-d1)/1000} 秒`);\r\n\r\n    detailedMovies.forEach(movie => {\r\n  console.log(`${movie.名称}\\t${movie.评分}`);\r\n    });\r\n  \r\n});\r\n",
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "body": {
+          "contentType": null,
+          "body": null
+        },
+        "requestVariables": [],
+        "responses": {},
+        "description": null
+      },
+      {
+        "v": "17",
+        "name": "TMDB-/movie/1304313",
+        "method": "GET",
+        "endpoint": "https://api.themoviedb.org/3/tv/1399",
+        "params": [
+          {
+            "key": "language",
+            "value": "zh-CN",
+            "active": true,
+            "description": ""
+          }
+        ],
+        "headers": [
+          {
+            "key": "Authorization",
+            "value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyZGNlYjM3NTkwNThiNzdjZGEyNTQzMTQ1MTQ2ZjdmMSIsIm5iZiI6MTc3OTg2MjczMC4xNDMwMDAxLCJzdWIiOiI2YTE2OGNjYTU4M2NmODgzYzViNDY3ODciLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.VsTg3MMVoCRoOSFgoW4S06G1yBdVIb6hrWwTTk0Lj8I",
+            "active": true,
+            "description": ""
+          }
+        ],
+        "preRequestScript": "",
+        "testScript": "// 1. 直接用 pw.response.body 获取响应对象\r\nconst detail = pw.response.body;\r\n\r\n// 2. 提取你需要的数据\r\nconst myMovieData = {\r\n  名称: detail.title,\r\n  日期: detail.release_date,\r\n  地区: detail.production_countries?.map(c => c.name).join(', ') || '',\r\n  类型: detail.genres?.map(g => g.name).join(', ') || '',\r\n  主演: detail.credits?.cast?.slice(0, 5).map(c => c.name).join(', ') || '',\r\n  评分: detail.vote_average\r\n};\r\n\r\n// 3. 在 Console 面板查看结果\r\nconsole.log(\"提取的电影数据：\", myMovieData);\r\n",
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "body": {
+          "contentType": null,
+          "body": null
+        },
+        "requestVariables": [],
+        "responses": {},
+        "description": null
+      },
+      {
+        "v": "17",
+        "name": "TMDB-/discover/movie",
+        "method": "GET",
+        "endpoint": "https://api.themoviedb.org/3/discover/movie",
+        "params": [
+          {
+            "key": "language",
+            "value": "zh-CN",
+            "active": true,
+            "description": "用投票数降序来获取"
+          },
+          {
+            "key": "page",
+            "value": "25",
+            "active": true,
+            "description": "页数"
+          },
+          {
+            "key": "sort_by",
+            "value": "vote_count.desc",
+            "active": true,
+            "description": "投票数降序"
+          },
+          {
+            "key": "sort_by",
+            "value": "vote_average.desc",
+            "active": false,
+            "description": "评分降序"
+          },
+          {
+            "key": "sort_by",
+            "value": "popularity.desc",
+            "active": false,
+            "description": "热度降序"
+          },
+          {
+            "key": "vote_count.gte",
+            "value": "2000",
+            "active": false,
+            "description": "投票数大于等于?"
+          },
+          {
+            "key": "vote_count.lte",
+            "value": "5000",
+            "active": false,
+            "description": "投票数小于等于?"
+          },
+          {
+            "key": "vote_average.gte",
+            "value": "8",
+            "active": false,
+            "description": "评分大于?"
+          },
+          {
+            "key": "vote_average.lte",
+            "value": "9",
+            "active": false,
+            "description": "评分小于?"
+          },
+          {
+            "key": "with_genres",
+            "value": "28",
+            "active": false,
+            "description": "筛选类型为“动作片”（Action）"
+          }
+        ],
+        "headers": [
+          {
+            "key": "Authorization",
+            "value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyZGNlYjM3NTkwNThiNzdjZGEyNTQzMTQ1MTQ2ZjdmMSIsIm5iZiI6MTc3OTg2MjczMC4xNDMwMDAxLCJzdWIiOiI2YTE2OGNjYTU4M2NmODgzYzViNDY3ODciLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.VsTg3MMVoCRoOSFgoW4S06G1yBdVIb6hrWwTTk0Lj8I",
+            "active": true,
+            "description": ""
+          }
+        ],
+        "preRequestScript": "export {};\n",
+        "testScript": "export {};\nconst d1 = Date.now();\r\nconst d2 = 20;//请求数量，popular最大值20\r\nconst s1 = \"TMDB/discover/movie，投票数降序，页数=？\\n\";//当前脚本详情\r\nlet i_num = 1;//开始序号\r\n\r\npw.test(\"获取电影详情\", async () => {\r\n  const TOKEN = \"Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyZGNlYjM3NTkwNThiNzdjZGEyNTQzMTQ1MTQ2ZjdmMSIsIm5iZiI6MTc3OTg2MjczMC4xNDMwMDAxLCJzdWIiOiI2YTE2OGNjYTU4M2NmODgzYzViNDY3ODciLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.VsTg3MMVoCRoOSFgoW4S06G1yBdVIb6hrWwTTk0Lj8I\"; // ⚠️ 替换成你的真实 Token\r\n  \r\n  // 1. 获取列表数据\r\n  const popularResponse = pw.response.body;\r\n\r\n  //WEB-拦截器-网络代理Proxy\r\n  //每个耗时500-700ms，代理全局/绕过大陆\r\n  //每个耗时1500-2500ms\r\n  const top10Movies = popularResponse.results.slice(0, d2);\r\n  \r\n  if (!top10Movies) {\r\n    console.error(\"没有获取到电影数据\");\r\n    return;\r\n  }\r\n\r\n  console.log(`📋 TMDB-API：获取 ${top10Movies.length} 部热门电影的详情...`);\r\n  const detailedMovies = [];\r\n  const logLines1 = [];\r\n  const genreMap = {\r\n    28: \"动作\", 12: \"冒险\", 16: \"动画\", 35: \"喜剧\",80: \"犯罪\", \r\n    14: \"奇幻\", 36: \"历史\", 27: \"恐怖\", 53: \"惊悚\", 37: \"西部\", 18: \"剧情\",\r\n    878: \"科幻\", 9648: \"悬疑\",\r\n    10402: \"音乐\", 10752: \"战争\", 10749: \"爱情\",  10751: \"家庭\"\r\n  };\r\n  // ISO 639-1 语言代码映射表（英文）\r\n  const languageMap = {\r\n    'en': '英语', 'zh': '中文', 'ja': '日语', 'ko': '韩语', 'fr': '法语',\r\n    'de': '德语', 'es': '西班牙语', 'it': '意大利语', 'ru': '俄语', 'pt': '葡萄牙语',\r\n    'ar': '阿拉伯语', 'hi': '印地语', 'th': '泰语', 'vi': '越南语', 'id': '印尼语',\r\n    'tr': '土耳其语', 'nl': '荷兰语', 'pl': '波兰语', 'sv': '瑞典语', 'he': '希伯来语',\r\n    'el': '希腊语', 'cs': '捷克语', 'hu': '匈牙利语', 'ro': '罗马尼亚语', 'da': '丹麦语',\r\n    'no': '挪威语', 'fi': '芬兰语', 'ms': '马来语', 'fa': '波斯语', 'bn': '孟加拉语',\r\n    'uk': '乌克兰语', 'ca': '加泰罗尼亚语', 'sr': '塞尔维亚语', 'hr': '克罗地亚语', 'sk': '斯洛伐克语'\r\n  };\r\n\r\n\r\n  for (const movie of top10Movies) {\r\n    const movieId = movie.id;\r\n    //console.log(`尝试获取: ${movie.title} (ID: ${movie.id})`);\r\n\r\n    // 2. 发起 fetch 请求//去掉\r\n    try {\r\n    \r\n      // 3. 整理成你需要的格式\r\n      const myMovieData = {\r\n        名称: movie.title,\r\n        原版名称: movie.original_title,\r\n        简介: movie.overview,\r\n        //简介2: movie.overview ? movie.overview.replace(/\\r?\\n|\\r/g, ' ') : '',\r\n        上映日期: movie.release_date,\r\n        类型: movie.genre_ids || [],\r\n        类型2: movie.genre_ids?.slice(0, 2).map(id => genreMap[id]).filter(Boolean).join(',') || '',\r\n        评分: movie.vote_average,\r\n        投票数: movie.vote_count,\r\n        热度: movie.popularity,\r\n        ID: movie.id,\r\n        原始语言: movie.original_language,\r\n        原始语言2: languageMap[movie.original_language] || movie.original_language.toUpperCase(),\r\n        成人内容: movie.adult,\r\n        海报: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,\r\n        背景图: `https://image.tmdb.org/t/p/original${movie.backdrop_path}`\r\n      };\r\n      \r\n      detailedMovies.push(myMovieData);\r\n      //console.log(`✅ 成功: ${myMovieData.名称}`);\r\n      //console.log(`✅ 成功获取: ${movie.title} (ID: ${movie.id})`);\r\n      logLines1.push(`✅ 成功获取: ${movie.title} (ID: ${movie.id})\\n`);\r\n\r\n      // 礼貌性延迟，避免请求过快\r\n      //await new Promise(resolve => setTimeout(resolve, 30));\r\n\r\n    } catch (error) {\r\n      console.error(\"fetch 请求失败:\", error.message);\r\n    }\r\n  }\r\n\r\n  // 4. 输出最终结果\r\n  console.log(logLines1.join(\"\"));//\r\n  console.log(`\\n🎉 ===== 最终获得 ${top10Movies.length} 部热门电影的详情 =====`);\r\n  //console.log(`📋 准备获取 ${top10Movies.length} 部电影的详情...`);\r\n  //console.log(JSON.stringify(detailedMovies, null, 2));\r\n  //console.log(JSON.stringify(detailedMovies));\r\n// 将数据转换为制表符分隔的格式输出\r\n//console.log(\"标题\\t日期\\t地区\\t类型\\t主演\\t评分\"); // 可选：加个表头\r\n\r\n//detailedMovies.forEach(movie => {\r\n  //console.log(`${movie.名称}\\t${movie.日期}\\t${movie.类型}\\t${movie.评分}`);\r\n//});\r\n// 创建日志数组，暂存所有行\r\n  const logLines = [];\r\n  //logLines.push(s1);\r\n  //logLines.push(\"序号\\t标题\\t年份\\t语言\\t类型\\t评分\\t投票数\\t热度\\tID\\t简介\\t海报\\t背景图\\n\");\r\n  console.log(\"序号\\t标题\\t年份\\t语言\\t类型\\t评分\\t投票数\\t热度\\tID\\t简介\\t海报\\t背景图\\n\");\r\n  // 收集数据行（不加表头）\r\n\r\n\r\n  \r\n\r\n  detailedMovies.forEach(movie => {\r\n  //logLines.push(`${movie.名称}\\t${movie.日期}\\n`);\r\n  //logLines.push(`${i_num++}\\t${movie.名称}\\t${movie.上映日期}\\t${movie.原始语言}\\t${movie.类型}\\t${movie.评分}\\t${movie.投票数}\\t${movie.热度}\\t${movie.ID}\\t${movie.简介}\\t${movie.海报}\\t${movie.背景图}\\n`);\r\n\r\n    //简介去掉换行 \r\n    const cleanOverview = movie.简介 ? movie.简介.replace(/\\r?\\n|\\r/g, '') : '';\r\n    logLines.push(`${i_num++}\\t${movie.名称}\\t${movie.上映日期.slice(0, 4)}\\t${movie.原始语言2}\\t${movie.类型2}\\t${movie.评分}\\t${movie.投票数}\\t${movie.热度}\\t${movie.ID}\\t${cleanOverview}\\t${movie.海报}\\t${movie.背景图}\\n`);\r\n\r\n});\r\n\r\n// 一次性输出所有行（只有一行日志 = 只有一个时间戳）\r\n  console.log(logLines.join(\"\"));\r\n  //console.log(logLines);\r\n\r\n\r\n  console.log(`脚本耗时1: ${(Date.now()-d1)/1000} 秒`);\r\n\r\n  //分行打印结果\r\n  //detailedMovies.forEach(movie => {\r\n  //console.log(`${movie.名称}\\t${movie.评分}`);\r\n  //});\r\n\r\n\r\n});\r\n\r\n//console.log(`脚本耗时2: ${(Date.now() - d1) / 1000} 秒`);\r\n",
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "body": {
+          "contentType": null,
+          "body": null
+        },
+        "requestVariables": [],
+        "responses": {
+          "https://api.themoviedb.org/3/discover/movie": {
+            "name": "https://api.themoviedb.org/3/discover/movie",
+            "originalRequest": {
+              "v": "6",
+              "name": "TMDB-/discover/movie",
+              "method": "GET",
+              "endpoint": "https://api.themoviedb.org/3/discover/movie",
+              "headers": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyZGNlYjM3NTkwNThiNzdjZGEyNTQzMTQ1MTQ2ZjdmMSIsIm5iZiI6MTc3OTg2MjczMC4xNDMwMDAxLCJzdWIiOiI2YTE2OGNjYTU4M2NmODgzYzViNDY3ODciLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.VsTg3MMVoCRoOSFgoW4S06G1yBdVIb6hrWwTTk0Lj8I",
+                  "active": true,
+                  "description": ""
+                }
+              ],
+              "params": [
+                {
+                  "key": "language",
+                  "value": "zh-CN",
+                  "active": true,
+                  "description": ""
+                },
+                {
+                  "key": "with_genres",
+                  "value": "28",
+                  "active": true,
+                  "description": "筛选类型为“动作片”（Action）"
+                },
+                {
+                  "key": "sort_by",
+                  "value": "vote_average.desc",
+                  "active": true,
+                  "description": "按评分从高到低排序"
+                },
+                {
+                  "key": "vote_count.gte",
+                  "value": "200",
+                  "active": true,
+                  "description": "只返回投票数大于等于200的电影。"
+                }
+              ],
+              "body": {
+                "contentType": null,
+                "body": null
+              },
+              "auth": {
+                "authType": "inherit",
+                "authActive": true
+              },
+              "requestVariables": []
+            },
+            "status": "OK",
+            "code": 200,
+            "headers": [],
+            "body": ""
+          }
+        },
+        "description": null
+      },
+      {
+        "v": "17",
+        "name": "TMDB-/search/movie",
+        "method": "GET",
+        "endpoint": "https://api.themoviedb.org/3/search/movie",
+        "params": [
+          {
+            "key": "language",
+            "value": "zh-CN",
+            "active": true,
+            "description": ""
+          },
+          {
+            "key": "query",
+            "value": "Inception",
+            "active": true,
+            "description": "所有标题中包含“Inception”（盗梦空间）的电影"
+          }
+        ],
+        "headers": [
+          {
+            "key": "Authorization",
+            "value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyZGNlYjM3NTkwNThiNzdjZGEyNTQzMTQ1MTQ2ZjdmMSIsIm5iZiI6MTc3OTg2MjczMC4xNDMwMDAxLCJzdWIiOiI2YTE2OGNjYTU4M2NmODgzYzViNDY3ODciLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.VsTg3MMVoCRoOSFgoW4S06G1yBdVIb6hrWwTTk0Lj8I",
+            "active": true,
+            "description": ""
+          }
+        ],
+        "preRequestScript": "",
+        "testScript": "// 1. 直接用 pw.response.body 获取响应对象\r\nconst detail = pw.response.body;\r\n\r\n// 2. 提取你需要的数据\r\nconst myMovieData = {\r\n  名称: detail.title,\r\n  日期: detail.release_date,\r\n  地区: detail.production_countries?.map(c => c.name).join(', ') || '',\r\n  类型: detail.genres?.map(g => g.name).join(', ') || '',\r\n  主演: detail.credits?.cast?.slice(0, 5).map(c => c.name).join(', ') || '',\r\n  评分: detail.vote_average\r\n};\r\n\r\n// 3. 在 Console 面板查看结果\r\nconsole.log(\"提取的电影数据：\", myMovieData);\r\n",
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "body": {
+          "contentType": null,
+          "body": null
+        },
+        "requestVariables": [],
+        "responses": {},
+        "description": null
+      },
+      {
+        "v": "17",
+        "name": "TMDB-/account",
+        "method": "GET",
+        "endpoint": "https://api.themoviedb.org/3/search/movie",
+        "params": [
+          {
+            "key": "language",
+            "value": "zh-CN",
+            "active": true,
+            "description": ""
+          },
+          {
+            "key": "query",
+            "value": "Inception",
+            "active": true,
+            "description": "所有标题中包含“Inception”（盗梦空间）的电影"
+          }
+        ],
+        "headers": [
+          {
+            "key": "Authorization",
+            "value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyZGNlYjM3NTkwNThiNzdjZGEyNTQzMTQ1MTQ2ZjdmMSIsIm5iZiI6MTc3OTg2MjczMC4xNDMwMDAxLCJzdWIiOiI2YTE2OGNjYTU4M2NmODgzYzViNDY3ODciLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.VsTg3MMVoCRoOSFgoW4S06G1yBdVIb6hrWwTTk0Lj8I",
+            "active": true,
+            "description": ""
+          }
+        ],
+        "preRequestScript": "",
+        "testScript": "// 1. 直接用 pw.response.body 获取响应对象\r\nconst detail = pw.response.body;\r\n\r\n// 2. 提取你需要的数据\r\nconst myMovieData = {\r\n  名称: detail.title,\r\n  日期: detail.release_date,\r\n  地区: detail.production_countries?.map(c => c.name).join(', ') || '',\r\n  类型: detail.genres?.map(g => g.name).join(', ') || '',\r\n  主演: detail.credits?.cast?.slice(0, 5).map(c => c.name).join(', ') || '',\r\n  评分: detail.vote_average\r\n};\r\n\r\n// 3. 在 Console 面板查看结果\r\nconsole.log(\"提取的电影数据：\", myMovieData);\r\n",
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "body": {
+          "contentType": null,
+          "body": null
+        },
+        "requestVariables": [],
+        "responses": {},
+        "description": null
+      },
+      {
+        "v": "17",
+        "name": "TMDB-/tv/1399",
+        "method": "GET",
+        "endpoint": "https://api.themoviedb.org/3/tv/1399",
+        "params": [
+          {
+            "key": "language",
+            "value": "zh-CN",
+            "active": true,
+            "description": ""
+          }
+        ],
+        "headers": [
+          {
+            "key": "Authorization",
+            "value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyZGNlYjM3NTkwNThiNzdjZGEyNTQzMTQ1MTQ2ZjdmMSIsIm5iZiI6MTc3OTg2MjczMC4xNDMwMDAxLCJzdWIiOiI2YTE2OGNjYTU4M2NmODgzYzViNDY3ODciLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.VsTg3MMVoCRoOSFgoW4S06G1yBdVIb6hrWwTTk0Lj8I",
+            "active": true,
+            "description": ""
+          }
+        ],
+        "preRequestScript": "",
+        "testScript": "// 1. 直接用 pw.response.body 获取响应对象\r\nconst detail = pw.response.body;\r\n\r\n// 2. 提取你需要的数据\r\nconst myMovieData = {\r\n  名称: detail.title,\r\n  日期: detail.release_date,\r\n  地区: detail.production_countries?.map(c => c.name).join(', ') || '',\r\n  类型: detail.genres?.map(g => g.name).join(', ') || '',\r\n  主演: detail.credits?.cast?.slice(0, 5).map(c => c.name).join(', ') || '',\r\n  评分: detail.vote_average\r\n};\r\n\r\n// 3. 在 Console 面板查看结果\r\nconsole.log(\"提取的电影数据：\", myMovieData);\r\n",
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "body": {
+          "contentType": null,
+          "body": null
+        },
+        "requestVariables": [],
+        "responses": {},
+        "description": null
+      },
+      {
+        "v": "17",
+        "name": "TMDB-/person/287",
+        "method": "GET",
+        "endpoint": "https://api.themoviedb.org/3/person/287",
+        "params": [
+          {
+            "key": "language",
+            "value": "zh-CN",
+            "active": true,
+            "description": ""
+          }
+        ],
+        "headers": [
+          {
+            "key": "Authorization",
+            "value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyZGNlYjM3NTkwNThiNzdjZGEyNTQzMTQ1MTQ2ZjdmMSIsIm5iZiI6MTc3OTg2MjczMC4xNDMwMDAxLCJzdWIiOiI2YTE2OGNjYTU4M2NmODgzYzViNDY3ODciLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.VsTg3MMVoCRoOSFgoW4S06G1yBdVIb6hrWwTTk0Lj8I",
+            "active": true,
+            "description": ""
+          }
+        ],
+        "preRequestScript": "",
+        "testScript": "// 1. 直接用 pw.response.body 获取响应对象\r\nconst detail = pw.response.body;\r\n\r\n// 2. 提取你需要的数据\r\nconst myMovieData = {\r\n  名称: detail.title,\r\n  日期: detail.release_date,\r\n  地区: detail.production_countries?.map(c => c.name).join(', ') || '',\r\n  类型: detail.genres?.map(g => g.name).join(', ') || '',\r\n  主演: detail.credits?.cast?.slice(0, 5).map(c => c.name).join(', ') || '',\r\n  评分: detail.vote_average\r\n};\r\n\r\n// 3. 在 Console 面板查看结果\r\nconsole.log(\"提取的电影数据：\", myMovieData);\r\n",
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "body": {
+          "contentType": null,
+          "body": null
+        },
+        "requestVariables": [],
+        "responses": {},
+        "description": null
+      },
+      {
+        "v": "17",
+        "name": "TMDB-/discover/movie - 多页",
+        "method": "GET",
+        "endpoint": "https://api.themoviedb.org/3/discover/movie",
+        "params": [
+          {
+            "key": "language",
+            "value": "zh-CN",
+            "active": true,
+            "description": "用投票数降序来获取"
+          },
+          {
+            "key": "page",
+            "value": "25",
+            "active": true,
+            "description": "页数"
+          },
+          {
+            "key": "sort_by",
+            "value": "vote_count.desc",
+            "active": true,
+            "description": "投票数降序"
+          },
+          {
+            "key": "sort_by",
+            "value": "vote_average.desc",
+            "active": false,
+            "description": "评分降序"
+          },
+          {
+            "key": "sort_by",
+            "value": "popularity.desc",
+            "active": false,
+            "description": "热度降序"
+          },
+          {
+            "key": "vote_count.gte",
+            "value": "2000",
+            "active": false,
+            "description": "投票数大于等于?"
+          },
+          {
+            "key": "vote_count.lte",
+            "value": "5000",
+            "active": false,
+            "description": "投票数小于等于?"
+          },
+          {
+            "key": "vote_average.gte",
+            "value": "8",
+            "active": false,
+            "description": "评分大于?"
+          },
+          {
+            "key": "vote_average.lte",
+            "value": "9",
+            "active": false,
+            "description": "评分小于?"
+          },
+          {
+            "key": "with_genres",
+            "value": "28",
+            "active": false,
+            "description": "筛选类型为“动作片”（Action）"
+          }
+        ],
+        "headers": [
+          {
+            "key": "Authorization",
+            "value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyZGNlYjM3NTkwNThiNzdjZGEyNTQzMTQ1MTQ2ZjdmMSIsIm5iZiI6MTc3OTg2MjczMC4xNDMwMDAxLCJzdWIiOiI2YTE2OGNjYTU4M2NmODgzYzViNDY3ODciLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.VsTg3MMVoCRoOSFgoW4S06G1yBdVIb6hrWwTTk0Lj8I",
+            "active": true,
+            "description": ""
+          }
+        ],
+        "preRequestScript": "export {};\n",
+        "testScript": "export {};\n// 在 Hoppscotch 的 Tests 标签页中运行\r\npw.test(\"获取 discover/movie 多页电影数据（按投票数排序）\", async () => {\r\n  const TOKEN = \"Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyZGNlYjM3NTkwNThiNzdjZGEyNTQzMTQ1MTQ2ZjdmMSIsIm5iZiI6MTc3OTg2MjczMC4xNDMwMDAxLCJzdWIiOiI2YTE2OGNjYTU4M2NmODgzYzViNDY3ODciLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.VsTg3MMVoCRoOSFgoW4S06G1yBdVIb6hrWwTTk0Lj8I\"; // ⚠️ 替换成你的真实 Token\r\n  const page_start = 1;\r\n  const page_stop = 2;\r\n  //const sort_value = 'vote_count.desc';//投票降序\r\n  const sort_value = 'vote_average.desc';//评分降序\r\n\r\n  // 语言代码 → 中文名称映射表\r\n  const languageMap = {\r\n    'en': '英语', 'zh': '中文', 'ja': '日语', 'ko': '韩语', 'fr': '法语',\r\n    'de': '德语', 'es': '西班牙语', 'it': '意大利语', 'ru': '俄语', 'pt': '葡萄牙语',\r\n    'ar': '阿拉伯语', 'hi': '印地语', 'th': '泰语', 'vi': '越南语', 'id': '印尼语',\r\n    'tr': '土耳其语', 'nl': '荷兰语', 'pl': '波兰语', 'sv': '瑞典语', 'he': '希伯来语'\r\n  };\r\n  \r\n  // 类型 ID → 中文名称映射表（常见类型）\r\n  const genreMap = {\r\n    28: \"动作\", 12: \"冒险\", 16: \"动画\", 35: \"喜剧\", 80: \"犯罪\",\r\n    18: \"剧情\", 10751: \"家庭\", 14: \"奇幻\", 36: \"历史\", 27: \"恐怖\",\r\n    10402: \"音乐\", 9648: \"悬疑\", 10749: \"爱情\", 878: \"科幻\", 53: \"惊悚\",\r\n    10752: \"战争\", 37: \"西部\"\r\n  };\r\n  \r\n  // 存储所有数据行\r\n  let logLines = [];\r\n  \r\n  // 表头\r\n  logLines.push(sort_value);\r\n  logLines.push(\"页码\\t序号\\t标题\\t上映日期\\t语言\\t类型\\t评分\\t投票数\\t热度\\tID\\t简介\");\r\n  \r\n  //let globalIndex = 0;  // 全局序号（跨页累计）\r\n  let globalIndex = (page_start-1)*20;  // 全局序号（跨页累计）\r\n  let globalNum = 0;  // 全局数量（跨页累计）\r\n  // 循环获取第 1 页和第 2 页\r\n  for (let page = page_start; page <= page_stop; page++) {\r\n    //console.log(`正在获取第 ${page} 页...`);\r\n    \r\n    try {\r\n      const response = await fetch(\r\n        `https://api.themoviedb.org/3/discover/movie?page=${page}&sort_by=${sort_value}&language=zh-CN`,\r\n        {\r\n          headers: {\r\n            'Authorization': TOKEN\r\n          }\r\n        }\r\n      );\r\n      \r\n      const data = await response.json();\r\n      \r\n      if (data.results && data.results.length > 0) {\r\n        data.results.forEach(movie => {\r\n          globalIndex++;\r\n          globalNum++;\r\n          \r\n          // 处理语言：代码转中文名称\r\n          const language = languageMap[movie.original_language] || movie.original_language.toUpperCase();\r\n          \r\n          // 处理类型：ID 转中文名称\r\n          const genreNames = movie.genre_ids\r\n            //?.map(id => genreMap[id])\r\n            ?.slice(0, 2).map(id => genreMap[id])\r\n            .filter(Boolean)\r\n            .join(',') || '';\r\n          \r\n          // 处理简介：去除换行符\r\n          const overview = movie.overview \r\n            //? movie.overview.replace(/\\r?\\n|\\r/g, ' ').substring(0, 200)\r\n            ? movie.overview.replace(/\\r?\\n|\\r/g, ' ')\r\n            : '暂无简介';\r\n          \r\n          // 按制表符分隔输出\r\n          logLines.push(\r\n            `${page}\\t` +\r\n            `${globalIndex}\\t` +\r\n            `${movie.title || '未知'}\\t` +\r\n            //`${movie.release_date || '未知'}\\t` +\r\n            `${movie.release_date.slice(0, 4) || '未知'}\\t` +\r\n            `${language}\\t` +\r\n            `${genreNames}\\t` +\r\n            `${movie.vote_average || 0}\\t` +\r\n            `${movie.vote_count || 0}\\t` +\r\n            `${movie.popularity || 0}\\t` +\r\n            `${movie.id || ''}\\t` +\r\n            `${overview}`\r\n          );\r\n        });\r\n        \r\n        console.log(`第 ${page} 页获取成功，获得 ${data.results.length} 部电影`);\r\n      } else {\r\n        console.warn(`第 ${page} 页无数据`);\r\n      }\r\n      \r\n    } catch (error) {\r\n      console.error(`获取第 ${page} 页失败:`, error.message);\r\n    }\r\n  }\r\n  \r\n  // 一次性打印所有数据\r\n  console.log(`\\n===== 共获取 ${globalNum} 部电影 =====\\n`);\r\n  console.log(logLines.join(\"\\n\"));\r\n});",
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "body": {
+          "contentType": null,
+          "body": null
+        },
+        "requestVariables": [],
+        "responses": {
+          "https://api.themoviedb.org/3/discover/movie": {
+            "name": "https://api.themoviedb.org/3/discover/movie",
+            "originalRequest": {
+              "v": "6",
+              "name": "TMDB-/discover/movie",
+              "method": "GET",
+              "endpoint": "https://api.themoviedb.org/3/discover/movie",
+              "headers": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyZGNlYjM3NTkwNThiNzdjZGEyNTQzMTQ1MTQ2ZjdmMSIsIm5iZiI6MTc3OTg2MjczMC4xNDMwMDAxLCJzdWIiOiI2YTE2OGNjYTU4M2NmODgzYzViNDY3ODciLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.VsTg3MMVoCRoOSFgoW4S06G1yBdVIb6hrWwTTk0Lj8I",
+                  "active": true,
+                  "description": ""
+                }
+              ],
+              "params": [
+                {
+                  "key": "language",
+                  "value": "zh-CN",
+                  "active": true,
+                  "description": ""
+                },
+                {
+                  "key": "with_genres",
+                  "value": "28",
+                  "active": true,
+                  "description": "筛选类型为“动作片”（Action）"
+                },
+                {
+                  "key": "sort_by",
+                  "value": "vote_average.desc",
+                  "active": true,
+                  "description": "按评分从高到低排序"
+                },
+                {
+                  "key": "vote_count.gte",
+                  "value": "200",
+                  "active": true,
+                  "description": "只返回投票数大于等于200的电影。"
+                }
+              ],
+              "body": {
+                "contentType": null,
+                "body": null
+              },
+              "auth": {
+                "authType": "inherit",
+                "authActive": true
+              },
+              "requestVariables": []
+            },
+            "status": "OK",
+            "code": 200,
+            "headers": [],
+            "body": ""
+          }
+        },
+        "description": null
+      },
+      {
+        "v": "17",
+        "name": "笑话-笑话盒子",
+        "method": "GET",
+        "endpoint": "https://cn.apihz.cn/api/zici/xiaohua.php",
+        "params": [
+          {
+            "key": "id",
+            "value": "10017637",
+            "active": true,
+            "description": ""
+          },
+          {
+            "key": "key",
+            "value": "truman1234",
+            "active": true,
+            "description": ""
+          }
+        ],
+        "headers": [],
+        "preRequestScript": "",
+        "testScript": "",
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "body": {
+          "contentType": null,
+          "body": null
+        },
+        "requestVariables": [],
+        "responses": {},
+        "description": null
+      },
+      {
+        "v": "17",
+        "name": "笑话-天聚数行",
+        "method": "GET",
+        "endpoint": "https://apis.tianapi.com/joke/index",
+        "params": [
+          {
+            "key": "key",
+            "value": "79b74a736e17f76a1cad61eed78e2e6f",
+            "active": true,
+            "description": ""
+          },
+          {
+            "key": "num",
+            "value": "1",
+            "active": true,
+            "description": ""
+          }
+        ],
+        "headers": [],
+        "preRequestScript": "",
+        "testScript": "",
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "body": {
+          "contentType": null,
+          "body": null
+        },
+        "requestVariables": [],
+        "responses": {},
+        "description": null
+      },
+      {
+        "v": "17",
+        "name": "彩虹屁-天聚数行",
+        "method": "GET",
+        "endpoint": "https://apis.tianapi.com/caihongpi/index",
+        "params": [
+          {
+            "key": "key",
+            "value": "79b74a736e17f76a1cad61eed78e2e6f",
+            "active": true,
+            "description": ""
+          }
+        ],
+        "headers": [],
+        "preRequestScript": "",
+        "testScript": "",
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "body": {
+          "contentType": null,
+          "body": null
+        },
+        "requestVariables": [],
+        "responses": {},
+        "description": null
+      },
+      {
+        "v": "17",
+        "name": "诗句-今日诗词",
+        "method": "GET",
+        "endpoint": "https://v2.jinrishici.com/one.json",
+        "params": [],
+        "headers": [],
+        "preRequestScript": "",
+        "testScript": "",
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "body": {
+          "contentType": null,
+          "body": null
+        },
+        "requestVariables": [],
+        "responses": {},
+        "description": null
+      }
+    ],
+    "auth": {
+      "authType": "none",
+      "authActive": true
+    },
+    "headers": [],
+    "variables": [],
+    "description": "",
+    "preRequestScript": "",
+    "testScript": ""
+  },
+  {
+    "v": 12,
+    "name": "请求链",
+    "folders": [],
+    "requests": [
+      {
+        "v": "17",
+        "name": "TMDB-detail",
+        "method": "GET",
+        "endpoint": "https://api.themoviedb.org/3/movie/popular",
+        "params": [
+          {
+            "key": "language",
+            "value": "zh-CN",
+            "active": true,
+            "description": ""
+          }
+        ],
+        "headers": [
+          {
+            "key": "Authorization",
+            "value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyZGNlYjM3NTkwNThiNzdjZGEyNTQzMTQ1MTQ2ZjdmMSIsIm5iZiI6MTc3OTg2MjczMC4xNDMwMDAxLCJzdWIiOiI2YTE2OGNjYTU4M2NmODgzYzViNDY3ODciLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.VsTg3MMVoCRoOSFgoW4S06G1yBdVIb6hrWwTTk0Lj8I",
+            "active": true,
+            "description": ""
+          }
+        ],
+        "preRequestScript": "",
+        "testScript": "export {};\nconst d1 = Date.now();\r\nconst d2 = 1;//请求数量，popular最大值20\r\n\r\n\r\npw.test(\"获取电影详情\", async () => {\r\n  const TOKEN = \"Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyZGNlYjM3NTkwNThiNzdjZGEyNTQzMTQ1MTQ2ZjdmMSIsIm5iZiI6MTc3OTg2MjczMC4xNDMwMDAxLCJzdWIiOiI2YTE2OGNjYTU4M2NmODgzYzViNDY3ODciLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.VsTg3MMVoCRoOSFgoW4S06G1yBdVIb6hrWwTTk0Lj8I\"; // ⚠️ 替换成你的真实 Token\r\n  \r\n  // 1. 获取列表数据\r\n  const popularResponse = pw.response.body;\r\n\r\n  //WEB-拦截器-网络代理Proxy\r\n  //每个耗时500-700ms，代理全局/绕过大陆\r\n  //每个耗时1500-2500ms\r\n  const top10Movies = popularResponse.results.slice(0, d2);\r\n  \r\n  if (!top10Movies) {\r\n    console.error(\"没有获取到电影数据\");\r\n    return;\r\n  }\r\n\r\n  console.log(`📋 TMDB-API：获取 ${top10Movies.length} 部热门电影的详情...`);\r\n  const detailedMovies = [];\r\n  const logLines1 = [];\r\n  \r\n\r\n  for (const movie of top10Movies) {\r\n    const movieId = movie.id;\r\n    //console.log(`尝试获取: ${movie.title} (ID: ${movie.id})`);\r\n\r\n    // 2. 发起 fetch 请求\r\n    try {\r\n      const response = await fetch(\r\n        `https://api.themoviedb.org/3/movie/${movie.id}?append_to_response=credits`,\r\n        {\r\n          headers: {\r\n            'Authorization': TOKEN\r\n          }\r\n        }\r\n      );\r\n\r\n      const detail = await response.json();\r\n      // 3. 整理成你需要的格式\r\n      const myMovieData = {\r\n        名称: movie.title,\r\n        //原名: detail.title,\r\n        日期: detail.release_date,\r\n        //地区: detail.production_countries?.map(c => c.name).join(', ') || '',\r\n        地区2: detail.origin_country?.join(',') || '',\r\n        类型: detail.genres?.slice(0, 2).map(g => g.name).join(',') || '',\r\n        主演: detail.credits?.cast?.slice(0, 2).map(c => c.name).join(',') || '',\r\n        评分: detail.vote_average\r\n      };\r\n      \r\n      detailedMovies.push(myMovieData);\r\n      //console.log(`✅ 成功: ${myMovieData.名称}`);\r\n      //console.log(`✅ 成功获取: ${movie.title} (ID: ${movie.id})`);\r\n      logLines1.push(`✅ 成功获取: ${movie.title} (ID: ${movie.id})\\n`);\r\n\r\n      // 礼貌性延迟，避免请求过快\r\n      //await new Promise(resolve => setTimeout(resolve, 30));\r\n\r\n    } catch (error) {\r\n      console.error(\"fetch 请求失败:\", error.message);\r\n    }\r\n  }\r\n\r\n  // 4. 输出最终结果\r\n  console.log(logLines1.join(\"\"));//\r\n  console.log(`\\n🎉 ===== 最终获得 ${top10Movies.length} 部热门电影的详情 =====`);\r\n  //console.log(`📋 准备获取 ${top10Movies.length} 部电影的详情...`);\r\n  //console.log(JSON.stringify(detailedMovies, null, 2));\r\n  //console.log(JSON.stringify(detailedMovies));\r\n// 将数据转换为制表符分隔的格式输出\r\n//console.log(\"标题\\t日期\\t地区\\t类型\\t主演\\t评分\"); // 可选：加个表头\r\n\r\n//detailedMovies.forEach(movie => {\r\n  //console.log(`${movie.名称}\\t${movie.日期}\\t${movie.类型}\\t${movie.评分}`);\r\n//});\r\n// 创建日志数组，暂存所有行\r\nconst logLines = [];\r\nlogLines.push(\"序号\\t标题\\t日期\\t地区\\t类型\\t主演\\t评分\\n\");\r\n  // 收集数据行（不加表头）\r\nlet i_num=1;\r\ndetailedMovies.forEach(movie => {\r\n  logLines.push(`${i_num++}\\t${movie.名称}\\t${movie.日期}\\t${movie.地区2}\\t${movie.类型}\\t${movie.主演}\\t${movie.评分}\\n`);\r\n  //logLines.push(`${movie.名称}\\t${movie.日期}\\n`);\r\n});\r\n\r\n// 一次性输出所有行（只有一行日志 = 只有一个时间戳）\r\n  console.log(logLines.join(\"\"));\r\n  //console.log(logLines);\r\n\r\n\r\n  console.log(`脚本耗时: ${(Date.now()-d1)/1000} 秒`);\r\n\r\n  //const apiDuration = pw.response.responseTime;\r\n  //console.log(`API 请求耗时：${apiDuration} 毫秒`);\r\n\r\n  //detailedMovies.forEach(movie => { console.log(`${movie.名称}\\t${movie.评分}`);});\r\n});\r\n",
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "body": {
+          "contentType": null,
+          "body": null
+        },
+        "requestVariables": [],
+        "responses": {},
+        "description": null
+      }
+    ],
+    "auth": {
+      "authType": "none",
+      "authActive": true
+    },
+    "headers": [],
+    "variables": [],
+    "description": "",
+    "preRequestScript": "",
+    "testScript": ""
+  }
+]

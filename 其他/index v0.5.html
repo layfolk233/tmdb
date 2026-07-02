@@ -1059,7 +1059,7 @@
         withGenres: [],
         voteAverageGte: 0,
         voteAverageLte: 10,
-        voteCountGte: 10,
+        voteCountGte: 0,
         dateGte: '',
         dateLte: '',
         year: '',
@@ -1745,12 +1745,6 @@
     }
 
     async function loadData() {
-        // Auto-close hero section on any data fetch
-        if (!AppState.hasStarted) {
-            AppState.hasStarted = true;
-            const hero = $('heroSection');
-            if (hero) hero.classList.add('hidden');
-        }
         if (AppState.abortController) {
             AppState.abortController.abort();
         }
