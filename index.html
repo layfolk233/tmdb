@@ -911,11 +911,11 @@
             <!-- 搜索 + 排序（第一组） -->
             <div class="filter-group">
                 <div class="filter-section filter-row-inline">
-                    <label class="filter-label">🔍 搜索　　</label>
+                    <label class="filter-label">🔍 搜索</label>
                     <input type="text" class="filter-input" id="searchInput" placeholder="关键词...">
                 </div>
                 <div class="filter-section filter-row-inline">
-                    <label class="filter-label">📊 排序　　</label>
+                    <label class="filter-label">📊 排序</label>
                     <select class="filter-select" id="sortSelect"></select>
                 </div>
             </div>
@@ -923,7 +923,7 @@
             <!-- 筛选条件（第二组）：评分 → 票数 → 类型 → 年份 → 日期 -->
             <div class="filter-group">
                 <div class="filter-section filter-row-inline">
-                    <label class="filter-label">⭐ 评分　　</label>
+                    <label class="filter-label">⭐ 评分</label>
                     <div class="filter-row" style="flex:1;">
                         <input type="number" class="filter-input" id="ratingMin" placeholder="最低" min="0" max="10" step="0.5">
                         <span style="color:var(--text-muted);align-self:center;">—</span>
@@ -931,7 +931,7 @@
                     </div>
                 </div>
                 <div class="filter-section filter-row-inline">
-                    <label class="filter-label">🗳️ 票数　　</label>
+                    <label class="filter-label">🗳️ 票数</label>
                     <div class="filter-row" style="flex:1;">
                         <input type="number" class="filter-input" id="voteCountMin" placeholder="最少" min="0" value="10">
                         <span style="color:var(--text-muted);align-self:center;">—</span>
@@ -939,15 +939,15 @@
                     </div>
                 </div>
                 <div class="filter-section filter-row-inline">
-                    <label class="filter-label">🏷️ 类型　　</label>
+                    <label class="filter-label">🏷️ 类型</label>
                 </div>
                 <div class="genre-chips" id="genreChips">加载中...</div>
                 <div class="filter-section filter-row-inline">
-                    <label class="filter-label">📆 年份　　</label>
+                    <label class="filter-label">📆 年份</label>
                     <input type="number" class="filter-input" id="yearInput" placeholder="2024" min="1900" max="2030">
                 </div>
                 <div class="filter-section">
-                    <label class="filter-label" id="dateLabel">🗓️ 日期范围　　</label>
+                    <label class="filter-label" id="dateLabel">🗓️ 日期范围</label>
                     <div class="filter-section filter-row-inline">
                         <input type="date" class="filter-input" id="dateFrom">
                         <input type="date" class="filter-input" id="dateTo">
@@ -958,23 +958,23 @@
             <!-- 其他（第三组） -->
             <div class="filter-group">
                 <div class="filter-section filter-row-inline">
-                    <label class="filter-label">🌐 原始语言　　</label>
+                    <label class="filter-label">🌐 原始语言</label>
                     <select class="filter-select" id="languageSelect"></select>
                 </div>
                 <div class="filter-section filter-row-inline">
-                    <label class="filter-label">🌍 上映地区　　</label>
+                    <label class="filter-label">🌍 上映地区</label>
                     <select class="filter-select" id="regionSelect"></select>
                 </div>
                 <div class="filter-section">
                     <div class="filter-section filter-row-inline">
-                        <label class="filter-label">📡 流媒体　　</label>
+                        <label class="filter-label">📡 流媒体　</label>
                         <select class="filter-select" id="watchRegionSelect"></select>
                     </div>
                     <div class="provider-chips" id="providerChips" style="margin-top:4px;"></div>
                 </div>
                 <!-- 新增筛选行：返回语言 + 显示语言下拉 -->
                 <div class="filter-section filter-row-inline" style="border-top:1px solid var(--border-subtle);padding-top:8px;margin-top:4px;">
-                    <label class="filter-label">📄 显示语言　　</label>
+                    <label class="filter-label">📄 显示语言</label>
                     <select class="filter-select" id="displayLangSelect">
                         <option value="zh-CN">中文</option>
                         <option value="en-US">English</option>
