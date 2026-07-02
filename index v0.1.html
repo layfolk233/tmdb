@@ -1,0 +1,1651 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MovieVault — 影视推荐平台</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* ============================================================
+           DESIGN TOKENS
+           ============================================================ */
+        :root {
+            --bg-primary: #0b0f1a;
+            --bg-secondary: #111827;
+            --bg-tertiary: #1a2332;
+            --bg-card: #141e2e;
+            --bg-card-hover: #1a2840;
+            --bg-modal: #0d1320;
+            --bg-input: #0f1724;
+            --bg-chip: #1a2740;
+            --bg-chip-active: #1e3a5f;
+            --bg-skeleton: #1a2840;
+            --bg-skeleton-shine: #223050;
+
+            --border-subtle: #1e2d40;
+            --border-medium: #2a3a55;
+            --border-accent: #2d4a6e;
+
+            --text-primary: #e8edf5;
+            --text-secondary: #94a3b8;
+            --text-muted: #5f7188;
+
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-glow: rgba(59,130,246,0.25);
+            --accent-gradient: linear-gradient(135deg, #60a5fa, #3b82f6);
+
+            --rating-gold: #f59e0b;
+            --rating-bg: rgba(245,158,11,0.15);
+
+            --error: #ef4444;
+            --error-bg: rgba(239,68,68,0.1);
+            --success: #22c55e;
+            --success-bg: rgba(34,197,94,0.1);
+
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            --space-2xl: 48px;
+
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            --radius-full: 9999px;
+
+            --transition-fast: 0.15s ease;
+            --transition-smooth: 0.25s cubic-bezier(0.4,0,0.2,1);
+
+            --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+
+            --header-h: 60px;
+            --sidebar-w: 300px;
+        }
+
+        /* ============================================================
+           RESET & BASE
+           ============================================================ */
+        *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+        html { scroll-behavior:smooth; -webkit-font-smoothing:antialiased; }
+        body {
+            background:var(--bg-primary);
+            color:var(--text-primary);
+            font-family:var(--font-sans);
+            line-height:1.5;
+            min-height:100vh;
+            overflow-x:hidden;
+        }
+        body.modal-open { overflow:hidden; }
+        a { color:var(--accent); text-decoration:none; }
+        a:hover { text-decoration:underline; }
+        button { cursor:pointer; font-family:inherit; }
+        input,select { font-family:inherit; }
+        img { max-width:100%; display:block; }
+        ::-webkit-scrollbar { width:6px; }
+        ::-webkit-scrollbar-track { background:var(--bg-primary); }
+        ::-webkit-scrollbar-thumb { background:var(--border-accent); border-radius:3px; }
+
+        /* ============================================================
+           HEADER
+           ============================================================ */
+        .app-header {
+            position:sticky; top:0; z-index:100;
+            background:var(--bg-secondary);
+            border-bottom:1px solid var(--border-subtle);
+            height:var(--header-h);
+            display:flex; align-items:center; justify-content:space-between;
+            padding:0 var(--space-lg);
+            backdrop-filter:blur(12px);
+            -webkit-backdrop-filter:blur(12px);
+        }
+        .header-left { display:flex; align-items:center; gap:var(--space-md); }
+        .logo {
+            font-size:1.35rem; font-weight:800; letter-spacing:-0.02em;
+            background:var(--accent-gradient);
+            -webkit-background-clip:text; background-clip:text;
+            color:transparent;
+            white-space:nowrap;
+        }
+        .media-toggle {
+            display:flex; background:var(--bg-tertiary); border-radius:var(--radius-full);
+            padding:3px; gap:2px;
+        }
+        .media-btn {
+            padding:6px 16px; border-radius:var(--radius-full); border:none;
+            background:transparent; color:var(--text-secondary);
+            font-size:0.825rem; font-weight:500;
+            transition:var(--transition-fast);
+            white-space:nowrap;
+        }
+        .media-btn.active {
+            background:var(--accent); color:#fff;
+            box-shadow:0 2px 8px var(--accent-glow);
+        }
+        .media-btn:not(.active):hover { color:var(--text-primary); }
+
+        .header-right { display:flex; align-items:center; gap:var(--space-sm); }
+        .btn-icon {
+            width:36px; height:36px; border-radius:var(--radius-md); border:1px solid var(--border-subtle);
+            background:var(--bg-tertiary); color:var(--text-secondary);
+            display:flex; align-items:center; justify-content:center;
+            font-size:1rem; transition:var(--transition-fast);
+        }
+        .btn-icon:hover { border-color:var(--border-medium); color:var(--text-primary); }
+        .btn-icon.active-view { background:var(--bg-chip-active); border-color:var(--accent); color:var(--accent); }
+        .btn-filters-toggle { display:none; }
+
+        /* ============================================================
+           MAIN LAYOUT
+           ============================================================ */
+        .app-layout {
+            display:flex; min-height:calc(100vh - var(--header-h));
+        }
+
+        /* ============================================================
+           FILTER SIDEBAR
+           ============================================================ */
+        .filter-panel {
+            width:var(--sidebar-w); min-width:var(--sidebar-w);
+            background:var(--bg-secondary);
+            border-right:1px solid var(--border-subtle);
+            padding:var(--space-lg);
+            overflow-y:auto; max-height:calc(100vh - var(--header-h));
+            position:sticky; top:var(--header-h);
+            display:flex; flex-direction:column; gap:var(--space-md);
+        }
+        .filter-section { display:flex; flex-direction:column; gap:var(--space-xs); }
+        .filter-label {
+            font-size:0.75rem; font-weight:600; text-transform:uppercase;
+            letter-spacing:0.05em; color:var(--text-muted);
+        }
+        .filter-select, .filter-input {
+            width:100%; padding:8px 12px; border-radius:var(--radius-sm);
+            border:1px solid var(--border-subtle);
+            background:var(--bg-input); color:var(--text-primary);
+            font-size:0.85rem; transition:var(--transition-fast);
+        }
+        .filter-select:focus, .filter-input:focus {
+            outline:none; border-color:var(--accent);
+            box-shadow:0 0 0 3px var(--accent-glow);
+        }
+        .filter-select { cursor:pointer; }
+
+        .filter-row { display:flex; gap:var(--space-sm); }
+        .filter-row .filter-input { flex:1; }
+
+        .genre-chips { display:flex; flex-wrap:wrap; gap:6px; max-height:200px; overflow-y:auto; padding:2px 0; }
+        .genre-chip {
+            padding:5px 12px; border-radius:var(--radius-full);
+            border:1px solid var(--border-subtle);
+            background:var(--bg-chip); color:var(--text-secondary);
+            font-size:0.75rem; font-weight:500; cursor:pointer;
+            transition:var(--transition-fast);
+            white-space:nowrap;
+        }
+        .genre-chip:hover { border-color:var(--border-medium); color:var(--text-primary); }
+        .genre-chip.active {
+            background:var(--bg-chip-active); border-color:var(--accent);
+            color:#60a5fa;
+        }
+
+        .provider-chips { display:flex; flex-wrap:wrap; gap:6px; }
+        .provider-chip {
+            padding:5px 10px; border-radius:var(--radius-full);
+            border:1px solid var(--border-subtle);
+            background:var(--bg-chip); color:var(--text-secondary);
+            font-size:0.7rem; font-weight:500; cursor:pointer;
+            transition:var(--transition-fast);
+        }
+        .provider-chip:hover { border-color:var(--border-medium); }
+        .provider-chip.active {
+            background:var(--bg-chip-active); border-color:var(--accent);
+            color:#60a5fa;
+        }
+
+        .btn-primary {
+            width:100%; padding:10px; border-radius:var(--radius-md); border:none;
+            background:var(--accent); color:#fff;
+            font-size:0.85rem; font-weight:600;
+            transition:var(--transition-fast);
+        }
+        .btn-primary:hover { background:var(--accent-hover); box-shadow:0 4px 12px var(--accent-glow); }
+        .btn-secondary {
+            width:100%; padding:10px; border-radius:var(--radius-md);
+            border:1px solid var(--border-subtle);
+            background:transparent; color:var(--text-secondary);
+            font-size:0.85rem; font-weight:500;
+            transition:var(--transition-fast);
+        }
+        .btn-secondary:hover { border-color:var(--border-medium); color:var(--text-primary); }
+
+        .filter-overlay { display:none; }
+
+        /* ============================================================
+           CONTENT AREA
+           ============================================================ */
+        .content-area {
+            flex:1; padding:var(--space-lg);
+            display:flex; flex-direction:column;
+            gap:var(--space-md);
+            min-width:0;
+        }
+        .results-header {
+            display:flex; align-items:center; justify-content:space-between;
+            flex-wrap:wrap; gap:var(--space-sm);
+        }
+        .results-count { font-size:0.9rem; color:var(--text-secondary); }
+        .results-count strong { color:var(--text-primary); }
+        .active-filters {
+            display:flex; flex-wrap:wrap; gap:6px; align-items:center;
+        }
+        .filter-tag {
+            display:inline-flex; align-items:center; gap:4px;
+            padding:3px 10px; border-radius:var(--radius-full);
+            background:var(--bg-chip-active); color:#60a5fa;
+            font-size:0.7rem; font-weight:500;
+        }
+        .filter-tag-remove {
+            cursor:pointer; opacity:0.7; font-size:0.85rem; line-height:1;
+        }
+        .filter-tag-remove:hover { opacity:1; }
+
+        /* ============================================================
+           LIST VIEW (DEFAULT)
+           ============================================================ */
+        .card-list { display:flex; flex-direction:column; gap:var(--space-sm); }
+        .card-list-item {
+            display:flex; gap:var(--space-md);
+            background:var(--bg-card); border:1px solid var(--border-subtle);
+            border-radius:var(--radius-lg); padding:var(--space-md);
+            cursor:pointer; transition:var(--transition-smooth);
+            contain:content;
+        }
+        .card-list-item:hover {
+            background:var(--bg-card-hover); border-color:var(--border-medium);
+            transform:translateX(4px);
+        }
+        .card-list-poster {
+            width:64px; height:96px; border-radius:var(--radius-sm);
+            object-fit:cover; flex-shrink:0; background:var(--bg-tertiary);
+        }
+        .card-list-poster-placeholder {
+            width:64px; height:96px; border-radius:var(--radius-sm);
+            flex-shrink:0; background:var(--bg-tertiary);
+            display:flex; align-items:center; justify-content:center;
+            font-size:1.5rem; color:var(--text-muted);
+        }
+        .card-list-info { flex:1; min-width:0; display:flex; flex-direction:column; gap:4px; justify-content:center; }
+        .card-list-title { font-weight:700; font-size:1rem; color:var(--text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .card-list-meta { display:flex; flex-wrap:wrap; gap:8px; align-items:center; font-size:0.8rem; color:var(--text-secondary); }
+        .card-list-meta span { white-space:nowrap; }
+        .card-list-rating {
+            display:inline-flex; align-items:center; gap:3px;
+            background:var(--rating-bg); color:var(--rating-gold);
+            padding:2px 8px; border-radius:var(--radius-full);
+            font-weight:700; font-size:0.78rem;
+        }
+        .card-list-genres { display:flex; flex-wrap:wrap; gap:4px; }
+        .card-list-genre-tag {
+            font-size:0.68rem; padding:1px 8px; border-radius:var(--radius-full);
+            border:1px solid var(--border-subtle); color:var(--text-muted);
+            white-space:nowrap;
+        }
+        .card-list-overview {
+            font-size:0.8rem; color:var(--text-muted);
+            display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;
+            overflow:hidden; line-height:1.4;
+        }
+
+        /* ============================================================
+           GRID VIEW
+           ============================================================ */
+        .card-grid {
+            display:grid;
+            grid-template-columns:repeat(auto-fill, minmax(175px, 1fr));
+            gap:var(--space-md);
+        }
+        .card-grid-item {
+            background:var(--bg-card); border:1px solid var(--border-subtle);
+            border-radius:var(--radius-lg); overflow:hidden;
+            cursor:pointer; transition:var(--transition-smooth);
+            contain:content;
+        }
+        .card-grid-item:hover {
+            transform:translateY(-4px);
+            border-color:var(--border-medium);
+            box-shadow:0 8px 24px rgba(0,0,0,0.3);
+        }
+        .card-grid-poster-wrap { position:relative; aspect-ratio:2/3; overflow:hidden; background:var(--bg-tertiary); }
+        .card-grid-poster { width:100%; height:100%; object-fit:cover; transition:transform 0.3s ease; }
+        .card-grid-item:hover .card-grid-poster { transform:scale(1.05); }
+        .card-grid-rating {
+            position:absolute; top:8px; right:8px;
+            background:rgba(0,0,0,0.75); color:var(--rating-gold);
+            padding:3px 8px; border-radius:var(--radius-full);
+            font-size:0.72rem; font-weight:700;
+            backdrop-filter:blur(4px);
+        }
+        .card-grid-info { padding:10px 12px 12px; }
+        .card-grid-title {
+            font-weight:600; font-size:0.85rem; color:var(--text-primary);
+            white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+        }
+        .card-grid-year { font-size:0.72rem; color:var(--text-muted); margin-top:2px; }
+
+        /* ============================================================
+           PAGINATION
+           ============================================================ */
+        .pagination {
+            display:flex; align-items:center; justify-content:center; gap:var(--space-xs);
+            padding:var(--space-md) 0;
+        }
+        .page-btn {
+            min-width:36px; height:36px; border-radius:var(--radius-sm);
+            border:1px solid var(--border-subtle);
+            background:var(--bg-card); color:var(--text-secondary);
+            font-size:0.85rem; font-weight:500;
+            display:flex; align-items:center; justify-content:center;
+            transition:var(--transition-fast); padding:0 10px;
+        }
+        .page-btn:hover:not(:disabled):not(.active) {
+            border-color:var(--border-medium); color:var(--text-primary);
+        }
+        .page-btn.active {
+            background:var(--accent); border-color:var(--accent); color:#fff;
+            box-shadow:0 2px 8px var(--accent-glow);
+        }
+        .page-btn:disabled { opacity:0.35; cursor:default; }
+        .page-ellipsis { color:var(--text-muted); padding:0 4px; }
+
+        /* ============================================================
+           DETAIL MODAL
+           ============================================================ */
+        .modal-overlay {
+            position:fixed; inset:0; z-index:200;
+            background:rgba(0,0,0,0.8); backdrop-filter:blur(8px);
+            display:none; align-items:center; justify-content:center;
+            padding:var(--space-lg);
+        }
+        .modal-overlay.open { display:flex; }
+        .modal-content {
+            background:var(--bg-modal); border:1px solid var(--border-medium);
+            border-radius:var(--radius-xl); max-width:800px; width:100%;
+            max-height:90vh; overflow-y:auto; position:relative;
+            animation:modalIn 0.3s ease;
+        }
+        @keyframes modalIn {
+            from { opacity:0; transform:scale(0.95) translateY(20px); }
+            to { opacity:1; transform:scale(1) translateY(0); }
+        }
+        .modal-close {
+            position:sticky; top:12px; float:right; z-index:10;
+            width:36px; height:36px; border-radius:50%;
+            border:none; background:rgba(0,0,0,0.6);
+            color:#fff; font-size:1.2rem;
+            display:flex; align-items:center; justify-content:center;
+            margin-right:12px;
+        }
+        .modal-close:hover { background:rgba(255,255,255,0.15); }
+        .modal-backdrop-wrap {
+            position:relative; width:100%; height:250px; overflow:hidden;
+            border-radius:var(--radius-xl) var(--radius-xl) 0 0;
+        }
+        .modal-backdrop {
+            width:100%; height:100%; object-fit:cover;
+        }
+        .modal-backdrop-gradient {
+            position:absolute; inset:0;
+            background:linear-gradient(to top, var(--bg-modal) 0%, transparent 60%);
+        }
+        .modal-body { padding:var(--space-lg); margin-top:-60px; position:relative; }
+        .modal-poster-row { display:flex; gap:var(--space-lg); align-items:flex-start; }
+        .modal-poster {
+            width:180px; border-radius:var(--radius-md);
+            box-shadow:0 8px 32px rgba(0,0,0,0.5); flex-shrink:0;
+        }
+        .modal-info { flex:1; min-width:0; }
+        .modal-title { font-size:1.6rem; font-weight:800; line-height:1.2; }
+        .modal-tagline { font-size:0.9rem; color:var(--text-muted); font-style:italic; margin:4px 0 12px; }
+        .modal-meta-row {
+            display:flex; flex-wrap:wrap; gap:var(--space-sm); align-items:center;
+            font-size:0.85rem; color:var(--text-secondary); margin-bottom:12px;
+        }
+        .modal-meta-row .sep { color:var(--text-muted); }
+        .modal-rating-big {
+            display:inline-flex; align-items:center; gap:6px;
+            background:var(--rating-bg); color:var(--rating-gold);
+            padding:6px 14px; border-radius:var(--radius-full);
+            font-weight:700; font-size:1.1rem;
+        }
+        .modal-genres { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:16px; }
+        .modal-genre-tag {
+            padding:4px 12px; border-radius:var(--radius-full);
+            border:1px solid var(--border-medium); color:var(--text-secondary);
+            font-size:0.78rem;
+        }
+        .modal-overview-title { font-weight:700; margin-bottom:6px; font-size:0.95rem; }
+        .modal-overview { font-size:0.9rem; color:var(--text-secondary); line-height:1.7; margin-bottom:20px; }
+        .modal-section { margin-bottom:20px; }
+        .modal-section-title { font-weight:700; font-size:0.95rem; margin-bottom:10px; display:flex; align-items:center; gap:6px; }
+        .cast-grid { display:flex; gap:12px; overflow-x:auto; padding-bottom:8px; }
+        .cast-card {
+            flex-shrink:0; width:100px; text-align:center;
+        }
+        .cast-photo {
+            width:72px; height:72px; border-radius:50%; object-fit:cover;
+            margin:0 auto 6px; background:var(--bg-tertiary);
+        }
+        .cast-photo-placeholder {
+            width:72px; height:72px; border-radius:50%; margin:0 auto 6px;
+            background:var(--bg-tertiary);
+            display:flex; align-items:center; justify-content:center;
+            font-size:1.5rem; color:var(--text-muted);
+        }
+        .cast-name { font-size:0.75rem; font-weight:600; color:var(--text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .cast-character { font-size:0.68rem; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .recs-grid { display:flex; gap:10px; overflow-x:auto; padding-bottom:8px; }
+        .rec-card {
+            flex-shrink:0; width:130px; cursor:pointer;
+            transition:var(--transition-fast);
+        }
+        .rec-card:hover { transform:translateY(-3px); }
+        .rec-poster {
+            width:100%; aspect-ratio:2/3; object-fit:cover;
+            border-radius:var(--radius-sm); background:var(--bg-tertiary);
+        }
+        .rec-title { font-size:0.72rem; font-weight:600; margin-top:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .rec-rating { font-size:0.68rem; color:var(--rating-gold); }
+        .modal-tmdb-link {
+            display:inline-flex; align-items:center; gap:6px;
+            padding:8px 16px; border-radius:var(--radius-md);
+            background:var(--accent); color:#fff; font-size:0.85rem; font-weight:600;
+            transition:var(--transition-fast); margin-top:8px;
+        }
+        .modal-tmdb-link:hover { background:var(--accent-hover); text-decoration:none; }
+
+        /* ============================================================
+           LOADING SKELETONS
+           ============================================================ */
+        @keyframes shimmer {
+            0% { background-position:-400px 0; }
+            100% { background-position:400px 0; }
+        }
+        .skeleton {
+            background:linear-gradient(90deg, var(--bg-skeleton) 25%, var(--bg-skeleton-shine) 50%, var(--bg-skeleton) 75%);
+            background-size:800px 100%;
+            animation:shimmer 1.5s infinite;
+            border-radius:var(--radius-sm);
+        }
+        .skeleton-list-item {
+            display:flex; gap:var(--space-md); padding:var(--space-md);
+            background:var(--bg-card); border-radius:var(--radius-lg);
+            border:1px solid var(--border-subtle);
+        }
+        .skel-poster { width:64px; height:96px; flex-shrink:0; border-radius:var(--radius-sm); }
+        .skel-info { flex:1; display:flex; flex-direction:column; gap:8px; justify-content:center; }
+        .skel-title { height:18px; width:60%; }
+        .skel-meta { height:14px; width:40%; }
+        .skel-text { height:14px; width:80%; }
+
+        /* ============================================================
+           STATES
+           ============================================================ */
+        .state-message {
+            display:flex; flex-direction:column; align-items:center;
+            justify-content:center; padding:var(--space-2xl); text-align:center;
+            gap:var(--space-md); min-height:300px;
+        }
+        .state-icon { font-size:3rem; }
+        .state-title { font-size:1.1rem; font-weight:700; }
+        .state-desc { color:var(--text-muted); font-size:0.9rem; max-width:400px; }
+        .state-retry {
+            padding:10px 24px; border-radius:var(--radius-full);
+            border:none; background:var(--accent); color:#fff;
+            font-weight:600; font-size:0.9rem; transition:var(--transition-fast);
+        }
+        .state-retry:hover { background:var(--accent-hover); }
+
+        /* ============================================================
+           RESPONSIVE
+           ============================================================ */
+        @media (max-width:1024px) {
+            .filter-panel { width:260px; min-width:260px; }
+            .card-grid { grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); }
+        }
+        @media (max-width:768px) {
+            .app-layout { flex-direction:column; }
+            .btn-filters-toggle { display:flex; }
+            .filter-panel {
+                position:fixed; top:var(--header-h); left:0; bottom:0; z-index:150;
+                width:300px; max-width:85vw; transform:translateX(-100%);
+                transition:transform 0.3s ease; border-right:1px solid var(--border-subtle);
+            }
+            .filter-panel.open { transform:translateX(0); }
+            .filter-overlay {
+                display:none; position:fixed; inset:0; top:var(--header-h); z-index:140;
+                background:rgba(0,0,0,0.5);
+            }
+            .filter-overlay.open { display:block; }
+            .content-area { padding:var(--space-md); }
+            .card-list-item { flex-direction:row; gap:12px; padding:12px; }
+            .card-list-poster, .card-list-poster-placeholder { width:56px; height:84px; }
+            .card-grid { grid-template-columns:repeat(auto-fill, minmax(140px, 1fr)); gap:12px; }
+            .modal-poster-row { flex-direction:column; align-items:center; }
+            .modal-poster { width:150px; }
+            .modal-title { font-size:1.3rem; text-align:center; }
+            .modal-backdrop-wrap { height:180px; }
+            .app-header { padding:0 var(--space-md); }
+            .logo { font-size:1.15rem; }
+            .media-btn { padding:5px 12px; font-size:0.78rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============================================================
+    HEADER
+    ============================================================ -->
+    <header class="app-header">
+        <div class="header-left">
+            <span class="logo">🎬 MovieVault</span>
+            <div class="media-toggle" id="mediaToggle">
+                <button class="media-btn active" data-type="movie">电影</button>
+                <button class="media-btn" data-type="tv">电视剧</button>
+            </div>
+        </div>
+        <div class="header-right">
+            <button class="btn-icon btn-filters-toggle" id="btnFiltersToggle" title="筛选" aria-label="打开筛选面板">
+                ☰
+            </button>
+            <button class="btn-icon active-view" id="btnListView" title="列表视图" aria-label="列表视图">
+                📋
+            </button>
+            <button class="btn-icon" id="btnGridView" title="网格视图" aria-label="网格视图">
+                🎞️
+            </button>
+        </div>
+    </header>
+
+    <!-- ============================================================
+    MAIN LAYOUT
+    ============================================================ -->
+    <div class="app-layout">
+        <!-- Filter Overlay (mobile) -->
+        <div class="filter-overlay" id="filterOverlay"></div>
+
+        <!-- Filter Sidebar -->
+        <aside class="filter-panel" id="filterPanel">
+            <!-- Search -->
+            <div class="filter-section">
+                <label class="filter-label">🔍 搜索</label>
+                <input type="text" class="filter-input" id="searchInput" placeholder="输入关键词搜索...">
+            </div>
+
+            <!-- Sort -->
+            <div class="filter-section">
+                <label class="filter-label">📊 排序方式</label>
+                <select class="filter-select" id="sortSelect"></select>
+            </div>
+
+            <!-- Genres -->
+            <div class="filter-section">
+                <label class="filter-label">🏷️ 类型</label>
+                <div class="genre-chips" id="genreChips">加载中...</div>
+            </div>
+
+            <!-- Rating Range -->
+            <div class="filter-section">
+                <label class="filter-label">⭐ 评分范围</label>
+                <div class="filter-row">
+                    <input type="number" class="filter-input" id="ratingMin" placeholder="最低" min="0" max="10" step="0.5">
+                    <input type="number" class="filter-input" id="ratingMax" placeholder="最高" min="0" max="10" step="0.5">
+                </div>
+            </div>
+
+            <!-- Minimum Votes -->
+            <div class="filter-section">
+                <label class="filter-label">🗳️ 最低投票数</label>
+                <input type="number" class="filter-input" id="voteCountMin" placeholder="例如: 100" min="0">
+            </div>
+
+            <!-- Release Date Range -->
+            <div class="filter-section">
+                <label class="filter-label" id="dateLabel">📅 上映日期范围</label>
+                <div class="filter-row">
+                    <input type="date" class="filter-input" id="dateFrom">
+                    <input type="date" class="filter-input" id="dateTo">
+                </div>
+            </div>
+
+            <!-- Year -->
+            <div class="filter-section">
+                <label class="filter-label">📆 特定年份</label>
+                <input type="number" class="filter-input" id="yearInput" placeholder="例如: 2024" min="1900" max="2030">
+            </div>
+
+            <!-- Original Language -->
+            <div class="filter-section">
+                <label class="filter-label">🌐 原始语言</label>
+                <select class="filter-select" id="languageSelect"></select>
+            </div>
+
+            <!-- Region -->
+            <div class="filter-section">
+                <label class="filter-label">🌍 地区</label>
+                <select class="filter-select" id="regionSelect"></select>
+            </div>
+
+            <!-- Watch Providers -->
+            <div class="filter-section">
+                <label class="filter-label">📡 流媒体平台</label>
+                <select class="filter-select" id="watchRegionSelect"></select>
+                <div class="provider-chips" id="providerChips" style="margin-top:4px;">
+                    <span style="font-size:0.7rem;color:var(--text-muted);">选择地区后可筛选平台</span>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <button class="btn-secondary" id="btnReset">🔄 重置筛选</button>
+        </aside>
+
+        <!-- Content Area -->
+        <main class="content-area" id="contentArea">
+            <div class="results-header" id="resultsHeader">
+                <div class="results-count" id="resultsCount"></div>
+                <div class="active-filters" id="activeFilters"></div>
+            </div>
+            <div id="cardContainer"></div>
+            <nav class="pagination" id="pagination" aria-label="分页导航"></nav>
+        </main>
+    </div>
+
+    <!-- ============================================================
+    DETAIL MODAL
+    ============================================================ -->
+    <div class="modal-overlay" id="detailModal" aria-hidden="true">
+        <div class="modal-content" id="modalContent" role="dialog" aria-modal="true">
+            <button class="modal-close" id="modalClose" aria-label="关闭">&times;</button>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <script>
+    /* ============================================================
+       SECTION 1: CONFIGURATION & CONSTANTS
+       ============================================================ */
+    const TMDB_TOKEN = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyZGNlYjM3NTkwNThiNzdjZGEyNTQzMTQ1MTQ2ZjdmMSIsIm5iZiI6MTc3OTg2MjczMC4xNDMwMDAxLCJzdWIiOiI2YTE2OGNjYTU4M2NmODgzYzViNDY3ODciLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.VsTg3MMVoCRoOSFgoW4S06G1yBdVIb6hrWwTTk0Lj8I';
+
+    const IMAGE_BASE = 'https://image.tmdb.org/t/p/';
+    const POSTER_SIZES = { thumb:'w92', small:'w185', medium:'w342', large:'w500', xlarge:'w780' };
+    const BACKDROP_SIZE = 'w780';
+    const PROFILE_SIZE = 'w185';
+
+    const SORT_OPTIONS = {
+        movie: [
+            { value:'popularity.desc', label:'🔥 流行度 ↓' },
+            { value:'popularity.asc', label:'🔥 流行度 ↑' },
+            { value:'revenue.desc', label:'💰 票房 ↓' },
+            { value:'revenue.asc', label:'💰 票房 ↑' },
+            { value:'primary_release_date.desc', label:'📅 上映日期 ↓' },
+            { value:'primary_release_date.asc', label:'📅 上映日期 ↑' },
+            { value:'vote_average.desc', label:'⭐ 评分 ↓' },
+            { value:'vote_average.asc', label:'⭐ 评分 ↑' },
+            { value:'vote_count.desc', label:'🗳️ 投票数 ↓' },
+            { value:'vote_count.asc', label:'🗳️ 投票数 ↑' },
+            { value:'original_title.asc', label:'🔤 标题 A-Z' },
+            { value:'original_title.desc', label:'🔤 标题 Z-A' },
+        ],
+        tv: [
+            { value:'popularity.desc', label:'🔥 流行度 ↓' },
+            { value:'popularity.asc', label:'🔥 流行度 ↑' },
+            { value:'first_air_date.desc', label:'📅 首播日期 ↓' },
+            { value:'first_air_date.asc', label:'📅 首播日期 ↑' },
+            { value:'vote_average.desc', label:'⭐ 评分 ↓' },
+            { value:'vote_average.asc', label:'⭐ 评分 ↑' },
+            { value:'vote_count.desc', label:'🗳️ 投票数 ↓' },
+            { value:'vote_count.asc', label:'🗳️ 投票数 ↑' },
+        ]
+    };
+
+    const LANGUAGES = [
+        { code:'', label:'全部语言' },
+        { code:'en', label:'English' },
+        { code:'zh', label:'中文' },
+        { code:'ja', label:'日本語' },
+        { code:'ko', label:'한국어' },
+        { code:'fr', label:'Français' },
+        { code:'de', label:'Deutsch' },
+        { code:'es', label:'Español' },
+        { code:'it', label:'Italiano' },
+        { code:'pt', label:'Português' },
+        { code:'ru', label:'Русский' },
+        { code:'hi', label:'हिन्दी' },
+        { code:'th', label:'ไทย' },
+        { code:'sv', label:'Svenska' },
+        { code:'da', label:'Dansk' },
+        { code:'nl', label:'Nederlands' },
+        { code:'no', label:'Norsk' },
+        { code:'fi', label:'Suomi' },
+        { code:'pl', label:'Polski' },
+        { code:'tr', label:'Türkçe' },
+        { code:'ar', label:'العربية' },
+        { code:'id', label:'Bahasa Indonesia' },
+        { code:'vi', label:'Tiếng Việt' },
+    ];
+
+    const REGIONS = [
+        { code:'', label:'全部地区' },
+        { code:'US', label:'🇺🇸 美国' },
+        { code:'CN', label:'🇨🇳 中国' },
+        { code:'JP', label:'🇯🇵 日本' },
+        { code:'KR', label:'🇰🇷 韩国' },
+        { code:'GB', label:'🇬🇧 英国' },
+        { code:'FR', label:'🇫🇷 法国' },
+        { code:'DE', label:'🇩🇪 德国' },
+        { code:'IN', label:'🇮🇳 印度' },
+        { code:'HK', label:'🇭🇰 香港' },
+        { code:'TW', label:'🇹🇼 台湾' },
+        { code:'CA', label:'🇨🇦 加拿大' },
+        { code:'AU', label:'🇦🇺 澳大利亚' },
+        { code:'BR', label:'🇧🇷 巴西' },
+        { code:'MX', label:'🇲🇽 墨西哥' },
+        { code:'ES', label:'🇪🇸 西班牙' },
+        { code:'IT', label:'🇮🇹 意大利' },
+        { code:'RU', label:'🇷🇺 俄罗斯' },
+        { code:'SE', label:'🇸🇪 瑞典' },
+        { code:'NL', label:'🇳🇱 荷兰' },
+    ];
+
+    const WATCH_PROVIDERS = [
+        { id:8, name:'Netflix' },
+        { id:9, name:'Amazon Prime Video' },
+        { id:337, name:'Disney+' },
+        { id:350, name:'Apple TV+' },
+        { id:384, name:'Max (HBO)' },
+        { id:15, name:'Hulu' },
+        { id:531, name:'Paramount+' },
+        { id:2, name:'Apple iTunes' },
+        { id:3, name:'Google Play Movies' },
+        { id:611, name:'iQIYI' },
+        { id:283, name:'Crunchyroll' },
+        { id:119, name:'Amazon Prime Video (US)' },
+    ];
+
+    /* ============================================================
+       SECTION 2: STATE MANAGEMENT
+       ============================================================ */
+    const AppState = {
+        mediaType: 'movie',
+        sortBy: 'popularity.desc',
+        withGenres: [],
+        voteAverageGte: 0,
+        voteAverageLte: 10,
+        voteCountGte: 0,
+        dateGte: '',
+        dateLte: '',
+        year: '',
+        withOriginalLanguage: '',
+        region: '',
+        watchProviders: [],
+        watchRegion: '',
+        searchQuery: '',
+        currentPage: 1,
+        totalPages: 1,
+        totalResults: 0,
+        results: [],
+        genres: { movie:[], tv:[] },
+        genreMap: { movie:new Map(), tv:new Map() },
+        viewMode: 'list',
+        isLoading: false,
+        error: null,
+        detailData: null,
+        filtersOpen: false,
+        abortController: null,
+        searchDebounce: null,
+        filterDebounce: null,
+    };
+
+    /* ============================================================
+       SECTION 3: UTILITIES
+       ============================================================ */
+    function escapeHtml(str) {
+        if (!str && str !== 0) return '';
+        const map = { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#x27;' };
+        return String(str).replace(/[&<>"']/g, m => map[m]);
+    }
+
+    function langToRegion(langCode) {
+        const map = {
+            en:'US', zh:'CN', ja:'JP', ko:'KR', fr:'FR', de:'DE', es:'ES',
+            it:'IT', pt:'PT/BR', ru:'RU', hi:'IN', th:'TH', sv:'SE',
+            da:'DK', nl:'NL', no:'NO', fi:'FI', pl:'PL', tr:'TR',
+            ar:'AR', id:'ID', vi:'VN', ms:'MY', tl:'PH', he:'IL',
+        };
+        return map[langCode] || langCode.toUpperCase();
+    }
+
+    const $ = id => document.getElementById(id);
+
+    /* ============================================================
+       SECTION 4: API LAYER
+       ============================================================ */
+    async function apiFetch(endpoint, params = {}) {
+        const url = new URL('/tmdb/3' + endpoint, window.location.origin);
+        Object.entries(params).forEach(([k, v]) => {
+            if (v === '' || v === null || v === undefined) return;
+            if (Array.isArray(v) && v.length === 0) return;
+            url.searchParams.set(k, Array.isArray(v) ? v.join(',') : v);
+        });
+        url.searchParams.set('language', 'zh-CN');
+
+        const res = await fetch(url.toString(), {
+            headers: {
+                'Authorization': 'Bearer ' + TMDB_TOKEN,
+                'Content-Type': 'application/json',
+            },
+            signal: AppState.abortController ? AppState.abortController.signal : undefined,
+        });
+
+        if (!res.ok) {
+            const errText = await res.text().catch(() => 'Unknown error');
+            const err = new Error('HTTP ' + res.status + ': ' + errText.substring(0, 200));
+            err.status = res.status;
+            throw err;
+        }
+        return res.json();
+    }
+
+    async function fetchGenres(type) {
+        const cacheKey = 'tmdb_genres_' + type;
+        try {
+            const cached = sessionStorage.getItem(cacheKey);
+            if (cached) {
+                const parsed = JSON.parse(cached);
+                if (parsed.length > 0) return parsed;
+            }
+        } catch (_) {}
+
+        const data = await apiFetch('/genre/' + type + '/list');
+        const genres = data.genres || [];
+        try { sessionStorage.setItem(cacheKey, JSON.stringify(genres)); } catch (_) {}
+        return genres;
+    }
+
+    async function fetchDiscover() {
+        const params = { sort_by:AppState.sortBy, page:AppState.currentPage };
+
+        if (AppState.withGenres.length > 0) params.with_genres = AppState.withGenres;
+        if (AppState.voteAverageGte > 0) params['vote_average.gte'] = AppState.voteAverageGte;
+        if (AppState.voteAverageLte < 10) params['vote_average.lte'] = AppState.voteAverageLte;
+        if (AppState.voteCountGte > 0) params['vote_count.gte'] = AppState.voteCountGte;
+        if (AppState.year) {
+            params[AppState.mediaType === 'movie' ? 'primary_release_year' : 'first_air_date_year'] = AppState.year;
+        }
+        if (AppState.dateGte) {
+            params[AppState.mediaType === 'movie' ? 'primary_release_date.gte' : 'first_air_date.gte'] = AppState.dateGte;
+        }
+        if (AppState.dateLte) {
+            params[AppState.mediaType === 'movie' ? 'primary_release_date.lte' : 'first_air_date.lte'] = AppState.dateLte;
+        }
+        if (AppState.withOriginalLanguage) params.with_original_language = AppState.withOriginalLanguage;
+        if (AppState.region) params.region = AppState.region;
+        if (AppState.watchProviders.length > 0 && AppState.watchRegion) {
+            params.with_watch_providers = AppState.watchProviders;
+            params.watch_region = AppState.watchRegion;
+        }
+
+        return apiFetch('/discover/' + AppState.mediaType, params);
+    }
+
+    async function fetchSearch() {
+        const params = { query:AppState.searchQuery, page:AppState.currentPage };
+        if (AppState.year) params.year = AppState.year;
+        if (AppState.region) params.region = AppState.region;
+        return apiFetch('/search/' + AppState.mediaType, params);
+    }
+
+    async function fetchDetail(id) {
+        const append = 'credits,recommendations,watch/providers';
+        return apiFetch('/' + AppState.mediaType + '/' + id, { append_to_response:append });
+    }
+
+    /* ============================================================
+       SECTION 5: UI RENDERERS
+       ============================================================ */
+
+    // --- Filter Panel ---
+    function renderSortOptions() {
+        const sel = $('sortSelect');
+        const options = SORT_OPTIONS[AppState.mediaType];
+        sel.innerHTML = options.map(o =>
+            '<option value="' + o.value + '"' + (AppState.sortBy === o.value ? ' selected' : '') + '>' + escapeHtml(o.label) + '</option>'
+        ).join('');
+    }
+
+    function renderGenreChips() {
+        const container = $('genreChips');
+        const genres = AppState.genres[AppState.mediaType];
+        if (!genres.length) {
+            container.innerHTML = '<span style="font-size:0.75rem;color:var(--text-muted);">加载中...</span>';
+            return;
+        }
+        container.innerHTML = genres.map(g => {
+            const active = AppState.withGenres.includes(g.id);
+            return '<button class="genre-chip' + (active ? ' active' : '') + '" data-genre-id="' + g.id + '">' + escapeHtml(g.name) + '</button>';
+        }).join('');
+
+        container.querySelectorAll('.genre-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                const id = parseInt(chip.dataset.genreId);
+                const idx = AppState.withGenres.indexOf(id);
+                if (idx >= 0) AppState.withGenres.splice(idx, 1);
+                else AppState.withGenres.push(id);
+                renderGenreChips();
+                renderActiveFilters();
+                scheduleFilterFetch();
+            });
+        });
+    }
+
+    function renderLanguageOptions() {
+        $('languageSelect').innerHTML = LANGUAGES.map(l =>
+            '<option value="' + l.code + '"' + (AppState.withOriginalLanguage === l.code ? ' selected' : '') + '>' + escapeHtml(l.label) + '</option>'
+        ).join('');
+    }
+
+    function renderRegionOptions() {
+        $('regionSelect').innerHTML = REGIONS.map(r =>
+            '<option value="' + r.code + '"' + (AppState.region === r.code ? ' selected' : '') + '>' + escapeHtml(r.label) + '</option>'
+        ).join('');
+    }
+
+    function renderWatchRegionOptions() {
+        $('watchRegionSelect').innerHTML = '<option value="">选择地区...</option>' + REGIONS.filter(r => r.code).map(r =>
+            '<option value="' + r.code + '"' + (AppState.watchRegion === r.code ? ' selected' : '') + '>' + escapeHtml(r.label) + '</option>'
+        ).join('');
+    }
+
+    function renderProviderChips() {
+        const container = $('providerChips');
+        if (!AppState.watchRegion) {
+            container.innerHTML = '<span style="font-size:0.7rem;color:var(--text-muted);">选择地区后可筛选平台</span>';
+            return;
+        }
+        container.innerHTML = WATCH_PROVIDERS.map(p => {
+            const active = AppState.watchProviders.includes(p.id);
+            return '<button class="provider-chip' + (active ? ' active' : '') + '" data-provider-id="' + p.id + '">' + escapeHtml(p.name) + '</button>';
+        }).join('');
+
+        container.querySelectorAll('.provider-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                const id = parseInt(chip.dataset.providerId);
+                const idx = AppState.watchProviders.indexOf(id);
+                if (idx >= 0) AppState.watchProviders.splice(idx, 1);
+                else AppState.watchProviders.push(id);
+                renderProviderChips();
+                renderActiveFilters();
+                scheduleFilterFetch();
+            });
+        });
+    }
+
+    function renderActiveFilters() {
+        const container = $('activeFilters');
+        const tags = [];
+
+        if (AppState.searchQuery) {
+            tags.push({ label:'搜索: ' + AppState.searchQuery, clear:() => { $('searchInput').value = ''; AppState.searchQuery = ''; loadData(); } });
+        }
+        if (AppState.withGenres.length > 0) {
+            const genreMap = AppState.genreMap[AppState.mediaType];
+            AppState.withGenres.forEach(gid => {
+                const name = genreMap.get(gid) || 'ID:' + gid;
+                tags.push({ label:'类型: ' + name, clear:() => {
+                    AppState.withGenres = AppState.withGenres.filter(x => x !== gid);
+                    renderGenreChips(); renderActiveFilters(); scheduleFilterFetch();
+                }});
+            });
+        }
+        if (AppState.voteAverageGte > 0 || AppState.voteAverageLte < 10) {
+            tags.push({ label:'评分: ' + AppState.voteAverageGte + '-' + AppState.voteAverageLte, clear:() => {
+                AppState.voteAverageGte = 0; AppState.voteAverageLte = 10;
+                $('ratingMin').value = ''; $('ratingMax').value = '';
+                renderActiveFilters(); scheduleFilterFetch();
+            }});
+        }
+        if (AppState.voteCountGte > 0) {
+            tags.push({ label:'投票 ≥' + AppState.voteCountGte, clear:() => {
+                AppState.voteCountGte = 0; $('voteCountMin').value = '';
+                renderActiveFilters(); scheduleFilterFetch();
+            }});
+        }
+        if (AppState.year) {
+            tags.push({ label:'年份: ' + AppState.year, clear:() => {
+                AppState.year = ''; $('yearInput').value = '';
+                renderActiveFilters(); scheduleFilterFetch();
+            }});
+        }
+        if (AppState.withOriginalLanguage) {
+            tags.push({ label:'语言: ' + AppState.withOriginalLanguage, clear:() => {
+                AppState.withOriginalLanguage = ''; $('languageSelect').value = '';
+                renderActiveFilters(); scheduleFilterFetch();
+            }});
+        }
+        if (AppState.region) {
+            tags.push({ label:'地区: ' + AppState.region, clear:() => {
+                AppState.region = ''; $('regionSelect').value = '';
+                renderActiveFilters(); scheduleFilterFetch();
+            }});
+        }
+        if (AppState.watchProviders.length > 0) {
+            AppState.watchProviders.forEach(pid => {
+                const prov = WATCH_PROVIDERS.find(p => p.id === pid);
+                tags.push({ label:(prov ? prov.name : 'ID:' + pid), clear:() => {
+                    AppState.watchProviders = AppState.watchProviders.filter(x => x !== pid);
+                    renderProviderChips(); renderActiveFilters(); scheduleFilterFetch();
+                }});
+            });
+        }
+
+        container.innerHTML = tags.map(t =>
+            '<span class="filter-tag">' + escapeHtml(t.label) + '<span class="filter-tag-remove" data-clear="1">✕</span></span>'
+        ).join('');
+
+        container.querySelectorAll('.filter-tag-remove').forEach((el, i) => {
+            el.addEventListener('click', tags[i].clear);
+        });
+    }
+
+    // --- Content Cards ---
+    function renderListView() {
+        const container = $('cardContainer');
+        if (!AppState.results.length) {
+            renderEmpty();
+            return;
+        }
+        const genreMap = AppState.genreMap[AppState.mediaType];
+        container.innerHTML = '<div class="card-list">' + AppState.results.map(item => {
+            const title = item.title || item.name || 'Untitled';
+            const dateStr = item.release_date || item.first_air_date || '';
+            const year = dateStr ? dateStr.slice(0, 4) : '—';
+            const lang = item.original_language || '';
+            const region = lang ? langToRegion(lang) : '—';
+            const rating = item.vote_average != null ? item.vote_average.toFixed(1) : '?';
+            const overview = item.overview || '暂无简介';
+            const posterPath = item.poster_path;
+            const genreIds = (item.genre_ids || []).slice(0, 3);
+            const genreNames = genreIds.map(gid => genreMap.get(gid) || '').filter(Boolean);
+
+            let posterHtml;
+            if (posterPath) {
+                posterHtml = '<img class="card-list-poster" src="' + IMAGE_BASE + POSTER_SIZES.thumb + posterPath + '" alt="' + escapeHtml(title) + '" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';">' +
+                    '<div class="card-list-poster-placeholder" style="display:none;">🎬</div>';
+            } else {
+                posterHtml = '<div class="card-list-poster-placeholder">🎬</div>';
+            }
+
+            return '<div class="card-list-item" data-id="' + item.id + '">' +
+                posterHtml +
+                '<div class="card-list-info">' +
+                    '<div class="card-list-title">' + escapeHtml(title) + '</div>' +
+                    '<div class="card-list-meta">' +
+                        '<span>📆 ' + year + '</span>' +
+                        '<span>🌐 ' + escapeHtml(region) + '</span>' +
+                        '<span class="card-list-rating">★ ' + rating + '</span>' +
+                    '</div>' +
+                    (genreNames.length ? '<div class="card-list-genres">' + genreNames.map(g => '<span class="card-list-genre-tag">' + escapeHtml(g) + '</span>').join('') + '</div>' : '') +
+                    '<div class="card-list-overview">' + escapeHtml(overview) + '</div>' +
+                '</div>' +
+            '</div>';
+        }).join('') + '</div>';
+
+        container.querySelectorAll('.card-list-item').forEach(card => {
+            card.addEventListener('click', () => openDetail(parseInt(card.dataset.id)));
+        });
+    }
+
+    function renderGridView() {
+        const container = $('cardContainer');
+        if (!AppState.results.length) {
+            renderEmpty();
+            return;
+        }
+        container.innerHTML = '<div class="card-grid">' + AppState.results.map(item => {
+            const title = item.title || item.name || 'Untitled';
+            const dateStr = item.release_date || item.first_air_date || '';
+            const year = dateStr ? dateStr.slice(0, 4) : '—';
+            const rating = item.vote_average != null ? item.vote_average.toFixed(1) : '?';
+            const posterPath = item.poster_path;
+
+            let posterHtml;
+            if (posterPath) {
+                posterHtml = '<div class="card-grid-poster-wrap">' +
+                    '<img class="card-grid-poster" src="' + IMAGE_BASE + POSTER_SIZES.medium + posterPath + '" alt="' + escapeHtml(title) + '" loading="lazy" onerror="this.style.display=\'none\';">' +
+                    '<div class="card-grid-rating">★ ' + rating + '</div>' +
+                '</div>';
+            } else {
+                posterHtml = '<div class="card-grid-poster-wrap" style="display:flex;align-items:center;justify-content:center;font-size:3rem;">🎬</div>';
+            }
+
+            return '<div class="card-grid-item" data-id="' + item.id + '">' +
+                posterHtml +
+                '<div class="card-grid-info">' +
+                    '<div class="card-grid-title" title="' + escapeHtml(title) + '">' + escapeHtml(title) + '</div>' +
+                    '<div class="card-grid-year">📆 ' + year + '</div>' +
+                '</div>' +
+            '</div>';
+        }).join('') + '</div>';
+
+        container.querySelectorAll('.card-grid-item').forEach(card => {
+            card.addEventListener('click', () => openDetail(parseInt(card.dataset.id)));
+        });
+    }
+
+    function renderResultsHeader() {
+        $('resultsCount').innerHTML = AppState.totalResults > 0
+            ? '共找到 <strong>' + AppState.totalResults.toLocaleString() + '</strong> 部作品'
+            : '';
+    }
+
+    function renderPagination() {
+        const container = $('pagination');
+        if (AppState.totalPages <= 1) {
+            container.innerHTML = '';
+            return;
+        }
+        const current = AppState.currentPage;
+        const total = AppState.totalPages;
+        let pages = [];
+
+        pages.push(1);
+        for (let i = Math.max(2, current - 2); i <= Math.min(total - 1, current + 2); i++) {
+            if (i === pages[pages.length - 1] + 1) pages.push(i);
+            else if (i > pages[pages.length - 1] + 1) { pages.push('...'); pages.push(i); }
+        }
+        if (total > 1 && pages[pages.length - 1] !== total) {
+            if (pages[pages.length - 1] !== total - 1) pages.push('...');
+            pages.push(total);
+        }
+
+        container.innerHTML =
+            '<button class="page-btn" ' + (current === 1 ? 'disabled' : '') + ' data-page="' + (current - 1) + '">◀</button>' +
+            pages.map(p => {
+                if (p === '...') return '<span class="page-ellipsis">...</span>';
+                return '<button class="page-btn' + (p === current ? ' active' : '') + '" data-page="' + p + '">' + p + '</button>';
+            }).join('') +
+            '<button class="page-btn" ' + (current === total ? 'disabled' : '') + ' data-page="' + (current + 1) + '">▶</button>';
+
+        container.querySelectorAll('.page-btn:not([disabled])').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const page = parseInt(btn.dataset.page);
+                if (page && page !== AppState.currentPage && page >= 1 && page <= AppState.totalPages) {
+                    AppState.currentPage = page;
+                    loadData();
+                    document.querySelector('.content-area').scrollIntoView({ behavior:'smooth' });
+                }
+            });
+        });
+    }
+
+    function renderSkeletons() {
+        const container = $('cardContainer');
+        if (AppState.viewMode === 'list') {
+            container.innerHTML = Array.from({ length:8 }, () =>
+                '<div class="skeleton-list-item">' +
+                    '<div class="skeleton skel-poster"></div>' +
+                    '<div class="skel-info">' +
+                        '<div class="skeleton skel-title"></div>' +
+                        '<div class="skeleton skel-meta"></div>' +
+                        '<div class="skeleton skel-text"></div>' +
+                    '</div>' +
+                '</div>'
+            ).join('');
+        } else {
+            container.innerHTML = '<div class="card-grid">' + Array.from({ length:8 }, () =>
+                '<div class="card-grid-item">' +
+                    '<div class="card-grid-poster-wrap"><div class="skeleton" style="width:100%;height:100%;"></div></div>' +
+                    '<div class="card-grid-info">' +
+                        '<div class="skeleton" style="height:16px;width:80%;margin-bottom:6px;"></div>' +
+                        '<div class="skeleton" style="height:12px;width:40%;"></div>' +
+                    '</div>' +
+                '</div>'
+            ).join('') + '</div>';
+        }
+    }
+
+    function renderError(err) {
+        const container = $('cardContainer');
+        const status = err.status || 0;
+        let title = '请求失败';
+        let desc = err.message || '未知错误';
+        if (status === 401) {
+            title = 'API 认证失败';
+            desc = 'TMDB Access Token 无效或已过期，请检查 Token 配置。';
+        } else if (status === 429) {
+            title = '请求过于频繁';
+            desc = '已达到 API 速率限制，请稍后重试。';
+        }
+
+        container.innerHTML =
+            '<div class="state-message">' +
+                '<div class="state-icon">⚠️</div>' +
+                '<div class="state-title">' + escapeHtml(title) + '</div>' +
+                '<div class="state-desc">' + escapeHtml(desc) + '</div>' +
+                '<button class="state-retry" onclick="loadData()">🔄 重试</button>' +
+            '</div>';
+    }
+
+    function renderEmpty() {
+        const container = $('cardContainer');
+        container.innerHTML =
+            '<div class="state-message">' +
+                '<div class="state-icon">🔍</div>' +
+                '<div class="state-title">没有找到作品</div>' +
+                '<div class="state-desc">尝试调整筛选条件或搜索关键词，可能会有新发现哦。</div>' +
+                '<button class="state-retry" onclick="resetFilters();loadData();">🔄 重置筛选</button>' +
+            '</div>';
+    }
+
+    // --- Detail Modal ---
+    async function openDetail(id) {
+        AppState.isLoading = true;
+        $('detailModal').classList.add('open');
+        $('detailModal').setAttribute('aria-hidden', 'false');
+        $('modalBody').innerHTML =
+            '<div class="state-message" style="min-height:200px;">' +
+                '<div class="skeleton" style="width:100%;height:180px;border-radius:var(--radius-lg);"></div>' +
+                '<div class="skeleton" style="width:60%;height:24px;margin-top:16px;"></div>' +
+            '</div>';
+        document.body.classList.add('modal-open');
+
+        try {
+            AppState.detailData = await fetchDetail(id);
+            renderDetailModal();
+        } catch (err) {
+            $('modalBody').innerHTML =
+                '<div class="state-message" style="min-height:200px;">' +
+                    '<div class="state-icon">⚠️</div>' +
+                    '<div class="state-title">加载详情失败</div>' +
+                    '<div class="state-desc">' + escapeHtml(err.message) + '</div>' +
+                '</div>';
+        }
+        AppState.isLoading = false;
+    }
+
+    function renderDetailModal() {
+        const d = AppState.detailData;
+        const title = d.title || d.name || 'Untitled';
+        const dateStr = d.release_date || d.first_air_date || '';
+        const year = dateStr ? dateStr.slice(0, 4) : '';
+        const runtime = d.runtime ? d.runtime + ' 分钟' : (d.episode_run_time && d.episode_run_time.length ? d.episode_run_time[0] + ' 分钟/集' : '');
+        const tagline = d.tagline || '';
+        const overview = d.overview || '暂无简介';
+        const rating = d.vote_average != null ? d.vote_average.toFixed(1) : '?';
+        const voteCount = d.vote_count || 0;
+        const genres = (d.genres || []).map(g => g.name);
+        const countries = (d.production_countries || []).map(c => c.name).join(', ') || '—';
+        const tmdbUrl = 'https://www.themoviedb.org/' + AppState.mediaType + '/' + d.id;
+        //https://api.themoviedb.org/3/discover/movie
+        //const tmdbUrl = 'https://api.themoviedb.org/3' + AppState.mediaType + '/' + d.id;
+        const status = d.status || '';
+        const seasons = d.number_of_seasons ? d.number_of_seasons + ' 季' : '';
+        const episodes = d.number_of_episodes ? d.number_of_episodes + ' 集' : '';
+
+        const crew = d.credits || {};
+        const cast = (crew.cast || []).slice(0, 10);
+        const recs = (d.recommendations && d.recommendations.results || []).slice(0, 8);
+
+        let castHtml = '';
+        if (cast.length) {
+            castHtml = '<div class="cast-grid">' + cast.map(c => {
+                const photo = c.profile_path
+                    ? '<img class="cast-photo" src="' + IMAGE_BASE + PROFILE_SIZE + c.profile_path + '" alt="' + escapeHtml(c.name) + '" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';">' +
+                      '<div class="cast-photo-placeholder" style="display:none;">👤</div>'
+                    : '<div class="cast-photo-placeholder">👤</div>';
+                return '<div class="cast-card">' + photo +
+                    '<div class="cast-name" title="' + escapeHtml(c.name) + '">' + escapeHtml(c.name) + '</div>' +
+                    '<div class="cast-character" title="' + escapeHtml(c.character || '') + '">' + escapeHtml(c.character || '—') + '</div>' +
+                '</div>';
+            }).join('') + '</div>';
+        }
+
+        let recsHtml = '';
+        if (recs.length) {
+            recsHtml = '<div class="recs-grid">' + recs.map(r => {
+                const rtitle = r.title || r.name || 'Untitled';
+                const ryear = (r.release_date || r.first_air_date || '').slice(0, 4);
+                const rposter = r.poster_path
+                    ? '<img class="rec-poster" src="' + IMAGE_BASE + POSTER_SIZES.small + r.poster_path + '" alt="' + escapeHtml(rtitle) + '" loading="lazy">'
+                    : '<div class="rec-poster" style="display:flex;align-items:center;justify-content:center;font-size:2rem;">🎬</div>';
+                return '<div class="rec-card" data-id="' + r.id + '" title="' + escapeHtml(rtitle) + '">' + rposter +
+                    '<div class="rec-title">' + escapeHtml(rtitle) + '</div>' +
+                    '<div class="rec-rating">★ ' + (r.vote_average != null ? r.vote_average.toFixed(1) : '?') + (ryear ? ' · ' + ryear : '') + '</div>' +
+                '</div>';
+            }).join('') + '</div>';
+        }
+
+        const backdropHtml = d.backdrop_path
+            ? '<img class="modal-backdrop" src="' + IMAGE_BASE + BACKDROP_SIZE + d.backdrop_path + '" alt="" onerror="this.parentElement.style.display=\'none\';">'
+            : '';
+
+        const posterHtml = d.poster_path
+            ? '<img class="modal-poster" src="' + IMAGE_BASE + POSTER_SIZES.large + d.poster_path + '" alt="' + escapeHtml(title) + '">'
+            : '';
+
+        $('modalBody').innerHTML =
+            (backdropHtml ? '<div class="modal-backdrop-wrap">' + backdropHtml + '<div class="modal-backdrop-gradient"></div></div>' : '') +
+            '<div class="modal-body">' +
+                '<div class="modal-poster-row">' +
+                    posterHtml +
+                    '<div class="modal-info">' +
+                        '<h2 class="modal-title">' + escapeHtml(title) + (year ? ' (' + year + ')' : '') + '</h2>' +
+                        (tagline ? '<p class="modal-tagline">“' + escapeHtml(tagline) + '”</p>' : '') +
+                        '<div class="modal-meta-row">' +
+                            (year ? '<span>📆 ' + year + '</span><span class="sep">|</span>' : '') +
+                            (runtime ? '<span>⏱️ ' + runtime + '</span><span class="sep">|</span>' : '') +
+                            (seasons ? '<span>📺 ' + seasons + (episodes ? ' · ' + episodes : '') + '</span><span class="sep">|</span>' : '') +
+                            '<span class="modal-rating-big">⭐ ' + rating + ' <span style="font-weight:400;font-size:0.75rem;">(' + voteCount.toLocaleString() + ' 票)</span></span>' +
+                        '</div>' +
+                        (genres.length ? '<div class="modal-genres">' + genres.map(g => '<span class="modal-genre-tag">' + escapeHtml(g) + '</span>').join('') + '</div>' : '') +
+                        '<div class="modal-meta-row" style="margin-bottom:12px;">' +
+                            '<span>🌍 国家: ' + escapeHtml(countries) + '</span>' +
+                            (status ? '<span class="sep">|</span><span>📌 ' + escapeHtml(status) + '</span>' : '') +
+                        '</div>' +
+                    '</div>' +
+                '</div>' +
+                '<div style="margin-top:16px;">' +
+                    '<div class="modal-overview-title">📖 剧情简介</div>' +
+                    '<p class="modal-overview">' + escapeHtml(overview) + '</p>' +
+                '</div>' +
+                (castHtml ? '<div class="modal-section"><div class="modal-section-title">🎭 演员阵容</div>' + castHtml + '</div>' : '') +
+                (recsHtml ? '<div class="modal-section"><div class="modal-section-title">💡 相关推荐</div>' + recsHtml + '</div>' : '') +
+                '<a class="modal-tmdb-link" href="' + escapeHtml(tmdbUrl) + '" target="_blank" rel="noopener">🔗 在 TMDB 查看完整页面 →</a>' +
+            '</div>';
+
+        // Wire up recommendation clicks
+        $('modalBody').querySelectorAll('.rec-card').forEach(card => {
+            card.addEventListener('click', (e) => {
+                e.stopPropagation();
+                openDetail(parseInt(card.dataset.id));
+            });
+        });
+    }
+
+    function closeDetail() {
+        $('detailModal').classList.remove('open');
+        $('detailModal').setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('modal-open');
+        AppState.detailData = null;
+    }
+
+    /* ============================================================
+       SECTION 6: DATA LOADING
+       ============================================================ */
+    function scheduleFilterFetch() {
+        clearTimeout(AppState.filterDebounce);
+        AppState.filterDebounce = setTimeout(() => {
+            AppState.currentPage = 1;
+            loadData();
+        }, 300);
+    }
+
+    async function loadData() {
+        // Cancel any in-flight request
+        if (AppState.abortController) {
+            AppState.abortController.abort();
+        }
+        AppState.abortController = new AbortController();
+        AppState.isLoading = true;
+        AppState.error = null;
+
+        renderSkeletons();
+        renderResultsHeader();
+        renderPagination();
+        renderActiveFilters();
+
+        try {
+            const data = AppState.searchQuery.trim()
+                ? await fetchSearch()
+                : await fetchDiscover();
+
+            AppState.results = data.results || [];
+            AppState.totalResults = data.total_results || 0;
+            AppState.totalPages = Math.min(data.total_pages || 1, 500);
+
+            if (AppState.viewMode === 'grid') renderGridView();
+            else renderListView();
+
+            renderResultsHeader();
+            renderPagination();
+            renderActiveFilters();
+        } catch (err) {
+            if (err.name === 'AbortError') return;
+            AppState.error = err;
+            renderError(err);
+            renderPagination();
+        }
+        AppState.isLoading = false;
+        AppState.abortController = null;
+    }
+
+    function resetFilters() {
+        AppState.sortBy = 'popularity.desc';
+        AppState.withGenres = [];
+        AppState.voteAverageGte = 0;
+        AppState.voteAverageLte = 10;
+        AppState.voteCountGte = 0;
+        AppState.dateGte = '';
+        AppState.dateLte = '';
+        AppState.year = '';
+        AppState.withOriginalLanguage = '';
+        AppState.region = '';
+        AppState.watchProviders = [];
+        AppState.watchRegion = '';
+        AppState.searchQuery = '';
+        AppState.currentPage = 1;
+
+        $('sortSelect').value = 'popularity.desc';
+        $('ratingMin').value = '';
+        $('ratingMax').value = '';
+        $('voteCountMin').value = '';
+        $('dateFrom').value = '';
+        $('dateTo').value = '';
+        $('yearInput').value = '';
+        $('languageSelect').value = '';
+        $('regionSelect').value = '';
+        $('watchRegionSelect').value = '';
+        $('searchInput').value = '';
+
+        renderGenreChips();
+        renderProviderChips();
+        renderActiveFilters();
+    }
+
+    /* ============================================================
+       SECTION 7: EVENT HANDLERS
+       ============================================================ */
+    function setupEvents() {
+        // Media type toggle
+        $('mediaToggle').addEventListener('click', e => {
+            const btn = e.target.closest('.media-btn');
+            if (!btn) return;
+            const type = btn.dataset.type;
+            if (type === AppState.mediaType) return;
+            AppState.mediaType = type;
+            AppState.currentPage = 1;
+            AppState.withGenres = [];
+            AppState.sortBy = 'popularity.desc';
+            document.querySelectorAll('.media-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            updateDateLabel();
+            renderSortOptions();
+            renderGenreChips();
+            renderActiveFilters();
+            loadData();
+        });
+
+        // View mode toggles
+        $('btnListView').addEventListener('click', () => {
+            AppState.viewMode = 'list';
+            $('btnListView').classList.add('active-view');
+            $('btnGridView').classList.remove('active-view');
+            if (AppState.results.length) renderListView();
+            else if (AppState.isLoading) renderSkeletons();
+        });
+        $('btnGridView').addEventListener('click', () => {
+            AppState.viewMode = 'grid';
+            $('btnGridView').classList.add('active-view');
+            $('btnListView').classList.remove('active-view');
+            if (AppState.results.length) renderGridView();
+            else if (AppState.isLoading) renderSkeletons();
+        });
+
+        // Mobile filter toggle
+        $('btnFiltersToggle').addEventListener('click', () => {
+            AppState.filtersOpen = !AppState.filtersOpen;
+            if (AppState.filtersOpen) {
+                $('filterPanel').classList.add('open');
+                $('filterOverlay').classList.add('open');
+            } else {
+                $('filterPanel').classList.remove('open');
+                $('filterOverlay').classList.remove('open');
+            }
+        });
+        $('filterOverlay').addEventListener('click', () => {
+            AppState.filtersOpen = false;
+            $('filterPanel').classList.remove('open');
+            $('filterOverlay').classList.remove('open');
+        });
+
+        // Sort change
+        $('sortSelect').addEventListener('change', () => {
+            AppState.sortBy = $('sortSelect').value;
+            scheduleFilterFetch();
+        });
+
+        // Search input (debounced)
+        $('searchInput').addEventListener('input', () => {
+            clearTimeout(AppState.searchDebounce);
+            AppState.searchDebounce = setTimeout(() => {
+                AppState.searchQuery = $('searchInput').value.trim();
+                AppState.currentPage = 1;
+                loadData();
+            }, 400);
+        });
+
+        // Filter inputs
+        $('ratingMin').addEventListener('change', () => {
+            const v = parseFloat($('ratingMin').value);
+            AppState.voteAverageGte = isNaN(v) ? 0 : Math.max(0, Math.min(10, v));
+            scheduleFilterFetch();
+        });
+        $('ratingMax').addEventListener('change', () => {
+            const v = parseFloat($('ratingMax').value);
+            AppState.voteAverageLte = isNaN(v) ? 10 : Math.max(0, Math.min(10, v));
+            scheduleFilterFetch();
+        });
+        $('voteCountMin').addEventListener('change', () => {
+            const v = parseInt($('voteCountMin').value);
+            AppState.voteCountGte = isNaN(v) ? 0 : Math.max(0, v);
+            scheduleFilterFetch();
+        });
+        $('dateFrom').addEventListener('change', () => {
+            AppState.dateGte = $('dateFrom').value;
+            scheduleFilterFetch();
+        });
+        $('dateTo').addEventListener('change', () => {
+            AppState.dateLte = $('dateTo').value;
+            scheduleFilterFetch();
+        });
+        $('yearInput').addEventListener('change', () => {
+            AppState.year = $('yearInput').value.trim();
+            scheduleFilterFetch();
+        });
+        $('languageSelect').addEventListener('change', () => {
+            AppState.withOriginalLanguage = $('languageSelect').value;
+            scheduleFilterFetch();
+        });
+        $('regionSelect').addEventListener('change', () => {
+            AppState.region = $('regionSelect').value;
+            scheduleFilterFetch();
+        });
+        $('watchRegionSelect').addEventListener('change', () => {
+            AppState.watchRegion = $('watchRegionSelect').value;
+            AppState.watchProviders = [];
+            renderProviderChips();
+            scheduleFilterFetch();
+        });
+
+        // Reset button
+        $('btnReset').addEventListener('click', () => {
+            resetFilters();
+            loadData();
+        });
+
+        // Modal close
+        $('modalClose').addEventListener('click', closeDetail);
+        $('detailModal').addEventListener('click', e => {
+            if (e.target === $('detailModal')) closeDetail();
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape' && $('detailModal').classList.contains('open')) {
+                closeDetail();
+            }
+        });
+    }
+
+    function updateDateLabel() {
+        $('dateLabel').textContent = AppState.mediaType === 'movie' ? '📅 上映日期范围' : '📅 首播日期范围';
+    }
+
+    /* ============================================================
+       SECTION 8: INITIALIZATION
+       ============================================================ */
+    async function init() {
+        setupEvents();
+
+        // Render static filter options
+        renderLanguageOptions();
+        renderRegionOptions();
+        renderWatchRegionOptions();
+        renderSortOptions();
+        updateDateLabel();
+
+        // Fetch genres (cached)
+        try {
+            const genres = await fetchGenres('movie');
+            AppState.genres.movie = genres;
+            const map = new Map();
+            genres.forEach(g => map.set(g.id, g.name));
+            AppState.genreMap.movie = map;
+        } catch (_) {
+            AppState.genres.movie = [];
+        }
+        try {
+            const tvGenres = await fetchGenres('tv');
+            AppState.genres.tv = tvGenres;
+            const map = new Map();
+            tvGenres.forEach(g => map.set(g.id, g.name));
+            AppState.genreMap.tv = map;
+        } catch (_) {
+            AppState.genres.tv = [];
+        }
+
+        renderGenreChips();
+        renderProviderChips();
+
+        // Load initial data
+        loadData();
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
