@@ -561,13 +561,16 @@
             display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;
             overflow:hidden; line-height:1.4;
         }
+        @media (max-width:768px) {
+            .card-list-overview { -webkit-line-clamp:3; }
+        }
 
         /* ============================================================
            GRID VIEW
            ============================================================ */
         .card-grid {
             display:grid;
-            grid-template-columns:repeat(auto-fill, minmax(175px, 1fr));
+            grid-template-columns:repeat(auto-fill, minmax(160px, 1fr));
             gap:var(--space-md);
         }
         .card-grid-item {
@@ -783,7 +786,7 @@
             .content-area { padding:var(--space-md); }
             .card-list-item { flex-direction:row; gap:12px; padding:12px; }
             .card-list-poster, .card-list-poster-placeholder { width:56px; height:84px; }
-            .card-grid { grid-template-columns:repeat(auto-fill, minmax(140px, 1fr)); gap:12px; }
+            .card-grid { grid-template-columns:repeat(auto-fill, minmax(130px, 1fr)); gap:12px; }
             .modal-poster-row { flex-direction:column; align-items:center; }
             .modal-poster { width:150px; }
             .modal-title { font-size:1.3rem; text-align:center; }
@@ -797,7 +800,7 @@
             .filter-sidebar { width:85vw; }
         }
         @media (max-width:480px) {
-            .card-grid { grid-template-columns:repeat(auto-fill, minmax(120px, 1fr)); gap:10px; }
+            .card-grid { grid-template-columns:repeat(3, 1fr); gap:10px; }
         }
     </style>
 </head>
@@ -868,13 +871,8 @@
                 </div>
             </div>
 
-            <!-- 筛选条件（第二组） -->
+            <!-- 筛选条件（第二组）：评分 → 票数 → 类型 → 年份 → 日期 -->
             <div class="filter-group">
-                <div class="filter-section filter-row-inline">
-                    <label class="filter-label">🏷️ 类型</label>
-                </div>
-                <div class="genre-chips" id="genreChips">加载中...</div>
-
                 <div class="filter-section filter-row-inline">
                     <label class="filter-label">⭐ 评分</label>
                     <div class="filter-row" style="flex:1;">
@@ -887,6 +885,10 @@
                     <label class="filter-label">🗳️ 票数</label>
                     <input type="number" class="filter-input" id="voteCountMin" placeholder="100" min="0">
                 </div>
+                <div class="filter-section filter-row-inline">
+                    <label class="filter-label">🏷️ 类型</label>
+                </div>
+                <div class="genre-chips" id="genreChips">加载中...</div>
                 <div class="filter-section filter-row-inline">
                     <label class="filter-label">📆 年份</label>
                     <input type="number" class="filter-input" id="yearInput" placeholder="2024" min="1900" max="2030">
@@ -1418,8 +1420,17 @@
             const rating = item.vote_average != null ? item.vote_average.toFixed(1) : '?';
             const overview = item.overview || '暂无简介';
             const posterPath = item.poster_path;
-            const genreIds = (item.genre_ids || []).slice(0, 3);
+            const genreIds = (item.genre_ids || []).slice(0, 2);
             const genreNames = genreIds.map(gid => genreMap.get(gid) || '').filter(Boolean);
+
+            // Country name helper
+            function countryName(code) {
+                const m = { US:'美国', CN:'中国', JP:'日本', KR:'韩国', GB:'英国', FR:'法国',
+                    DE:'德国', IN:'印度', HK:'香港', TW:'台湾', CA:'加拿大', AU:'澳大利亚',
+                    BR:'巴西', MX:'墨西哥', ES:'西班牙', IT:'意大利', RU:'俄罗斯', SE:'瑞典', NL:'荷兰' };
+                return m[code] || code;
+            }
+            const regionCN = lang ? countryName(langToRegion(lang)) : '—';
 
             let posterHtml;
             if (posterPath) {
@@ -1435,10 +1446,10 @@
                     '<div class="card-list-title">' + escapeHtml(title) + '</div>' +
                     '<div class="card-list-meta">' +
                         '<span>📆 ' + year + '</span>' +
-                        '<span>🌐 ' + escapeHtml(region) + '</span>' +
+                        '<span>🌐 ' + escapeHtml(regionCN) + '</span>' +
+                        (genreNames.length ? genreNames.map(g => '<span class="card-list-genre-tag" style="font-size:0.75rem;">' + escapeHtml(g) + '</span>').join('') : '') +
                         '<span class="card-list-rating">★ ' + rating + '</span>' +
                     '</div>' +
-                    (genreNames.length ? '<div class="card-list-genres">' + genreNames.map(g => '<span class="card-list-genre-tag">' + escapeHtml(g) + '</span>').join('') + '</div>' : '') +
                     '<div class="card-list-overview">' + escapeHtml(overview) + '</div>' +
                 '</div>' +
             '</div>';
@@ -1915,16 +1926,34 @@
         });
         $('voteCountMin').addEventListener('change', () => {
             const v = parseInt($('voteCountMin').value);
-            AppState.voteCountGte = isNaN(v) ? 0 : Math.max(0, v);
+            AppState.voteCountGte = isNaN(v) ? 10 : Math.max(0, v);
+            $('voteCountMin').value = AppState.voteCountGte || '';
         });
         $('dateFrom').addEventListener('change', () => {
             AppState.dateGte = $('dateFrom').value;
+            // If date range set, clear year
+            if (AppState.dateGte || AppState.dateLte) {
+                AppState.year = '';
+                $('yearInput').value = '';
+            }
         });
         $('dateTo').addEventListener('change', () => {
             AppState.dateLte = $('dateTo').value;
+            if (AppState.dateGte || AppState.dateLte) {
+                AppState.year = '';
+                $('yearInput').value = '';
+            }
         });
         $('yearInput').addEventListener('change', () => {
-            AppState.year = $('yearInput').value.trim();
+            const y = $('yearInput').value.trim();
+            AppState.year = y;
+            // If year set, auto-fill date range
+            if (y) {
+                AppState.dateGte = y + '-01-01';
+                AppState.dateLte = y + '-12-31';
+                $('dateFrom').value = AppState.dateGte;
+                $('dateTo').value = AppState.dateLte;
+            }
         });
         $('languageSelect').addEventListener('change', () => {
             AppState.withOriginalLanguage = $('languageSelect').value;
