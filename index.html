@@ -36,7 +36,7 @@
 
             --text-primary: #e8edf5;
             --text-secondary: #94a3b8;
-            --text-muted: #5f7188;
+            --text-muted: #5f7188;/*5f7188*/
             --text-slogan: #4f6180;
 
             --accent: #3b82f6;
@@ -107,7 +107,7 @@
 
             --text-primary: #1a1d24;
             --text-secondary: #5a6475;
-            --text-muted: #8a94a6;
+            --text-muted: #8a94a6;/*#8a94a6*/
             --text-slogan: #9aa5b5;
 
             --accent: #3b82f6;
@@ -172,8 +172,9 @@
             color:transparent; white-space:nowrap;
         }
         .slogan {
-            font-size:0.7rem; color:var(--text-slogan);
+            font-size:0.95rem; color:var(--text-slogan);
             white-space:nowrap; display:block;
+            text-align:center;
             transition:color var(--transition-smooth);
         }
         .header-right { display:flex; align-items:center; gap:var(--space-sm); }
@@ -226,6 +227,7 @@
         }
         .pill-btn:hover { border-color:var(--border-medium); color:var(--text-primary); }
         .pill-btn .icon { font-size:0.9rem; line-height:1; }
+        .pill-btn.active { background:var(--bg-toolbar-btn-active); color:var(--bg-toolbar-btn-active-text); border-color:var(--bg-toolbar-btn-active); }
 
         /* Pill toggle group */
         .pill-toggle {
@@ -237,8 +239,19 @@
             border:none; border-radius:0;
             background:transparent;
         }
-        .pill-toggle .pill-btn:first-child { border-radius:var(--radius-full) 0 0 var(--radius-full); }
-        .pill-toggle .pill-btn:last-child { border-radius:0 var(--radius-full) var(--radius-full) 0; }
+        .pill-toggle .pill-btn:first-child {
+            border-radius:var(--radius-full) 0 0 var(--radius-full);
+        }
+        .pill-toggle .pill-btn:last-child {
+            border-radius:0 var(--radius-full) var(--radius-full) 0;
+        }
+        /* Only 2 sub-pills: both get full half-pill rounding */
+        .pill-toggle .pill-btn.sub-pill:first-child {
+            border-radius:var(--radius-full) 0 0 var(--radius-full);
+        }
+        .pill-toggle .pill-btn.sub-pill:last-child {
+            border-radius:0 var(--radius-full) var(--radius-full) 0;
+        }
         .pill-toggle .pill-btn.active {
             background:var(--bg-toolbar-btn-active);
             color:var(--bg-toolbar-btn-active-text);
@@ -281,7 +294,7 @@
             display:flex; flex-direction:column; gap:var(--space-md);
             transition:background var(--transition-smooth), border var(--transition-smooth);
         }
-        .filter-sidebar-header { display:none; }
+        .filter-sidebar-header { display:none !important; }
         .filter-overlay { display:none; }
 
         /* Narrow/phone: sidebar slides in as drawer */
@@ -292,23 +305,10 @@
                 transform:translateX(-100%);
                 margin-top:0 !important;
                 max-height:100vh;
+                padding-top:calc(var(--header-h) + var(--toolbar-h) + var(--space-lg));
                 transition:transform 0.3s ease, background var(--transition-smooth), border var(--transition-smooth);
             }
             .filter-sidebar.open { transform:translateX(0); }
-            .filter-sidebar-header {
-                display:flex; align-items:center; justify-content:space-between;
-                margin-bottom:var(--space-md);
-                flex-shrink:0;
-            }
-            .filter-sidebar-header h3 { font-size:0.95rem; font-weight:700; }
-            .filter-sidebar-close {
-                width:30px; height:30px; border-radius:50%;
-                border:none; background:var(--bg-toolbar); color:var(--text-secondary);
-                font-size:1rem;
-                display:flex; align-items:center; justify-content:center;
-                cursor:pointer;
-            }
-            .filter-sidebar-close:hover { color:var(--text-primary); }
             .filter-overlay {
                 display:none; position:fixed; inset:0; top:0; z-index:80;
                 background:rgba(0,0,0,0.4);
@@ -323,10 +323,11 @@
             transform:translateX(-100%);
             margin-top:0 !important;
             max-height:100vh;
+            padding-top:calc(var(--header-h) + var(--toolbar-h) + var(--space-lg));
             transition:transform 0.3s ease, background var(--transition-smooth), border var(--transition-smooth);
         }
         body.phone-mode .filter-sidebar.open { transform:translateX(0); }
-        body.phone-mode .filter-sidebar-header { display:flex; }
+        body.phone-mode .filter-sidebar-header { display:none !important; }
         body.phone-mode .filter-overlay {
             display:none; position:fixed; inset:0; top:0; z-index:80;
             background:rgba(0,0,0,0.4);
@@ -345,6 +346,14 @@
             background:var(--bg-input); color:var(--text-primary);
             font-size:0.85rem; transition:var(--transition-fast);
         }
+        .filter-input::placeholder {/* 输入框提示字符 */
+            color: #909090;      /* 文字颜色 */
+            font-size: 0.75rem;             /* 字号 */
+            font-weight: 400;              /* 粗细 */
+            opacity: 0.7;                  /* 透明度 */
+            font-style: normal;            /* 去掉浏览器默认斜体 */
+            letter-spacing: 0.5px;         /* 字间距（可选） */
+        }
         .filter-select:focus, .filter-input:focus {
             outline:none; border-color:var(--accent);
             box-shadow:0 0 0 3px var(--accent-glow);
@@ -357,7 +366,7 @@
         .filter-row-inline .filter-label { white-space:nowrap; flex-shrink:0; }
         .filter-row-inline .filter-input { flex:1; min-width:0; }
 
-        .genre-chips { display:flex; flex-wrap:wrap; gap:6px; max-height:200px; overflow-y:auto; padding:2px 0; }
+        .genre-chips { display:flex; flex-wrap:wrap; gap:6px; padding:2px 0; }
         .genre-chip {
             padding:5px 12px; border-radius:var(--radius-full);
             border:1px solid var(--border-subtle);
@@ -401,6 +410,79 @@
             transition:var(--transition-fast);
         }
         .btn-secondary:hover { border-color:var(--border-medium); color:var(--text-primary); }
+
+        /* Filter top bar — frozen at top */
+        .filter-top-bar {
+            display:flex; gap:8px;
+            position:sticky; top:0; z-index:2;
+            background:var(--bg-secondary);
+            padding:0 0 8px 0;
+            flex-shrink:0;
+        }
+        .filter-top-bar .btn-primary {
+            flex:1; padding:9px; border-radius:var(--radius-md); border:none;
+            background:var(--accent); color:#fff;
+            font-size:0.85rem; font-weight:600;
+            transition:var(--transition-fast);
+        }
+        .filter-top-bar .btn-primary:hover { background:var(--accent-hover); }
+        .filter-top-bar .btn-secondary {
+            flex:0 0 90px; width:90px; padding:9px; border-radius:var(--radius-md);
+            border:1px solid var(--border-subtle);
+            background:transparent; color:var(--text-secondary);
+            font-size:0.85rem; font-weight:500;
+            transition:var(--transition-fast);
+        }
+        .filter-top-bar .btn-secondary:hover { border-color:var(--border-medium); color:var(--text-primary); }
+
+        /* Section divider — colored background block */
+        .filter-section-divider {
+            border:none; height:1px;
+            background:var(--border-subtle);
+            margin:4px 0; flex-shrink:0;
+        }
+        .filter-group {
+            background:var(--bg-tertiary);
+            border-radius:var(--radius-md);
+            padding:var(--space-md);
+            display:flex; flex-direction:column; gap:var(--space-sm);
+            margin:2px 0;
+        }
+
+        /* ============================================================
+           HERO SECTION
+           ============================================================ */
+        .hero-section {
+            display:flex; align-items:center; justify-content:center;
+            min-height:60vh; text-align:center;
+            padding:var(--space-2xl);
+        }
+        .hero-section.hidden { display:none; }
+        .hero-content {
+            max-width:480px;
+        }
+        .hero-icon { font-size:4rem; margin-bottom:var(--space-md); }
+        .hero-title {
+            font-size:2.4rem; font-weight:800; letter-spacing:-0.03em;
+            background:var(--accent-gradient);
+            -webkit-background-clip:text; background-clip:text;
+            color:transparent; margin-bottom:var(--space-sm);
+        }
+        .hero-slogan {
+            font-size:1.15rem; color:var(--text-secondary);
+            margin-bottom:var(--space-md); font-weight:500;
+        }
+        .hero-desc {
+            font-size:1.5rem; color:var(--text-muted);
+            margin-bottom:var(--space-xl); line-height:1.0;
+        }
+        .hero-start {
+            padding:14px 48px; border-radius:var(--radius-full);
+            border:none; background:var(--accent); color:#fff;
+            font-size:2.05rem; font-weight:700;
+            transition:var(--transition-fast); cursor:pointer;
+        }
+        .hero-start:hover { background:var(--accent-hover); box-shadow:0 6px 20px var(--accent-glow); transform:translateY(-2px); }
 
         /* ============================================================
            CONTENT AREA — RESULTS
@@ -689,6 +771,7 @@
            ============================================================ */
         @media (max-width:1024px) {
             .card-grid { grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); }
+            .resp-toggle { display:none; }
         }
         @media (max-width:480px) {
             .app-layout { flex-direction:column; }
@@ -762,96 +845,86 @@
 
         <!-- Filter Sidebar — sticky on desktop, slide-in drawer on mobile -->
         <aside class="filter-sidebar" id="filterSidebar">
-            <div class="filter-sidebar-header">
-                <h3>🔍 筛选排序</h3>
-                <button class="filter-sidebar-close" id="btnFilterClose">✕</button>
-            </div>
-            <!-- Apply button — frozen at top, always visible -->
-            <button class="btn-primary" id="btnApply" style="flex-shrink:0;">✅ 应用筛选</button>
-
-            <!-- Search (inline: label + input on same row) -->
-            <div class="filter-section filter-row-inline">
-                <label class="filter-label">🔍 搜索</label>
-                <input type="text" class="filter-input" id="searchInput" placeholder="关键词...">
+            <!-- Frozen top bar: 应用筛选 + 重置 -->
+            <div class="filter-top-bar">
+                <button class="btn-primary" id="btnApply" style="flex:1;">应用筛选</button>
+                <button class="btn-secondary" id="btnReset" style="flex:0 0 90px;width:90px;">重置</button>
             </div>
 
-            <!-- Sort -->
-            <div class="filter-section filter-row-inline">
-                <label class="filter-label">📊 排序</label>
-                <select class="filter-select" id="sortSelect"></select>
-            </div>
-
-
-            <!-- Rating Range -->
-            <div class="filter-section filter-row-inline">
-                <label class="filter-label">⭐ 评分</label>
-                <div class="filter-row">
-                    <input type="number" class="filter-input" id="ratingMin" placeholder="最低" min="0" max="10" step="0.5">
-                    <span style="color:var(--text-muted);align-self:center;">—</span>
-                    <input type="number" class="filter-input" id="ratingMax" placeholder="最高" min="0" max="10" step="0.5">
-                </div>
-            </div>
-
-            <!-- Minimum Votes (inline) -->
-            <div class="filter-section filter-row-inline">
-                <label class="filter-label">🗳️ 票数</label>
-                <input type="number" class="filter-input" id="voteCountMin" placeholder="100" min="0">
-            </div>
-
-            <!-- Year (inline) -->
-            <div class="filter-section filter-row-inline">
-                <label class="filter-label">📆 年份</label>
-                <input type="number" class="filter-input" id="yearInput" placeholder="2024" min="1900" max="2030">
-            </div>
-
-
-            <!-- Release Date Range -->
-            <div class="filter-section">
-                <label class="filter-label" id="dateLabel">🗓️ 上映日期范围</label>
+            <!-- 搜索 + 排序（第一组） -->
+            <div class="filter-group">
                 <div class="filter-section filter-row-inline">
-                    <input type="date" class="filter-input" id="dateFrom">
-                    <!--span style="color:var(--text-muted);align-self:center;">—</span-->
-                    <input type="date" class="filter-input" id="dateTo">
+                    <label class="filter-label">🔍 搜索</label>
+                    <input type="text" class="filter-input" id="searchInput" placeholder="关键词...">
+                </div>
+                <div class="filter-section filter-row-inline">
+                    <label class="filter-label">📊 排序</label>
+                    <select class="filter-select" id="sortSelect"></select>
                 </div>
             </div>
 
-
-            <!-- Genres -->
-            <div class="filter-section">
-                <label class="filter-label">🏷️ 类型</label>
+            <!-- 筛选条件（第二组） -->
+            <div class="filter-group">
+                <div class="filter-section filter-row-inline">
+                    <label class="filter-label">🏷️ 类型</label>
+                </div>
                 <div class="genre-chips" id="genreChips">加载中...</div>
-            </div>
 
-            
-            <!-- Original Language (inline: label + select on same row) -->
-            <div class="filter-section filter-row-inline">
-                <label class="filter-label">🌐 语言</label>
-                <select class="filter-select" id="languageSelect"></select>
-            </div>
-
-            <!-- Region (inline) -->
-            <div class="filter-section filter-row-inline">
-                <label class="filter-label">🌍 地区</label>
-                <select class="filter-select" id="regionSelect"></select>
-            </div>
-
-            <!-- Watch Providers -->
-            <div class="filter-section">
                 <div class="filter-section filter-row-inline">
-                <label class="filter-label">📡 流媒体</label>
-                <select class="filter-select" id="watchRegionSelect"></select>
+                    <label class="filter-label">⭐ 评分</label>
+                    <div class="filter-row" style="flex:1;">
+                        <input type="number" class="filter-input" id="ratingMin" placeholder="最低" min="0" max="10" step="0.5">
+                        <span style="color:var(--text-muted);align-self:center;">—</span>
+                        <input type="number" class="filter-input" id="ratingMax" placeholder="最高" min="0" max="10" step="0.5">
+                    </div>
                 </div>
-                <div class="provider-chips" id="providerChips" style="margin-top:4px;">
-                    <!--span style="font-size:0.7rem;color:var(--text-muted);">选择地区后可筛选平台</span-->
+                <div class="filter-section filter-row-inline">
+                    <label class="filter-label">🗳️ 票数</label>
+                    <input type="number" class="filter-input" id="voteCountMin" placeholder="100" min="0">
+                </div>
+                <div class="filter-section filter-row-inline">
+                    <label class="filter-label">📆 年份</label>
+                    <input type="number" class="filter-input" id="yearInput" placeholder="2024" min="1900" max="2030">
+                </div>
+                <div class="filter-section">
+                    <label class="filter-label" id="dateLabel">🗓️ 日期范围</label>
+                    <div class="filter-section filter-row-inline">
+                        <input type="date" class="filter-input" id="dateFrom">
+                        <input type="date" class="filter-input" id="dateTo">
+                    </div>
                 </div>
             </div>
 
-            <!-- Actions -->
-            <button class="btn-secondary" id="btnReset">🔄 重置筛选</button>
+            <!-- 其他（第三组） -->
+            <div class="filter-group">
+                <div class="filter-section filter-row-inline">
+                    <label class="filter-label">🌐 语言</label>
+                    <select class="filter-select" id="languageSelect"></select>
+                </div>
+                <div class="filter-section filter-row-inline">
+                    <label class="filter-label">🌍 地区</label>
+                    <select class="filter-select" id="regionSelect"></select>
+                </div>
+                <div class="filter-section">
+                    <div class="filter-section filter-row-inline">
+                        <label class="filter-label">📡 流媒体</label>
+                        <select class="filter-select" id="watchRegionSelect"></select>
+                    </div>
+                    <div class="provider-chips" id="providerChips" style="margin-top:4px;"></div>
+                </div>
+            </div>
         </aside>
 
         <main class="content-area" id="contentArea">
-            <div class="results-header" id="resultsHeader">
+            <!-- Hero section (shown on first visit before data loads) -->
+            <div class="hero-section" id="heroSection">
+                <div class="hero-content">
+                    <p class="hero-desc">发现你喜爱的电影与电视剧</p>
+                    <p class="hero-desc">强大的筛选与推荐引擎</p>
+                    <button class="hero-start" id="btnHeroStart">开始探索</button>
+                </div>
+            </div>
+            <div class="results-header" id="resultsHeader" style="display:none;">
                 <div class="results-count" id="resultsCount"></div>
                 <div class="active-filters" id="activeFilters"></div>
             </div>
@@ -1001,6 +1074,7 @@
         error: null,
         detailData: null,
         filtersOpen: false,
+        hasStarted: false,           // first visit — show hero
         theme: 'dark',
         respMode: 'desktop',       // 'desktop' | 'phone'
         abortController: null,
@@ -1082,10 +1156,6 @@
         $('filterSidebar').style.transform = '';
         $('filterSidebar').style.marginTop = '';
         $('filterSidebar').style.maxHeight = '';
-
-        // Show sidebar header only on narrow/phone
-        const hdr = $('filterSidebar').querySelector('.filter-sidebar-header');
-        if (hdr) hdr.style.display = isNarrow ? 'flex' : 'none';
 
         // Close drawer when switching modes
         $('filterSidebar').classList.remove('open');
@@ -1757,16 +1827,18 @@
 
         // Filter drawer open/close
         $('btnFilterOpen').addEventListener('click', () => {
-            AppState.filtersOpen = true;
-            $('filterSidebar').classList.add('open');
-            $('filterOverlay').classList.add('open');
+            const open = !$('filterSidebar').classList.contains('open');
+            AppState.filtersOpen = open;
+            $('filterSidebar').classList.toggle('open', open);
+            $('filterOverlay').classList.toggle('open', open);
+            $('btnFilterOpen').classList.toggle('active', open);
         });
         function closeFilterDrawer() {
             AppState.filtersOpen = false;
             $('filterSidebar').classList.remove('open');
             $('filterOverlay').classList.remove('open');
+            $('btnFilterOpen').classList.remove('active');
         }
-        $('btnFilterClose').addEventListener('click', closeFilterDrawer);
         $('filterOverlay').addEventListener('click', closeFilterDrawer);
 
         // Media type toggle (pill-toggle delegation) — immediate fetch
@@ -1855,16 +1927,22 @@
             renderProviderChips();
         });
 
-        // Reset button — immediate, doesn't need apply
+        // Reset button — only clears inputs, apply triggers fetch
         $('btnReset').addEventListener('click', () => {
             resetFilters();
-            applyFilters();
         });
 
         // Modal close
         $('modalClose').addEventListener('click', closeDetail);
         $('detailModal').addEventListener('click', e => {
             if (e.target === $('detailModal')) closeDetail();
+        });
+
+        // Hero start button
+        $('btnHeroStart').addEventListener('click', () => {
+            AppState.hasStarted = true;
+            $('heroSection').classList.add('hidden');
+            loadData();
         });
 
         // Keyboard shortcuts
@@ -1917,8 +1995,8 @@
         renderGenreChips();
         renderProviderChips();
 
-        // Load initial data
-        loadData();
+        // Load initial data — don't auto fetch, show hero instead
+        // loadData();
     }
 
     document.addEventListener('DOMContentLoaded', init);
