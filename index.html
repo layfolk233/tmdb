@@ -533,8 +533,12 @@
         .card-list-item-bg {
             position:absolute; inset:0; z-index:0;
             background-size:cover; background-position:center;
-            opacity:0.25; border-radius:var(--radius-lg);
+            opacity:0.15; border-radius:var(--radius-lg);
             pointer-events:none;
+        }
+        .card-list-item-bg-poster {
+            width:52px; height:78px; border-radius:var(--radius-sm);
+            object-fit:cover; flex-shrink:0; position:relative; z-index:1;
         }
         .card-list-item:hover {
             background:var(--bg-card-hover);
@@ -555,7 +559,7 @@
             display:flex; align-items:center; justify-content:center;
             font-size:1.2rem; color:var(--text-muted);
         }
-        .card-list-info { flex:1; min-width:0; display:flex; flex-direction:column; gap:4px; justify-content:center; }
+        .card-list-info { flex:1; min-width:0; display:flex; flex-direction:column; gap:4px; justify-content:center; position:relative; z-index:1; }
         .card-list-title { font-weight:700; font-size:1rem; color:var(--text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
         .card-list-meta { display:flex; flex-wrap:wrap; gap:8px; align-items:center; font-size:0.8rem; color:var(--text-secondary); }
         .card-list-meta span { white-space:nowrap; }
@@ -1041,10 +1045,24 @@
                 <p style="font-size:0.82rem;color:var(--text-muted);line-height:1.6;margin-bottom:var(--space-md);padding:8px 12px;background:var(--bg-chip);border-radius:var(--radius-md);">
                     ⚠️ TMDB 国内使用较少，国产作品的投票数普遍偏低，数据无法真实反映国内作品质量和知名度。建议适当调整筛选条件。
                 </p>
-                <div style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:var(--space-md);">
-                    <div style="font-weight:600;margin-bottom:6px;">🔗 推荐影视参考</div>
-                    <div><a href="https://www.imdb.com/chart/top" target="_blank" rel="noopener" style="margin-right:12px;">IMDb 电影TOP250</a><a href="https://www.imdb.com/chart/toptv/" target="_blank" rel="noopener">IMDb 剧集TOP250</a></div>
-                    <div style="margin-top:4px;"><a href="https://movie.douban.com/top250" target="_blank" rel="noopener" style="margin-right:12px;">豆瓣 电影TOP250</a><a href="https://movie.douban.com/annual/2025" target="_blank" rel="noopener">豆瓣 年度电影</a> (2017-2025)</div>
+                <div id="aboutMovieLinks" style="margin-bottom:var(--space-md);">
+                    <div id="aboutMovieLinksToggle" style="cursor:pointer;font-size:0.85rem;font-weight:600;color:var(--accent);padding:8px 12px;background:var(--bg-chip);border-radius:var(--radius-md);">&#9654; 🔗 推荐影视参考</div>
+                    <div id="aboutMovieLinksContent" style="display:none;margin-top:6px;padding:8px 12px;background:var(--bg-chip);border-radius:var(--radius-md);">
+                        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                            <a href="https://www.imdb.com/chart/top" target="_blank" rel="noopener" style="padding:4px 12px;border-radius:var(--radius-full);border:1px solid var(--border-subtle);color:var(--text-secondary);text-decoration:none;font-size:0.78rem;transition:var(--transition-fast);">IMDb 电影TOP250</a>
+                            <a href="https://www.imdb.com/chart/toptv/" target="_blank" rel="noopener" style="padding:4px 12px;border-radius:var(--radius-full);border:1px solid var(--border-subtle);color:var(--text-secondary);text-decoration:none;font-size:0.78rem;transition:var(--transition-fast);">IMDb 剧集TOP250</a>
+                            <a href="https://movie.douban.com/top250" target="_blank" rel="noopener" style="padding:4px 12px;border-radius:var(--radius-full);border:1px solid var(--border-subtle);color:var(--text-secondary);text-decoration:none;font-size:0.78rem;transition:var(--transition-fast);">豆瓣 电影TOP250</a>
+                            <a href="https://movie.douban.com/annual/2025" target="_blank" rel="noopener" style="padding:4px 12px;border-radius:var(--radius-full);border:1px solid var(--border-subtle);color:var(--text-secondary);text-decoration:none;font-size:0.78rem;transition:var(--transition-fast);">豆瓣 2025年度</a>
+                            <a href="https://movie.douban.com/annual/2024" target="_blank" rel="noopener" style="padding:4px 12px;border-radius:var(--radius-full);border:1px solid var(--border-subtle);color:var(--text-secondary);text-decoration:none;font-size:0.78rem;transition:var(--transition-fast);">豆瓣 2024年度</a>
+                            <a href="https://movie.douban.com/annual/2023" target="_blank" rel="noopener" style="padding:4px 12px;border-radius:var(--radius-full);border:1px solid var(--border-subtle);color:var(--text-secondary);text-decoration:none;font-size:0.78rem;transition:var(--transition-fast);">豆瓣 2023年度</a>
+                            <a href="https://movie.douban.com/annual/2022" target="_blank" rel="noopener" style="padding:4px 12px;border-radius:var(--radius-full);border:1px solid var(--border-subtle);color:var(--text-secondary);text-decoration:none;font-size:0.78rem;transition:var(--transition-fast);">豆瓣 2022年度</a>
+                            <a href="https://movie.douban.com/annual/2021" target="_blank" rel="noopener" style="padding:4px 12px;border-radius:var(--radius-full);border:1px solid var(--border-subtle);color:var(--text-secondary);text-decoration:none;font-size:0.78rem;transition:var(--transition-fast);">豆瓣 2021年度</a>
+                            <a href="https://movie.douban.com/annual/2020" target="_blank" rel="noopener" style="padding:4px 12px;border-radius:var(--radius-full);border:1px solid var(--border-subtle);color:var(--text-secondary);text-decoration:none;font-size:0.78rem;transition:var(--transition-fast);">豆瓣 2020年度</a>
+                            <a href="https://movie.douban.com/annual/2019" target="_blank" rel="noopener" style="padding:4px 12px;border-radius:var(--radius-full);border:1px solid var(--border-subtle);color:var(--text-secondary);text-decoration:none;font-size:0.78rem;transition:var(--transition-fast);">豆瓣 2019年度</a>
+                            <a href="https://movie.douban.com/annual/2018" target="_blank" rel="noopener" style="padding:4px 12px;border-radius:var(--radius-full);border:1px solid var(--border-subtle);color:var(--text-secondary);text-decoration:none;font-size:0.78rem;transition:var(--transition-fast);">豆瓣 2018年度</a>
+                            <a href="https://movie.douban.com/annual/2017" target="_blank" rel="noopener" style="padding:4px 12px;border-radius:var(--radius-full);border:1px solid var(--border-subtle);color:var(--text-secondary);text-decoration:none;font-size:0.78rem;transition:var(--transition-fast);">豆瓣 2017年度</a>
+                        </div>
+                    </div>
                 </div>
                 <div id="aboutRequestLog">
                     <div id="aboutRequestToggle" style="cursor:pointer;font-size:0.85rem;font-weight:600;color:var(--accent);padding:8px 0;border-top:1px solid var(--border-subtle);">&#9654; 最近请求记录（5条）</div>
@@ -1754,15 +1772,13 @@
 
             let posterHtml;
             if (bgUrl) {
-                posterHtml = '<div class="card-list-item-bg" style="background-image:url(' + bgUrl + ');"></div>'
-                    + (posterPath ? '<img class="card-list-poster" src="' + IMAGE_BASE + POSTER_SIZES.thumb + posterPath + '" alt="' + escapeHtml(title) + '" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';">'
-                    + '<div class="card-list-poster-placeholder" style="display:none;">🎬</div>' : '<div class="card-list-poster-placeholder">🎬</div>');
+                posterHtml = '<div class="card-list-item-bg" style="background-image:url(' + bgUrl + ');"></div>';
             } else {
-                posterHtml = posterPath
-                    ? '<img class="card-list-poster" src="' + IMAGE_BASE + POSTER_SIZES.thumb + posterPath + '" alt="' + escapeHtml(title) + '" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';">'
-                    + '<div class="card-list-poster-placeholder" style="display:none;">🎬</div>'
-                    : '<div class="card-list-poster-placeholder">🎬</div>';
+                posterHtml = '';
             }
+            const posterImg = posterPath
+                ? '<img class="card-list-item-bg-poster" src="' + IMAGE_BASE + POSTER_SIZES.thumb + posterPath + '" alt="' + escapeHtml(title) + '" loading="lazy">'
+                : '<div class="card-list-item-bg-poster" style="background:var(--bg-tertiary);display:flex;align-items:center;justify-content:center;font-size:1.5rem;">🎬</div>';
 
             // Vote count color
             function voteColor(n) {
@@ -1790,17 +1806,20 @@
 
             return '<div class="card-list-item" data-id="' + item.id + '" style="max-width:100%;">' +
                 posterHtml +
-                '<div class="card-list-info">' +
-                    '<div class="card-list-title" style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:4px;"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:1;min-width:0;"><span class="card-list-idx">' + index + '.</span>' + escapeHtml(title) + '</span><span style="flex-shrink:0;"><span class="card-list-rating" style="font-size:0.72rem;margin:0;">★ ' + rating + '</span></span></div>' +
-                    '<div style="font-size:0.72rem;color:var(--text-secondary);margin-bottom:2px;">' +
-                        escapeHtml(fullDate) +
-                        ' · ' + escapeHtml(langCN) +
-                        (genreNames.length ? ' · ' + genreNames.join('/') : '') +
-                        ' · 评分人数 <span style="color:' + vc + ';">' + voteCount.toLocaleString() + '</span>' +
-                        ' · 热度 ' + popularity +
+                '<div style="display:flex;gap:var(--space-sm);align-items:flex-start;position:relative;z-index:1;margin-bottom:6px;">' +
+                    posterImg +
+                    '<div style="flex:1;min-width:0;">' +
+                        '<div class="card-list-title" style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:2px;"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:1;min-width:0;"><span class="card-list-idx">' + index + '.</span>' + escapeHtml(title) + '</span><span style="flex-shrink:0;"><span class="card-list-rating" style="font-size:0.72rem;margin:0;">★ ' + rating + '</span></span></div>' +
+                        '<div style="font-size:0.72rem;color:var(--text-secondary);">' +
+                            escapeHtml(fullDate) +
+                            ' · ' + escapeHtml(langCN) +
+                            (genreNames.length ? ' · ' + genreNames.join('/') : '') +
+                            ' · 评分人数 <span style="color:' + vc + ';">' + voteCount.toLocaleString() + '</span>' +
+                            ' · 热度 ' + popularity +
+                        '</div>' +
                     '</div>' +
-                    (overview ? '<div class="card-list-overview" style="-webkit-line-clamp:unset;display:block;overflow:visible;">' + escapeHtml(overview) + '</div>' : '') +
                 '</div>' +
+                    (overview ? '<div class="card-list-overview" style="-webkit-line-clamp:unset;display:block;overflow:visible;position:relative;z-index:1;">' + escapeHtml(overview) + '</div>' : '') +
             '</div>';
         }).join('');
 
@@ -2456,6 +2475,12 @@
             list.style.display = open ? 'none' : 'block';
             this.innerHTML = open ? '▶ 最近响应记录（1条）' : '▼ 最近响应记录（1条）';
         });
+        $('aboutMovieLinksToggle').addEventListener('click', function() {
+            const list = $('aboutMovieLinksContent');
+            const open = list.style.display !== 'none';
+            list.style.display = open ? 'none' : 'block';
+            this.innerHTML = open ? '▶ 🔗 推荐影视参考' : '▼ 🔗 推荐影视参考';
+        });
         $('aboutClose').addEventListener('click', () => {
             $('aboutModal').classList.remove('open');
             $('aboutModal').setAttribute('aria-hidden', 'true');
@@ -2513,11 +2538,24 @@
             const genres = await fetchGenres('movie');
             AppState.genres.movie = genres;
             const map = new Map();
-            genres.forEach(g => map.set(g.id, g.name));
+            const genreZh = {
+                'Action':'动作', 'Adventure':'冒险', 'Animation':'动画', 'Comedy':'喜剧',
+                'Crime':'犯罪', 'Documentary':'纪录片', 'Drama':'剧情', 'Family':'家庭',
+                'Fantasy':'奇幻', 'History':'历史', 'Horror':'恐怖', 'Music':'音乐',
+                'Mystery':'悬疑', 'Romance':'爱情', 'Science Fiction':'科幻', 'TV Movie':'电视电影',
+                'Thriller':'惊悚', 'War':'战争', 'Western':'西部', 'Sci-Fi & Fantasy':'科幻奇幻',
+                'Action & Adventure':'动作冒险', 'Kids':'儿童', 'News':'新闻', 'Reality':'真人秀',
+                'Soap':'肥皂剧', 'Talk':'脱口秀', 'War & Politics':'战争政治',
+            };
+            genres.forEach(g => {
+                const zh = genreZh[g.name] || g.name;
+                g.name = zh;
+                map.set(g.id, zh);
+            });
             AppState.genreMap.movie = map;
             // Default: exclude Music (id=10499 for movie)
             const musicId = map.has(10499) ? 10499 : null;
-            if (musicId && !AppState.withoutGenres.length) AppState.withoutGenres.push(musicId);
+            if (musicId && !AppState.withoutGenres.includes(musicId)) AppState.withoutGenres.push(musicId);
         } catch (_) {
             AppState.genres.movie = [];
         }
@@ -2525,11 +2563,15 @@
             const tvGenres = await fetchGenres('tv');
             AppState.genres.tv = tvGenres;
             const map = new Map();
-            tvGenres.forEach(g => map.set(g.id, g.name));
+            tvGenres.forEach(g => {
+                const zh = genreZh[g.name] || g.name;
+                g.name = zh;
+                map.set(g.id, zh);
+            });
             AppState.genreMap.tv = map;
             // Default: exclude Music (id=10772 for tv)
             const tvMusicId = map.has(10772) ? 10772 : null;
-            if (tvMusicId && !AppState.withoutGenres.length) AppState.withoutGenres.push(tvMusicId);
+            if (tvMusicId && !AppState.withoutGenres.includes(tvMusicId)) AppState.withoutGenres.push(tvMusicId);
         } catch (_) {
             AppState.genres.tv = [];
         }
