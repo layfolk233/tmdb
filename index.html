@@ -471,7 +471,7 @@
             font-size:2.4rem; font-weight:800; letter-spacing:-0.03em;
             background:var(--accent-gradient);
             -webkit-background-clip:text; background-clip:text;
-            color:transparent; margin-bottom:18px;
+            color:transparent; margin-bottom:18px;margin-top:58px;
         }
         .hero-slogan {
             font-size:1.5rem; color:var(--text-secondary);
@@ -537,7 +537,7 @@
             pointer-events:none;
         }
         .card-list-item-bg-poster {
-            width:52px; height:78px; border-radius:var(--radius-sm);
+            width:40px; height:60px; border-radius:var(--radius-sm);
             object-fit:cover; flex-shrink:0; position:relative; z-index:1;
         }
         .card-list-item:hover {
@@ -1805,20 +1805,17 @@
 
             return '<div class="card-list-item" data-id="' + item.id + '" style="max-width:100%;flex-direction:column;">' +
                 posterHtml +
-                '<div style="display:flex;gap:var(--space-sm);align-items:flex-start;position:relative;z-index:1;margin-bottom:6px;">' +
+                '<div style="display:flex;gap:var(--space-sm);align-items:flex-start;position:relative;z-index:1;margin-bottom:4px;">' +
                     posterImg +
                     '<div style="flex:1;min-width:0;">' +
-                        '<div class="card-list-title" style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:2px;"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:1;min-width:0;"><span class="card-list-idx">' + index + '.</span>' + escapeHtml(title) + '</span><span style="flex-shrink:0;"><span class="card-list-rating" style="font-size:0.72rem;margin:0;">★ ' + rating + '</span></span></div>' +
-                        '<div style="font-size:0.72rem;color:var(--text-secondary);">' +
-                            escapeHtml(fullDate) +
-                            ' · ' + escapeHtml(langCN) +
-                            (genreNames.length ? ' · ' + genreNames.join('/') : '') +
-                            ' · 评分人数 <span style="color:' + vc + ';">' + voteCount.toLocaleString() + '</span>' +
-                            ' · 热度 ' + popularity + 
+                        '<div class="card-list-title" style="margin-bottom:2px;"><span class="card-list-idx">' + index + '.</span>' + escapeHtml(title) + '</div>' +
+                        '<div style="font-size:0.72rem;color:var(--text-secondary);line-height:1.5;">' +
+                            '<div>' + escapeHtml(fullDate) + ' · ' + escapeHtml(langCN) + (genreNames.length ? ' · ' + genreNames.join('/') : '') + '</div>' +
+                            '<div>评分人数 <span style="color:' + vc + ';">' + voteCount.toLocaleString() + '</span> · 热度 ' + popularity + ' · <span class="card-list-rating" style="font-size:0.72rem;">★ ' + rating + '</span></div>' +
                         '</div>' +
                     '</div>' +
                 '</div>' +
-                    (overview ? '<div class="card-list-overview" style="-webkit-line-clamp:unset;display:block;overflow:visible;position:relative;z-index:1;">' + escapeHtml(overview) + '</div>' : '') +
+                    (overview ? '<div class="card-list-overview" style="-webkit-line-clamp:unset;display:block;overflow:visible;position:relative;z-index:1;margin-top:2px;">' + escapeHtml(overview) + '</div>' : '') +
             '</div>';
         }).join('');
 
