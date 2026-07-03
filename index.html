@@ -897,9 +897,11 @@
             </button>
         </div>
         <div class="toolbar-center">
-            <button class="pill-btn" data-preset="hot" id="btnPresetHot">🔥 热门</button>
-            <button class="pill-btn" data-preset="high" id="btnPresetHigh">⭐ 高分</button>
-            <button class="pill-btn" data-preset="niche" id="btnPresetNiche">🎯 小众</button>
+            <div class="pill-toggle" id="presetToggle">
+                <button class="pill-btn sub-pill" data-preset="hot">热门</button>
+                <button class="pill-btn sub-pill" data-preset="high">高分</button>
+                <button class="pill-btn sub-pill" data-preset="niche">小众</button>
+            </div>
         </div>
         <div class="toolbar-right">
             <div class="pill-toggle" id="viewToggle">
@@ -1119,7 +1121,7 @@
             { value:'revenue.asc', label:'💰 票房 ↑' },
             { value:'primary_release_date.desc', label:'📅 上映日期 ↓' },
             { value:'primary_release_date.asc', label:'📅 上映日期 ↑' },
-            { value:'vote_average.desc', label:'⭐ 评分 ↓' },
+            { value:'vote_average.desc', label:'⭐ 评分 ↓（默认）' },
             { value:'vote_average.asc', label:'⭐ 评分 ↑' },
             { value:'vote_count.desc', label:'🗳️ 投票数 ↓' },
             { value:'vote_count.asc', label:'🗳️ 投票数 ↑' },
@@ -1131,7 +1133,7 @@
             { value:'popularity.asc', label:'🔥 流行度 ↑' },
             { value:'first_air_date.desc', label:'📅 首播日期 ↓' },
             { value:'first_air_date.asc', label:'📅 首播日期 ↑' },
-            { value:'vote_average.desc', label:'⭐ 评分 ↓' },
+            { value:'vote_average.desc', label:'⭐ 评分 ↓（默认）' },
             { value:'vote_average.asc', label:'⭐ 评分 ↑' },
             { value:'vote_count.desc', label:'🗳️ 投票数 ↓' },
             { value:'vote_count.asc', label:'🗳️ 投票数 ↑' },
@@ -1300,7 +1302,7 @@
         AppState.region = '';
 
         // Remove active class from all preset buttons
-        document.querySelectorAll('[data-preset]').forEach(b => b.classList.remove('active'));
+        $('presetToggle').querySelectorAll('[data-preset]').forEach(b => b.classList.remove('active'));
 
         if (preset === 'hot') {
             AppState.sortBy = 'revenue.desc';
@@ -1308,21 +1310,21 @@
             AppState.voteCountLte = 0;
             AppState.voteAverageGte = 7;
             AppState.voteAverageLte = 10;
-            $('btnPresetHot').classList.add('active');
+            $('presetToggle').querySelector('[data-preset="hot"]').classList.add('active');
         } else if (preset === 'high') {
             AppState.sortBy = 'vote_average.desc';
             AppState.voteCountGte = 500;
             AppState.voteCountLte = 0;
             AppState.voteAverageGte = 0;
             AppState.voteAverageLte = 10;
-            $('btnPresetHigh').classList.add('active');
+            $('presetToggle').querySelector('[data-preset="high"]').classList.add('active');
         } else if (preset === 'niche') {
             AppState.sortBy = 'vote_average.desc';
             AppState.voteCountGte = 500;
             AppState.voteCountLte = 5000;
             AppState.voteAverageGte = 0;
             AppState.voteAverageLte = 10;
-            $('btnPresetNiche').classList.add('active');
+            $('presetToggle').querySelector('[data-preset="niche"]').classList.add('active');
         }
 
         // Show preset label
@@ -2344,8 +2346,8 @@
         renderActiveFilters();
         // Clear preset label
         $('presetLabel').textContent = '';
-        document.querySelectorAll('[data-preset]').forEach(b => b.classList.remove('active'));
-    }
+$('presetToggle').querySelectorAll('[data-preset]').forEach(b => b.classList.remove('active'));
+}
 
     /* ============================================================
        SECTION 8: EVENT HANDLERS
@@ -2450,7 +2452,7 @@
         });
 
         // Preset buttons
-        document.querySelectorAll('[data-preset]').forEach(btn => {
+        $('presetToggle').querySelectorAll('[data-preset]').forEach(btn => {
             btn.addEventListener('click', () => applyPreset(btn.dataset.preset));
         });
 
