@@ -276,7 +276,7 @@
             min-height:calc(100vh - var(--header-h) - var(--toolbar-h));
         }
         body.phone-mode .app-layout {
-            max-width:480px; margin:0 auto;
+            max-width:450px; margin:0 auto;
         }
         .content-area {
             flex:1; padding:var(--space-lg);
@@ -333,6 +333,7 @@
         }
         body.phone-mode .filter-sidebar.open { transform:translateX(0); }
         body.phone-mode .filter-sidebar-header { display:none !important; }
+        body.phone-mode .card-list { grid-template-columns:1fr !important; }
         body.phone-mode .filter-overlay {
             display:none; position:fixed; inset:0; top:0; z-index:80;
             background:rgba(0,0,0,0.4);
@@ -537,7 +538,7 @@
             pointer-events:none;
         }
         .card-list-item-bg-poster {
-            width:40px; height:60px; border-radius:var(--radius-sm);
+            width:55px; height:80px; border-radius:var(--radius-sm);
             object-fit:cover; flex-shrink:0; position:relative; z-index:1;
         }
         .card-list-item:hover {
@@ -840,7 +841,7 @@
             .card-grid { grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); }
             .resp-toggle { display:none; }
         }
-        @media (max-width:480px) {
+        @media (max-width:450px) {
             .app-layout { flex-direction:column; }
             .content-area { padding:var(--space-md); }
             .card-list-item { flex-direction:row; gap:12px; padding:12px; }
@@ -857,9 +858,6 @@
             .pill-btn .label { display:none; }
             .pill-btn .icon { font-size:1rem; }
             .filter-sidebar { width:85vw; }
-        }
-        @media (max-width:480px) {
-            .card-grid { grid-template-columns:repeat(2, 1fr); gap:10px; }
         }
     </style>
 </head>
@@ -1037,7 +1035,7 @@
         <div class="modal-content" style="max-width:600px;">
             <button class="modal-close" id="aboutClose" aria-label="关闭">&times;</button>
             <div style="padding:var(--space-xl);">
-                <h3 style="font-size:1.2rem;font-weight:700;margin-bottom:var(--space-md);">📋 关于影觅 V0.7</h3>
+                <h3 style="font-size:1.2rem;font-weight:700;margin-bottom:var(--space-md);">关于影觅 V0.7</h3>
                 <p style="font-size:0.9rem;color:var(--text-secondary);line-height:1.7;margin-bottom:var(--space-md);">
                     数据来源于 <a href="https://www.themoviedb.org/" target="_blank" rel="noopener">TMDB</a> 的官方API。
                 </p>
@@ -1045,7 +1043,7 @@
                     ⚠️ TMDB 国内使用较少，国产作品的投票数普遍偏低，数据无法真实反映国内作品质量和知名度。建议适当调整筛选条件。
                 </p>
                 <div id="aboutMovieLinks" style="margin-bottom:var(--space-md);">
-                    <div id="aboutMovieLinksToggle" style="cursor:pointer;font-size:0.85rem;font-weight:600;color:var(--accent);padding:8px 12px;background:var(--bg-chip);border-radius:var(--radius-md);">&#9654; 🔗 推荐影视参考</div>
+                    <div id="aboutMovieLinksToggle" style="cursor:pointer;font-size:0.85rem;font-weight:600;color:var(--accent);">▶ 这些榜单也值得查阅</div>
                     <div id="aboutMovieLinksContent" style="display:none;margin-top:6px;padding:8px 12px;background:var(--bg-chip);border-radius:var(--radius-md);">
                         <div style="display:flex;flex-wrap:wrap;gap:6px;">
                             <a href="https://www.imdb.com/chart/top" target="_blank" rel="noopener" style="padding:4px 12px;border-radius:var(--radius-full);border:1px solid var(--border-subtle);color:var(--text-secondary);text-decoration:none;font-size:0.78rem;transition:var(--transition-fast);">IMDb 电影TOP250</a>
@@ -1099,6 +1097,9 @@
     const POSTER_SIZES = { thumb:'w92', small:'w185', medium:'w342', large:'w500', xlarge:'w780' };
     const BACKDROP_SIZE = 'w780';
     const PROFILE_SIZE = 'w185';
+
+    // Default excluded genre IDs: Music (movie=10402, tv=10772)
+    const EXCLUDE_MUSIC_IDS = { movie: 10402, tv: 10772 };
 
     const SORT_OPTIONS = {
         movie: [
@@ -1257,6 +1258,16 @@
 
     const $ = id => document.getElementById(id);
 
+    function applyDefaultExcludes() {
+        const mediaType = AppState.mediaType;
+        const musicId = EXCLUDE_MUSIC_IDS[mediaType];
+        const map = AppState.genreMap[mediaType];
+        // Add default music exclusion if genre map has the music ID
+        if (map && map.has(musicId) && !AppState.withoutGenres.includes(musicId)) {
+            AppState.withoutGenres.push(musicId);
+        }
+    }
+
     /* ============================================================
        SECTION 4: THEME & RESPONSIVE TOGGLE
        ============================================================ */
@@ -1361,7 +1372,7 @@
         const cloned = res.clone();
         cloned.text().then(t => {
             responseLog.length = 0;
-            responseLog.push({ url: url, body: t.substring(0, 500), time: new Date().toLocaleTimeString() });
+            responseLog.push({ url: url, body: t, time: new Date().toLocaleTimeString() });
         }).catch(() => {});
         return res.json();
     }
@@ -1803,9 +1814,9 @@
                 '<span class="detail-meta-item"><span class="detail-meta-label">' + m.label + '</span><span class="detail-meta-value">' + m.value + '</span></span>'
             ).join('');
 
-            return '<div class="card-list-item" data-id="' + item.id + '" style="max-width:100%;flex-direction:column;">' +
+            return '<div class="card-list-item" data-id="' + item.id + '" style="max-width:100%;flex-direction:column;gap:0;">' +
                 posterHtml +
-                '<div style="display:flex;gap:var(--space-sm);align-items:flex-start;position:relative;z-index:1;margin-bottom:4px;">' +
+                '<div style="display:flex;gap:var(--space-sm);align-items:flex-start;position:relative;z-index:1;">' +
                     posterImg +
                     '<div style="flex:1;min-width:0;">' +
                         '<div class="card-list-title" style="margin-bottom:2px;"><span class="card-list-idx">' + index + '.</span>' + escapeHtml(title) + '</div>' +
@@ -1815,7 +1826,7 @@
                         '</div>' +
                     '</div>' +
                 '</div>' +
-                    (overview ? '<div class="card-list-overview" style="-webkit-line-clamp:unset;display:block;overflow:visible;position:relative;z-index:1;margin-top:2px;">' + escapeHtml(overview) + '</div>' : '') +
+                (overview ? '<div style="font-size:0.72rem;color:var(--text-muted);line-height:1.5;text-indent:58px;margin-top:-14px;margin-left:5px;">' + escapeHtml(overview) + '</div>' : '') +
             '</div>';
         }).join('') + '</div>';
 
@@ -2197,11 +2208,7 @@
 
     function resetFilters() {
         AppState.withoutGenres = [];
-        // Re-add default music exclusion
-        const musicId = AppState.mediaType === 'movie' ? 10499 : 10772;
-        if (AppState.genreMap[AppState.mediaType].has(musicId)) {
-            AppState.withoutGenres.push(musicId);
-        }
+        applyDefaultExcludes();
         AppState.sortBy = 'popularity.desc';
         AppState.withGenres = [];
         AppState.voteAverageGte = 0;
@@ -2305,11 +2312,7 @@
                 AppState.sortBy = 'popularity.desc';
                 AppState.withGenres = [];
                 AppState.withoutGenres = [];
-                // Default exclude music for current media type
-                const musicId = AppState.mediaType === 'movie' ? 10499 : 10772;
-                if (AppState.genreMap[AppState.mediaType].has(musicId)) {
-                    AppState.withoutGenres.push(musicId);
-                }
+                applyDefaultExcludes();
                 AppState.voteAverageGte = 0;
                 AppState.voteAverageLte = 10;
                 AppState.voteCountGte = 100;
@@ -2487,7 +2490,7 @@
             const list = $('aboutMovieLinksContent');
             const open = list.style.display !== 'none';
             list.style.display = open ? 'none' : 'block';
-            this.innerHTML = open ? '▶ 🔗 推荐影视参考' : '▼ 🔗 推荐影视参考';
+            this.innerHTML = open ? '▶ 这些榜单也值得查阅' : '▼ 这些榜单也值得查阅';
         });
         $('aboutClose').addEventListener('click', () => {
             $('aboutModal').classList.remove('open');
@@ -2561,9 +2564,6 @@
                 map.set(g.id, zh);
             });
             AppState.genreMap.movie = map;
-            // Default: exclude Music (id=10499 for movie)
-            const musicId = map.has(10499) ? 10499 : null;
-            if (musicId && !AppState.withoutGenres.includes(musicId)) AppState.withoutGenres.push(musicId);
         } catch (_) {
             AppState.genres.movie = [];
         }
@@ -2577,12 +2577,14 @@
                 map.set(g.id, zh);
             });
             AppState.genreMap.tv = map;
-            // Default: exclude Music (id=10772 for tv)
-            const tvMusicId = map.has(10772) ? 10772 : null;
-            if (tvMusicId && !AppState.withoutGenres.includes(tvMusicId)) AppState.withoutGenres.push(tvMusicId);
         } catch (_) {
             AppState.genres.tv = [];
         }
+
+        // Apply default exclusions for current media type
+        applyDefaultExcludes();
+
+        renderGenreChips();
 
         renderGenreChips();
         renderProviderChips();
