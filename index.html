@@ -519,7 +519,7 @@
            ============================================================ */
         .card-list { display:grid; grid-template-columns:1fr; gap:var(--space-sm); }
         @media (min-width:1024px) {
-            .card-list { grid-template-columns:1fr 1fr; }
+            .card-list { grid-template-columns:1fr 1fr; gap:25px; }
         }
         .card-list-item {
             display:flex; gap:var(--space-md);
@@ -1735,7 +1735,7 @@
         }
         const genreMap = AppState.genreMap[AppState.mediaType];
         const page = AppState.currentPage;
-        container.innerHTML = AppState.results.map((item, i) => {
+        container.innerHTML = '<div class="card-list">' + AppState.results.map((item, i) => {
             const index = (page - 1) * 20 + i + 1;
             const title = item.title || item.name || 'Untitled';
             const dateStr = item.release_date || item.first_air_date || '';
@@ -1817,7 +1817,7 @@
                 '</div>' +
                     (overview ? '<div class="card-list-overview" style="-webkit-line-clamp:unset;display:block;overflow:visible;position:relative;z-index:1;margin-top:2px;">' + escapeHtml(overview) + '</div>' : '') +
             '</div>';
-        }).join('');
+        }).join('') + '</div>';
 
         container.querySelectorAll('.card-list-item').forEach(card => {
             card.addEventListener('click', () => openDetail(parseInt(card.dataset.id)));
@@ -2197,6 +2197,11 @@
 
     function resetFilters() {
         AppState.withoutGenres = [];
+        // Re-add default music exclusion
+        const musicId = AppState.mediaType === 'movie' ? 10499 : 10772;
+        if (AppState.genreMap[AppState.mediaType].has(musicId)) {
+            AppState.withoutGenres.push(musicId);
+        }
         AppState.sortBy = 'popularity.desc';
         AppState.withGenres = [];
         AppState.voteAverageGte = 0;
@@ -2275,6 +2280,7 @@
             AppState.savedFilters[AppState.mediaType] = {
                 sortBy: AppState.sortBy,
                 withGenres: [...AppState.withGenres],
+                withoutGenres: [...AppState.withoutGenres],
                 voteAverageGte: AppState.voteAverageGte,
                 voteAverageLte: AppState.voteAverageLte,
                 voteCountGte: AppState.voteCountGte,
@@ -2298,6 +2304,12 @@
             } else {
                 AppState.sortBy = 'popularity.desc';
                 AppState.withGenres = [];
+                AppState.withoutGenres = [];
+                // Default exclude music for current media type
+                const musicId = AppState.mediaType === 'movie' ? 10499 : 10772;
+                if (AppState.genreMap[AppState.mediaType].has(musicId)) {
+                    AppState.withoutGenres.push(musicId);
+                }
                 AppState.voteAverageGte = 0;
                 AppState.voteAverageLte = 10;
                 AppState.voteCountGte = 100;
