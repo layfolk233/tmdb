@@ -371,9 +371,9 @@
         .filter-row-inline .filter-label { white-space:nowrap; flex-shrink:0; }
         .filter-row-inline .filter-input { flex:1; min-width:0; }
 
-        .genre-chips { display:flex; flex-wrap:wrap; gap:6px; padding:2px 0; }
+        .genre-chips { display:flex; flex-wrap:wrap; gap:3px; padding:2px 0; }
         .genre-chip {
-            padding:5px 12px; border-radius:var(--radius-full);
+            padding:3px 8px; border-radius:var(--radius-full);
             border:1px solid var(--border-subtle);
             background:var(--bg-chip); color:var(--text-secondary);
             font-size:0.75rem; font-weight:500; cursor:pointer;
@@ -467,9 +467,8 @@
             max-width:460px;
             display:flex; flex-direction:column; align-items:center;
         }
-        .hero-icon { font-size:2.5rem; margin-bottom:8px; }
         .hero-title {
-            font-size:1.8rem; font-weight:800; letter-spacing:-0.03em;
+            font-size:2.4rem; font-weight:800; letter-spacing:-0.03em;
             background:var(--accent-gradient);
             -webkit-background-clip:text; background-clip:text;
             color:transparent; margin-bottom:8px;
@@ -479,13 +478,13 @@
             margin-bottom:8px; font-weight:500;
         }
         .hero-desc {
-            font-size:1.85rem; color:var(--text-muted);
+            font-size:0.85rem; color:var(--text-muted);
             margin-bottom:4px; line-height:1.4;
         }
         .hero-start {
             padding:8px 24px; border-radius:var(--radius-full);
             border:none; background:var(--accent); color:#fff;
-            font-size:1.9rem; font-weight:700;
+            font-size:0.9rem; font-weight:700;
             transition:var(--transition-fast); cursor:pointer;
             margin-top:8px;
         }
@@ -529,6 +528,13 @@
             cursor:pointer; transition:var(--transition-smooth);
             contain:content;
             box-shadow:var(--shadow-card);
+            position:relative; overflow:hidden;
+        }
+        .card-list-item-bg {
+            position:absolute; inset:0; z-index:0;
+            background-size:cover; background-position:center;
+            opacity:0.25; border-radius:var(--radius-lg);
+            pointer-events:none;
         }
         .card-list-item:hover {
             background:var(--bg-card-hover);
@@ -567,7 +573,7 @@
         }
         .card-list-overview {
             font-size:0.8rem; color:var(--text-muted);
-            display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical;
+            display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;
             overflow:hidden; line-height:1.4;
         }
         /* Detail meta row — fixed-width label/value pairs */
@@ -849,7 +855,7 @@
             .filter-sidebar { width:85vw; }
         }
         @media (max-width:480px) {
-            .card-grid { grid-template-columns:repeat(3, 1fr); gap:10px; }
+            .card-grid { grid-template-columns:repeat(2, 1fr); gap:10px; }
         }
     </style>
 </head>
@@ -861,7 +867,6 @@
     <header class="app-header">
         <div class="header-left">
             <span class="logo">🎬 影觅</span>
-            <span class="slogan">让好作品不再隐秘</span>
         </div>
         <div class="header-right">
             <button class="resp-toggle" id="btnRespToggle" title="切换手机/电脑视图" aria-label="切换响应式视图">📱</button>
@@ -877,13 +882,12 @@
         <div class="toolbar-left">
             <button class="pill-btn" id="btnFilterOpen">
                 <span class="icon">🔍</span>
-                <span class="label">筛选</span>
             </button>
         </div>
         <div class="toolbar-center">
             <div class="pill-toggle" id="mediaToggle">
                 <button class="pill-btn sub-pill active" data-type="movie">电影</button>
-                <button class="pill-btn sub-pill" data-type="tv">电视剧</button>
+                <button class="pill-btn sub-pill" data-type="tv">剧集</button>
             </div>
         </div>
         <div class="toolbar-right">
@@ -935,7 +939,7 @@
                 <div class="filter-section filter-row-inline">
                     <label class="filter-label">🗳️ 票数</label>
                     <div class="filter-row" style="flex:1;">
-                        <input type="number" class="filter-input" id="voteCountMin" placeholder="最少" min="0" value="10">
+                        <input type="number" class="filter-input" id="voteCountMin" placeholder="最少" min="0" value="100">
                         <span style="color:var(--text-muted);align-self:center;">—</span>
                         <input type="number" class="filter-input" id="voteCountMax" placeholder="最多" min="0">
                     </div>
@@ -944,6 +948,10 @@
                     <label class="filter-label">🏷️ 类型</label>
                 </div>
                 <div class="genre-chips" id="genreChips">加载中...</div>
+                <div class="filter-section filter-row-inline">
+                    <label class="filter-label">🚫 排除类型</label>
+                </div>
+                <div class="genre-chips" id="withoutGenreChips"></div>
                 <div class="filter-section filter-row-inline">
                     <label class="filter-label">📆 年份</label>
                     <input type="number" class="filter-input" id="yearInput" placeholder="2026" min="1900" max="2030">
@@ -993,9 +1001,11 @@
             <!-- Hero section (shown on first visit before data loads) -->
             <div class="hero-section" id="heroSection">
                 <div class="hero-content">
-                    <p class="hero-desc" style="white-space:nowrap;">强大的筛选与推荐引擎</p>
-                    <p class="hero-desc" style="white-space:nowrap;">发现你喜爱的影视剧</p>
-                    <button class="hero-start" id="btnHeroStart" style="margin-top:12px;">开始探索</button>
+                    <h1 class="hero-title">影觅</h1>
+                    <p class="hero-slogan">让好作品不再隐秘</p>
+                    <p class="hero-desc">强大的筛选引擎</p>
+                    <p class="hero-desc">发现你喜爱的影视剧</p>
+                    <button class="hero-start" id="btnHeroStart">开始探索</button>
                 </div>
             </div>
             <div class="results-header" id="resultsHeader" style="display:none;">
@@ -1024,23 +1034,44 @@
         <div class="modal-content" style="max-width:600px;">
             <button class="modal-close" id="aboutClose" aria-label="关闭">&times;</button>
             <div style="padding:var(--space-xl);">
-                <h3 style="font-size:1.2rem;font-weight:700;margin-bottom:var(--space-md);">📋 关于影觅 V0.6</h3>
-                <p style="font-size:0.9rem;color:var(--text-secondary);line-height:1.7;margin-bottom:var(--space-lg);">
-                    本网站数据来源于 <a href="https://www.themoviedb.org/" target="_blank" rel="noopener">TMDB</a>（The Movie Database）API。
+                <h3 style="font-size:1.2rem;font-weight:700;margin-bottom:var(--space-md);">📋 关于影觅 V0.7</h3>
+                <p style="font-size:0.9rem;color:var(--text-secondary);line-height:1.7;margin-bottom:var(--space-md);">
+                    数据来源于 <a href="https://www.themoviedb.org/" target="_blank" rel="noopener">TMDB</a> 的官方API。
                 </p>
+                <p style="font-size:0.82rem;color:var(--text-muted);line-height:1.6;margin-bottom:var(--space-md);padding:8px 12px;background:var(--bg-chip);border-radius:var(--radius-md);">
+                    ⚠️ TMDB 国内使用较少，国产作品的投票数普遍偏低，数据无法真实反映国内作品质量和知名度。建议适当调整筛选条件。
+                </p>
+                <div style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:var(--space-md);">
+                    <div style="font-weight:600;margin-bottom:6px;">🔗 推荐影视参考</div>
+                    <div><a href="https://www.imdb.com/chart/top" target="_blank" rel="noopener" style="margin-right:12px;">IMDb 电影TOP250</a><a href="https://www.imdb.com/chart/toptv/" target="_blank" rel="noopener">IMDb 剧集TOP250</a></div>
+                    <div style="margin-top:4px;"><a href="https://movie.douban.com/top250" target="_blank" rel="noopener" style="margin-right:12px;">豆瓣 电影TOP250</a><a href="https://movie.douban.com/annual/2025" target="_blank" rel="noopener">豆瓣 年度电影</a> (2017-2025)</div>
+                </div>
                 <div id="aboutRequestLog">
-                    <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:var(--space-sm);">最近请求记录：</p>
-                    <div id="aboutRequestList" style="font-size:0.72rem;color:var(--text-secondary);line-height:1.6;word-break:break-all;"></div>
+                    <div id="aboutRequestToggle" style="cursor:pointer;font-size:0.85rem;font-weight:600;color:var(--accent);padding:8px 0;border-top:1px solid var(--border-subtle);">&#9654; 最近请求记录（5条）</div>
+                    <div id="aboutRequestList" style="display:none;font-size:0.72rem;color:var(--text-secondary);line-height:1.6;word-break:break-all;margin-top:4px;max-height:200px;overflow-y:auto;"></div>
+                    <div id="aboutResponseToggle" style="cursor:pointer;font-size:0.85rem;font-weight:600;color:var(--accent);padding:8px 0;border-top:1px solid var(--border-subtle);margin-top:4px;">&#9654; 最近响应记录（1条）</div>
+                    <div id="aboutResponseList" style="display:none;font-size:0.72rem;color:var(--text-secondary);line-height:1.6;word-break:break-all;margin-top:4px;max-height:200px;overflow-y:auto;"></div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- ============================================================
+    PERSON MODAL
+    ============================================================ -->
+    <div class="modal-overlay" id="personModal" aria-hidden="true">
+        <div class="modal-content" style="max-width:650px;">
+            <button class="modal-close" id="personModalClose" aria-label="关闭">&times;</button>
+            <div id="personModalBody" style="padding:var(--space-lg);"></div>
+        </div>
+    </div>
+
     <script>
     /* ============================================================
-       GLOBAL — request log
+       GLOBAL — request & response log
        ============================================================ */
     const requestLog = [];
+    const responseLog = [];
 
     /* ============================================================
        SECTION 1: CONFIGURATION & CONSTANTS
@@ -1081,28 +1112,28 @@
 
     const LANGUAGES = [
         { code:'', label:'全部语言' },
-        { code:'en', label:'English' },
+        { code:'en', label:'英语' },
         { code:'zh', label:'中文' },
-        { code:'ja', label:'日本語' },
-        { code:'ko', label:'한국어' },
-        { code:'fr', label:'Français' },
-        { code:'de', label:'Deutsch' },
-        { code:'es', label:'Español' },
-        { code:'it', label:'Italiano' },
-        { code:'pt', label:'Português' },
-        { code:'ru', label:'Русский' },
-        { code:'hi', label:'हिन्दी' },
-        { code:'th', label:'ไทย' },
-        { code:'sv', label:'Svenska' },
-        { code:'da', label:'Dansk' },
-        { code:'nl', label:'Nederlands' },
-        { code:'no', label:'Norsk' },
-        { code:'fi', label:'Suomi' },
-        { code:'pl', label:'Polski' },
-        { code:'tr', label:'Türkçe' },
-        { code:'ar', label:'العربية' },
-        { code:'id', label:'Bahasa Indonesia' },
-        { code:'vi', label:'Tiếng Việt' },
+        { code:'ja', label:'日语' },
+        { code:'ko', label:'韩语' },
+        { code:'fr', label:'法语' },
+        { code:'de', label:'德语' },
+        { code:'es', label:'西班牙语' },
+        { code:'it', label:'意大利语' },
+        { code:'pt', label:'葡萄牙语' },
+        { code:'ru', label:'俄语' },
+        { code:'hi', label:'印地语' },
+        { code:'th', label:'泰语' },
+        { code:'sv', label:'瑞典语' },
+        { code:'da', label:'丹麦语' },
+        { code:'nl', label:'荷兰语' },
+        { code:'no', label:'挪威语' },
+        { code:'fi', label:'芬兰语' },
+        { code:'pl', label:'波兰语' },
+        { code:'tr', label:'土耳其语' },
+        { code:'ar', label:'阿拉伯语' },
+        { code:'id', label:'印尼语' },
+        { code:'vi', label:'越南语' },
     ];
 
     const REGIONS = [
@@ -1150,9 +1181,10 @@
         mediaType: 'movie',
         sortBy: 'popularity.desc',
         withGenres: [],
+        withoutGenres: [],
         voteAverageGte: 0,
         voteAverageLte: 10,
-        voteCountGte: 10,
+        voteCountGte: 100,
         voteCountLte: 0,
         dateGte: '',
         dateLte: '',
@@ -1180,6 +1212,11 @@
         abortController: null,
         searchDebounce: null,
         filterDebounce: null,
+        // Saved filter states per media type
+        savedFilters: {
+            movie: null,
+            tv: null,
+        },
     };
 
     /* ============================================================
@@ -1283,7 +1320,7 @@
         // Log request URL (before fetch, so even failed requests are logged)
         const fullUrl = url.toString();
         requestLog.unshift({ url: fullUrl, time: new Date().toLocaleTimeString() });
-        if (requestLog.length > 3) requestLog.length = 3;
+        if (requestLog.length > 5) requestLog.length = 5;
 
         const res = await fetch(fullUrl, {
             headers: {
@@ -1303,6 +1340,12 @@
             err.status = res.status;
             throw err;
         }
+        // Log response (only keep 1 most recent)
+        const cloned = res.clone();
+        cloned.text().then(t => {
+            responseLog.length = 0;
+            responseLog.push({ url: url, body: t.substring(0, 500), time: new Date().toLocaleTimeString() });
+        }).catch(() => {});
         return res.json();
     }
 
@@ -1326,6 +1369,7 @@
         const params = { sort_by:AppState.sortBy, page:AppState.currentPage };
 
         if (AppState.withGenres.length > 0) params.with_genres = AppState.withGenres;
+        if (AppState.withoutGenres.length > 0) params.without_genres = AppState.withoutGenres;
         if (AppState.voteAverageGte > 0) params['vote_average.gte'] = AppState.voteAverageGte;
         if (AppState.voteAverageLte < 10) params['vote_average.lte'] = AppState.voteAverageLte;
         if (AppState.voteCountGte > 0) params['vote_count.gte'] = AppState.voteCountGte;
@@ -1361,6 +1405,10 @@
         return apiFetch('/' + AppState.mediaType + '/' + id, { append_to_response:append });
     }
 
+    async function fetchPerson(personId) {
+        return apiFetch('/person/' + personId, { append_to_response:'combined_credits' });
+    }
+
     /* ============================================================
        SECTION 6: UI RENDERERS
        ============================================================ */
@@ -1392,6 +1440,24 @@
                 const idx = AppState.withGenres.indexOf(id);
                 if (idx >= 0) AppState.withGenres.splice(idx, 1);
                 else AppState.withGenres.push(id);
+                renderGenreChips();
+                renderActiveFilters();
+            });
+        });
+
+        // Also populate without-genre chips
+        const withoutContainer = $('withoutGenreChips');
+        withoutContainer.innerHTML = genres.map(g => {
+            const active = AppState.withoutGenres.includes(g.id);
+            return '<button class="genre-chip' + (active ? ' active' : '') + '" data-without-genre-id="' + g.id + '">' + escapeHtml(g.name) + '</button>';
+        }).join('');
+
+        withoutContainer.querySelectorAll('.genre-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                const id = parseInt(chip.dataset.withoutGenreId);
+                const idx = AppState.withoutGenres.indexOf(id);
+                if (idx >= 0) AppState.withoutGenres.splice(idx, 1);
+                else AppState.withoutGenres.push(id);
                 renderGenreChips();
                 renderActiveFilters();
             });
@@ -1563,11 +1629,11 @@
                     '<div class="card-list-title"><span class="card-list-idx">' + index + '.</span>' + escapeHtml(title) + '</div>' +
                     '<div class="card-list-meta">' +
                         '<span>📆 ' + year + '</span>' +
-                        ' · <span>🌐 ' + escapeHtml(langCN) + '</span>' +
-                        (genreName ? ' · <span class="card-list-genre-tag" style="font-size:0.75rem;">' + escapeHtml(genreName) + '</span>' : '') +
-                        ' · <span class="card-list-rating">★ ' + rating + '</span>' +
+                        ' <span>🌐 ' + escapeHtml(langCN) + '</span>' +
+                        (genreName ? ' <span class="card-list-genre-tag" style="font-size:0.75rem;">' + escapeHtml(genreName) + '</span>' : '') +
+                        ' <span class="card-list-rating">★ ' + rating + '</span>' +
                     '</div>' +
-                    (overview ? '<div class="card-list-overview">' + escapeHtml(overview) + '</div>' : '') +
+                    (overview ? '<div class="card-list-overview" style="-webkit-line-clamp:2;">' + escapeHtml(overview) + '</div>' : '') +
                 '</div>' +
             '</div>';
         }).join('') + '</div>';
@@ -1643,7 +1709,7 @@
             : '';
     }
 
-    // --- Detail View ("完整" view) — single column, 3-line cards, all discover fields ---
+    // --- Detail View ("完整" view) — single column, rating right aligned ---
     function renderDetailView() {
         const container = $('cardContainer');
         if (!AppState.results.length) {
@@ -1679,17 +1745,23 @@
             const popularity = item.popularity != null ? Math.round(item.popularity) : '—';
             const overview = item.overview || '';
             const posterPath = item.poster_path;
+            const backdropPath = item.backdrop_path;
             const genreIds = (item.genre_ids || []);
             const genreNames = genreIds.map(gid => genreMap.get(gid) || '').filter(Boolean);
-            const adult = item.adult ? '是' : '否';
-            const video = item.video ? '是' : '否';
+
+            // Use backdrop as background image, fallback to poster
+            const bgUrl = backdropPath ? IMAGE_BASE + 'w780' + backdropPath : (posterPath ? IMAGE_BASE + POSTER_SIZES.medium + posterPath : null);
 
             let posterHtml;
-            if (posterPath) {
-                posterHtml = '<img class="card-list-poster" src="' + IMAGE_BASE + POSTER_SIZES.thumb + posterPath + '" alt="' + escapeHtml(title) + '" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';">' +
-                    '<div class="card-list-poster-placeholder" style="display:none;">🎬</div>';
+            if (bgUrl) {
+                posterHtml = '<div class="card-list-item-bg" style="background-image:url(' + bgUrl + ');"></div>'
+                    + (posterPath ? '<img class="card-list-poster" src="' + IMAGE_BASE + POSTER_SIZES.thumb + posterPath + '" alt="' + escapeHtml(title) + '" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';">'
+                    + '<div class="card-list-poster-placeholder" style="display:none;">🎬</div>' : '<div class="card-list-poster-placeholder">🎬</div>');
             } else {
-                posterHtml = '<div class="card-list-poster-placeholder">🎬</div>';
+                posterHtml = posterPath
+                    ? '<img class="card-list-poster" src="' + IMAGE_BASE + POSTER_SIZES.thumb + posterPath + '" alt="' + escapeHtml(title) + '" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';">'
+                    + '<div class="card-list-poster-placeholder" style="display:none;">🎬</div>'
+                    : '<div class="card-list-poster-placeholder">🎬</div>';
             }
 
             // Vote count color
@@ -1709,10 +1781,8 @@
                 { label:'🌐', value:escapeHtml(langCN) },
             ];
             if (genreNames.length) {
-                metaItems.push({ label:'🏷️', value:genreNames.map(g => '<span class="card-list-genre-tag">' + escapeHtml(g) + '</span>').join(' ') });
+                metaItems.push({ label:'🏷️', value:genreNames.join('/') });
             }
-            metaItems.push({ label:'🔞', value:adult });
-            metaItems.push({ label:'📼', value:video });
 
             const metaHtml = metaItems.map(m =>
                 '<span class="detail-meta-item"><span class="detail-meta-label">' + m.label + '</span><span class="detail-meta-value">' + m.value + '</span></span>'
@@ -1721,13 +1791,13 @@
             return '<div class="card-list-item" data-id="' + item.id + '" style="max-width:100%;">' +
                 posterHtml +
                 '<div class="card-list-info">' +
-                    '<div class="card-list-title" style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:4px;"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:1;min-width:0;"><span class="card-list-idx">' + index + '.</span>' + escapeHtml(title) + '</span><span style="flex-shrink:0;white-space:nowrap;font-size:0.78rem;"><span style="font-weight:600;">⭐ ' + rating + '</span> <span style="font-weight:400;color:' + vc + ';">(' + voteCount.toLocaleString() + ' 票)</span> <span style="color:var(--text-muted);">🔥 ' + popularity + '</span></span></div>' +
+                    '<div class="card-list-title" style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:4px;"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:1;min-width:0;"><span class="card-list-idx">' + index + '.</span>' + escapeHtml(title) + '</span><span style="flex-shrink:0;"><span class="card-list-rating" style="font-size:0.72rem;margin:0;">★ ' + rating + '</span></span></div>' +
                     '<div style="font-size:0.72rem;color:var(--text-secondary);margin-bottom:2px;">' +
                         escapeHtml(fullDate) +
                         ' · ' + escapeHtml(langCN) +
-                        (genreNames.length ? ' · ' + genreNames.map(g => '<span class="card-list-genre-tag">' + escapeHtml(g) + '</span>').join(' ') : '') +
-                        ' · 成人 ' + adult +
-                        ' · 视频 ' + video +
+                        (genreNames.length ? ' · ' + genreNames.join('/') : '') +
+                        ' · 评分人数 <span style="color:' + vc + ';">' + voteCount.toLocaleString() + '</span>' +
+                        ' · 热度 ' + popularity +
                     '</div>' +
                     (overview ? '<div class="card-list-overview" style="-webkit-line-clamp:unset;display:block;overflow:visible;">' + escapeHtml(overview) + '</div>' : '') +
                 '</div>' +
@@ -1902,7 +1972,7 @@
                     ? '<img class="cast-photo" src="' + IMAGE_BASE + PROFILE_SIZE + c.profile_path + '" alt="' + escapeHtml(c.name) + '" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';">' +
                       '<div class="cast-photo-placeholder" style="display:none;">👤</div>'
                     : '<div class="cast-photo-placeholder">👤</div>';
-                return '<div class="cast-card">' + photo +
+                return '<div class="cast-card" data-person="' + c.id + '" style="cursor:pointer;">' + photo +
                     '<div class="cast-name" title="' + escapeHtml(c.name) + '">' + escapeHtml(c.name) + '</div>' +
                     '<div class="cast-character" title="' + escapeHtml(c.character || '') + '">' + escapeHtml(c.character || '—') + '</div>' +
                 '</div>';
@@ -1973,6 +2043,66 @@
                 openDetail(parseInt(card.dataset.id));
             });
         });
+
+        // Wire up cast click → person modal
+        $('modalBody').querySelectorAll('.cast-card[data-person]').forEach(card => {
+            card.addEventListener('click', (e) => {
+                e.stopPropagation();
+                openPerson(parseInt(card.dataset.person));
+            });
+        });
+    }
+
+    // --- Person Modal ---
+    function openPerson(personId) {
+        const modal = $('personModal');
+        const body = $('personModalBody');
+        modal.classList.add('open');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('modal-open');
+        body.innerHTML = '<div class="state-message" style="min-height:200px;"><div class="skeleton" style="width:100%;height:180px;border-radius:var(--radius-lg);"></div></div>';
+
+        fetchPerson(personId).then(data => {
+            const name = data.name || 'Unknown';
+            const photo = data.profile_path ? '<img src="' + IMAGE_BASE + 'w185' + data.profile_path + '" alt="' + escapeHtml(name) + '" style="width:120px;border-radius:var(--radius-md);flex-shrink:0;">' : '<div style="width:120px;height:180px;background:var(--bg-tertiary);border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;font-size:3rem;flex-shrink:0;">&#128100;</div>';
+            const dept = data.known_for_department || '';
+            const bio = data.biography || '暂无简介';
+            const birthday = data.birthday || '—';
+            const deathday = data.deathday ? ' — ' + data.deathday : '';
+            const place = data.place_of_birth || '—';
+            const alsoKnown = data.also_known_as && data.also_known_as.length ? data.also_known_as.join('、') : '—';
+            const credits = data.combined_credits || {};
+            const allCredits = (credits.cast || []).concat(credits.crew || []);
+            const knownWorks = allCredits.slice(0, 15);
+
+            body.innerHTML =
+                '<div style="display:flex;gap:var(--space-lg);align-items:flex-start;">' +
+                    photo +
+                    '<div style="flex:1;min-width:0;">' +
+                        '<h2 style="font-size:1.4rem;font-weight:800;margin-bottom:4px;">' + escapeHtml(name) + '</h2>' +
+                        (dept ? '<p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:var(--space-md);">' + escapeHtml(dept) + '</p>' : '') +
+                        '<div class="modal-info-table" style="margin-bottom:var(--space-md);">' +
+                            '<div class="info-row"><span class="info-label">&#127802; 生日</span><span class="info-value">' + escapeHtml(birthday) + escapeHtml(deathday) + '</span></div>' +
+                            '<div class="info-row"><span class="info-label">&#128205; 出生地</span><span class="info-value">' + escapeHtml(place) + '</span></div>' +
+                            '<div class="info-row"><span class="info-label">&#128221; 又名</span><span class="info-value">' + escapeHtml(alsoKnown) + '</span></div>' +
+                        '</div>' +
+                        '<div class="modal-overview-title">&#128214; 简介</div>' +
+                        '<p class="modal-overview">' + escapeHtml(bio) + '</p>' +
+                    '</div>' +
+                '</div>' +
+                (knownWorks.length ? '<div class="modal-section" style="margin-top:var(--space-md);"><div class="modal-section-title">&#127916; 代表作</div><div style="display:flex;flex-wrap:wrap;gap:6px;">' + knownWorks.map(w =>
+                    '<span style="font-size:0.75rem;padding:4px 10px;border-radius:var(--radius-full);border:1px solid var(--border-subtle);color:var(--text-secondary);">' + escapeHtml(w.title || w.name || '—') + '</span>'
+                ).join('') + '</div></div>' : '');
+        }).catch(err => {
+            body.innerHTML = '<div class="state-message"><div class="state-icon">&#9888;&#65039;</div><div class="state-title">加载失败</div><div class="state-desc">' + escapeHtml(err.message) + '</div></div>';
+        });
+    }
+
+    function closePerson() {
+        const modal = $('personModal');
+        modal.classList.remove('open');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('modal-open');
     }
 
     function closeDetail() {
@@ -2051,6 +2181,7 @@
     }
 
     function resetFilters() {
+        AppState.withoutGenres = [];
         AppState.sortBy = 'popularity.desc';
         AppState.withGenres = [];
         AppState.voteAverageGte = 0;
@@ -2071,7 +2202,7 @@
         $('sortSelect').value = 'popularity.desc';
         $('ratingMin').value = '';
         $('ratingMax').value = '';
-        $('voteCountMin').value = '10';
+        $('voteCountMin').value = '100';
         $('voteCountMax').value = '';
         $('dateFrom').value = '';
         $('dateTo').value = '';
@@ -2118,22 +2249,71 @@
         }
         $('filterOverlay').addEventListener('click', closeFilterDrawer);
 
-        // Media type toggle (pill-toggle delegation) — immediate fetch
+        // Media type toggle (pill-toggle delegation) — save/restore filter state
         $('mediaToggle').addEventListener('click', e => {
             const btn = e.target.closest('.pill-btn');
             if (!btn || !btn.dataset.type) return;
             const type = btn.dataset.type;
             if (type === AppState.mediaType) return;
+
+            // Save current filter state
+            AppState.savedFilters[AppState.mediaType] = {
+                sortBy: AppState.sortBy,
+                withGenres: [...AppState.withGenres],
+                voteAverageGte: AppState.voteAverageGte,
+                voteAverageLte: AppState.voteAverageLte,
+                voteCountGte: AppState.voteCountGte,
+                voteCountLte: AppState.voteCountLte,
+                dateGte: AppState.dateGte,
+                dateLte: AppState.dateLte,
+                year: AppState.year,
+                withOriginalLanguage: AppState.withOriginalLanguage,
+                region: AppState.region,
+                searchQuery: AppState.searchQuery,
+                currentPage: 1,
+            };
+
+            // Switch media type
             AppState.mediaType = type;
-            AppState.currentPage = 1;
-            AppState.withGenres = [];
-            AppState.sortBy = 'popularity.desc';
+
+            // Restore saved filter state or default
+            const saved = AppState.savedFilters[type];
+            if (saved) {
+                Object.assign(AppState, saved);
+            } else {
+                AppState.sortBy = 'popularity.desc';
+                AppState.withGenres = [];
+                AppState.voteAverageGte = 0;
+                AppState.voteAverageLte = 10;
+                AppState.voteCountGte = 100;
+                AppState.voteCountLte = 0;
+                AppState.dateGte = '';
+                AppState.dateLte = '';
+                AppState.year = '';
+                AppState.withOriginalLanguage = '';
+                AppState.region = '';
+                AppState.searchQuery = '';
+                AppState.currentPage = 1;
+            }
+
             $('mediaToggle').querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             updateDateLabel();
             renderSortOptions();
             renderGenreChips();
             renderActiveFilters();
+            // Sync filter input values
+            $('sortSelect').value = AppState.sortBy;
+            $('ratingMin').value = AppState.voteAverageGte || '';
+            $('ratingMax').value = AppState.voteAverageLte < 10 ? AppState.voteAverageLte : '';
+            $('voteCountMin').value = AppState.voteCountGte || '';
+            $('voteCountMax').value = AppState.voteCountLte || '';
+            $('dateFrom').value = AppState.dateGte;
+            $('dateTo').value = AppState.dateLte;
+            $('yearInput').value = AppState.year;
+            $('languageSelect').value = AppState.withOriginalLanguage;
+            $('regionSelect').value = AppState.region;
+            $('searchInput').value = AppState.searchQuery;
             loadData();
         });
 
@@ -2228,7 +2408,6 @@
             AppState.watchProviders = [];
             renderProviderChips();
         });
-
         // Reset button — only clears inputs, apply triggers fetch
         $('btnReset').addEventListener('click', () => {
             resetFilters();
@@ -2252,11 +2431,30 @@
             $('aboutModal').classList.add('open');
             $('aboutModal').setAttribute('aria-hidden', 'false');
             document.body.classList.add('modal-open');
-            // Render request log
+            $('aboutRequestList').style.display = 'none';
+            $('aboutResponseList').style.display = 'none';
+            $('aboutRequestToggle').innerHTML = '▶ 最近请求记录（5条）';
+            $('aboutResponseToggle').innerHTML = '▶ 最近响应记录（1条）';
             const list = $('aboutRequestList');
             list.innerHTML = requestLog.length
                 ? requestLog.map(r => '<div style="margin-bottom:6px;">🕐 ' + escapeHtml(r.time) + '<br>🔗 ' + escapeHtml(r.url) + '</div>').join('')
                 : '<span style="color:var(--text-muted);">暂无请求记录</span>';
+            const rlist = $('aboutResponseList');
+            rlist.innerHTML = responseLog.length
+                ? responseLog.map(r => '<div style="margin-bottom:6px;">🕐 ' + escapeHtml(r.time) + '<br>🔗 ' + escapeHtml(r.url) + '<br>📦 ' + escapeHtml(r.body) + '</div>').join('')
+                : '<span style="color:var(--text-muted);">暂无响应记录</span>';
+        });
+        $('aboutRequestToggle').addEventListener('click', function() {
+            const list = $('aboutRequestList');
+            const open = list.style.display !== 'none';
+            list.style.display = open ? 'none' : 'block';
+            this.innerHTML = open ? '▶ 最近请求记录（5条）' : '▼ 最近请求记录（5条）';
+        });
+        $('aboutResponseToggle').addEventListener('click', function() {
+            const list = $('aboutResponseList');
+            const open = list.style.display !== 'none';
+            list.style.display = open ? 'none' : 'block';
+            this.innerHTML = open ? '▶ 最近响应记录（1条）' : '▼ 最近响应记录（1条）';
         });
         $('aboutClose').addEventListener('click', () => {
             $('aboutModal').classList.remove('open');
@@ -2281,7 +2479,14 @@
                     document.body.classList.remove('modal-open');
                 }
                 else if ($('filterSidebar').classList.contains('open')) closeFilterDrawer();
+                else if ($('personModal').classList.contains('open')) closePerson();
             }
+        });
+
+        // Person modal close
+        $('personModalClose').addEventListener('click', closePerson);
+        $('personModal').addEventListener('click', e => {
+            if (e.target === $('personModal')) closePerson();
         });
     }
 
@@ -2310,6 +2515,9 @@
             const map = new Map();
             genres.forEach(g => map.set(g.id, g.name));
             AppState.genreMap.movie = map;
+            // Default: exclude Music (id=10499 for movie)
+            const musicId = map.has(10499) ? 10499 : null;
+            if (musicId && !AppState.withoutGenres.length) AppState.withoutGenres.push(musicId);
         } catch (_) {
             AppState.genres.movie = [];
         }
@@ -2319,6 +2527,9 @@
             const map = new Map();
             tvGenres.forEach(g => map.set(g.id, g.name));
             AppState.genreMap.tv = map;
+            // Default: exclude Music (id=10772 for tv)
+            const tvMusicId = map.has(10772) ? 10772 : null;
+            if (tvMusicId && !AppState.withoutGenres.length) AppState.withoutGenres.push(tvMusicId);
         } catch (_) {
             AppState.genres.tv = [];
         }
@@ -2327,7 +2538,7 @@
         renderProviderChips();
 
         // Set vote count default value in input
-        $('voteCountMin').value = '10';
+        $('voteCountMin').value = '100';
 
         // Load initial data — don't auto fetch, show hero instead
         // loadData();
